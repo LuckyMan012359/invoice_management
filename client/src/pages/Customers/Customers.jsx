@@ -36,7 +36,6 @@ export const Customers = () => {
           pageSize: customersPerPage,
           keyword: keyword,
         });
-        console.log(response, 'response.data');
 
         setFilteredCustomers(response.data.data);
 
@@ -49,12 +48,35 @@ export const Customers = () => {
     fetchData();
   }, [isChanged, keyword, currentPage, customersPerPage]);
 
+  const validatePassword = (password) => {
+    const minLength = /.{8,}/;
+    const specialChar = /[!@#$%^&*(),.?":{}|<>]/;
+    const number = /[0-9]/;
+    const upperCase = /[A-Z]/;
+    const lowerCase = /[a-z]/;
+
+    if (!minLength.test(password)) return 'Password must be at least 8 characters long.';
+    if (!specialChar.test(password)) return 'Password must include at least one special character.';
+    if (!number.test(password)) return 'Password must include at least one number.';
+    if (!upperCase.test(password)) return 'Password must include at least one uppercase letter.';
+    if (!lowerCase.test(password)) return 'Password must include at least one lowercase letter.';
+    return '';
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const passwordError = validatePassword(customer.password);
+
+    if (passwordError) {
+      toast.error(passwordError);
+
+      return;
+    }
+
     setIsChanged(false);
     if (type === 'Add') {
       const response = await axiosInstance('/customer/add_customer', 'post', customer);
-      console.log(response);
 
       if (response.status === 403 || response.status === 409) {
         toast.warning(response.data.message);
@@ -175,9 +197,19 @@ export const Customers = () => {
                   <td className='py-2 px-4'>
                     {customer.firstName} {customer.lastName}
                   </td>
-                  <td className='py-2 px-4'>{customer.totalPurchase || 0}</td>
-                  <td className='py-2 px-4'>{customer.totalPayment || 0}</td>
-                  <td className='py-2 px-4'>{customer.totalBalance || 0}</td>
+                  {customer.role === 'admin' ? (
+                    <>
+                      <td className='py-2 px-4 text-center' colSpan={3}>
+                        Admin
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className='py-2 px-4'>{customer.totalPurchase.toLocaleString() || 0}</td>
+                      <td className='py-2 px-4'>{customer.totalPayment.toLocaleString() || 0}</td>
+                      <td className='py-2 px-4'>{customer.totalBalance.toLocaleString() || 0}</td>
+                    </>
+                  )}
                   <td className='py-2 px-4 flex gap-[25px]'>
                     <button
                       className='text-gray-800 py-1 rounded mr-1 dark:text-white'

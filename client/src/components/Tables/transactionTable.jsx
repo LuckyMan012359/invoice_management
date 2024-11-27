@@ -51,7 +51,6 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
   useEffect(() => {
     const fetchUserRole = async () => {
       const userRole = await getUserRole();
-      console.log(userRole);
 
       setRole(userRole);
     };
@@ -96,7 +95,6 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
       });
 
       setTotalPages(response.data.totalPage);
-      console.log(response.data.transactions);
       setTransactionData(response.data.transactions);
     };
     fetchData();
@@ -115,7 +113,6 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     });
 
     setTotalPages(response.data.totalPage);
-    console.log(response.data.transactions);
     setTransactionData(response.data.transactions);
   };
 

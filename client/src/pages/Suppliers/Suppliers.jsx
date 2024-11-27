@@ -25,8 +25,6 @@ export const Suppliers = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log('asdf');
-
       const response = await axiosInstance('/supplier/get_suppliers', 'get', {
         pageNum: currentPage,
         pageSize: suppliersPerPage,

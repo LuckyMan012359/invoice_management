@@ -4,7 +4,6 @@ const User = require('../models/user.model');
 
 exports.createCustomer = async (req, res) => {
   const { firstName, lastName, email, phoneNumber, role, homeAddress, password } = req.body;
-  console.log(role);
 
   try {
     const existingCustomer = await User.findOne({ email }).exec();
@@ -95,8 +94,6 @@ exports.readCustomer = async (req, res) => {
       }),
     );
 
-    console.log(resultCustomer);
-
     return res.status(200).send({
       data: resultCustomer,
       meta: {
@@ -115,8 +112,6 @@ exports.readCustomer = async (req, res) => {
 exports.updateCustomer = async (req, res) => {
   const { _id, firstName, lastName, email, phoneNumber, homeAddress, password } = req.body;
 
-  console.log(req.body);
-
   try {
     const existingCustomer = await User.findOne({ _id }).exec();
     if (!existingCustomer) {
@@ -132,8 +127,6 @@ exports.updateCustomer = async (req, res) => {
     };
 
     if (password && password.trim()) {
-      console.log(123);
-
       updateFields.password = bcrypt.hashSync(password, 8);
     }
 
@@ -147,7 +140,6 @@ exports.updateCustomer = async (req, res) => {
 };
 
 exports.deleteCustomer = async (req, res) => {
-  console.log(req.query);
   const { deleteCustomerID } = req.query;
 
   try {

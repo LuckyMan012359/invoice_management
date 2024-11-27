@@ -28,8 +28,6 @@ exports.createPendingTransaction = async (req, res) => {
       pendingStatus = '2';
     }
 
-    console.log(pendingStatus);
-
     const attachments = req.files
       ? req.files.map((file) => ({
           originalname: file.originalname,
@@ -105,8 +103,6 @@ exports.createPendingTransaction = async (req, res) => {
 exports.readPendingTransaction = async (req, res) => {
   try {
     const { customer, supplier, keyword, date, pageNum, pageSize } = req.query;
-
-    console.log(req.query);
 
     const match = {};
 
@@ -304,8 +300,6 @@ exports.updatePendingTransaction = async (req, res) => {
             : Number(latestTransaction.balance) +
               Number(latestTransaction.amount) -
               Number(existingPendingTransaction.amount);
-
-        console.log(balance);
       }
 
       let attachments = latestTransaction.attachments;

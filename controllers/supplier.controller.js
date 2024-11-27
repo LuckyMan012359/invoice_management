@@ -31,8 +31,6 @@ exports.createSupplier = async (req, res) => {
 exports.readSupplier = async (req, res) => {
   const { pageNum, pageSize, keyword } = req.query;
 
-  console.log(req.query);
-
   try {
     const filter = keyword
       ? {
@@ -106,8 +104,6 @@ exports.readSupplier = async (req, res) => {
 exports.updateSupplier = async (req, res) => {
   const { _id, name, email, phoneNumber, homeAddress } = req.body;
 
-  console.log(req.body);
-
   try {
     const existingCustomer = await Supplier.findOne({ _id }).exec();
     if (!existingCustomer) {
@@ -131,7 +127,6 @@ exports.updateSupplier = async (req, res) => {
 };
 
 exports.deleteSupplier = async (req, res) => {
-  console.log(req.query);
   const { deleteSupplierID } = req.query;
 
   try {
