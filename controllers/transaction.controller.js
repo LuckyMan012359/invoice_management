@@ -253,10 +253,13 @@ exports.updateTransaction = async (req, res) => {
       return res.status(404).send({ message: 'Transaction not found.' });
     }
 
-    const latestTransaction = await Transaction.findOne({ customer_id })
+    const latestTransaction = await Transaction.findOne({
+      $and: [{ customer_id }, { created: { $lt: existingTransaction.created } }],
+    })
       .sort({ created: -1 })
-      .skip(1)
+      .skip(0)
       .limit(1);
+
     let balance = transaction_type === 'invoice' ? Number(amount) : -Number(amount);
 
     if (latestTransaction && latestTransaction._id.toString() !== transaction_id) {
@@ -307,6 +310,33 @@ exports.updateTransaction = async (req, res) => {
 
     await existingTransaction.save();
 
+    const otherTransactions = await Transaction.find({
+      $and: [
+        {
+          customer_id,
+        },
+        {
+          created: { $gt: existingTransaction.created },
+        },
+      ],
+    }).sort({ created: -1 });
+
+    otherTransactions.map(async (transaction) => {
+      if (transaction.transaction_type === 'invoice') {
+        balance += transaction.amount;
+        console.log(balance);
+
+        transaction.balance = balance;
+      } else {
+        balance -= transaction.amount;
+        console.log(balance);
+
+        transaction.balance = balance;
+      }
+
+      await transaction.save();
+    });
+
     res.status(200).send({
       message: 'Transaction updated successfully!',
       transaction: existingTransaction,
@@ -346,7 +376,45 @@ exports.deleteTransaction = async (req, res) => {
       });
     }
 
-    await Transaction.findByIdAndDelete(transaction_id);
+    const deletedTransaction = await Transaction.findByIdAndDelete(transaction_id);
+
+    const otherTransactions = await Transaction.find({
+      created: { $gt: deletedTransaction.created },
+    }).sort({ created: -1 });
+
+    if (otherTransactions && otherTransactions.length > 0) {
+      otherTransactions.map(async (transaction) => {
+        if (deletedTransaction.transaction_type === 'invoice') {
+          transaction.balance -= deletedTransaction.amount;
+        } else {
+          transaction.balance += deletedTransaction.amount;
+        }
+
+        await transaction.save();
+      });
+    } else {
+      let balance;
+
+      otherTransactions.map(async (transaction, index) => {
+        if (index === 0) {
+          balance =
+            transaction.transaction_type === 'invoice'
+              ? transaction.amount
+              : transaction.amount * -1;
+
+          transaction.balance = balance;
+        } else {
+          balance =
+            transaction.transaction_type === 'invoice'
+              ? balance + transaction.amount
+              : balance - transaction.amount;
+
+          transaction.balance = balance;
+        }
+
+        await transaction.save();
+      });
+    }
 
     res.status(200).send({
       message: 'Transaction and associated attachments deleted successfully!',

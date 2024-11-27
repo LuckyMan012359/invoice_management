@@ -327,7 +327,7 @@ const TransactionForm = ({
                 className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
                 type='file'
                 multiple
-                accept='image/*, application/pdf'
+                accept='.jpg, .jpeg, .png, .webp, .jfif, .pdf'
                 name='attachments'
               />
             </div>

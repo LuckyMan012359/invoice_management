@@ -3,6 +3,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { useEffect, useState } from 'react';
 import Datepicker from 'react-tailwindcss-datepicker';
 import axiosInstance from '../../utils/axiosInstance';
+import { LoadingOutlined } from '@ant-design/icons';
 
 import { toast } from 'react-toastify';
 
@@ -34,6 +35,8 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
 
   const [userRole, setUserRole] = useState('');
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       const role = await getUserRole();
@@ -58,6 +61,8 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+
       const response = await axiosInstance('/pending/get_pending_transactions', 'get', {
         customer: '',
         supplier: '',
@@ -69,6 +74,8 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
 
       setTotalPages(response.data.totalPage);
       setTransactionData(response.data.transactions);
+
+      setLoading(false);
     };
     fetchData();
   }, [isChanged, currentPage, transactionsPerPage]);
@@ -241,81 +248,91 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
                 <th className='p-3'>{t('Action')}</th>
               </tr>
             </thead>
-            <tbody>
-              {transactionData.map((item, index) => (
-                <tr
-                  key={item._id || `transaction-${index}`}
-                  className='border-b dark:border-gray-600 dark:text-gray-300'
-                >
-                  <td className='p-3'>{index + 1 + transactionsPerPage * (currentPage - 1)}</td>
-                  <td className='p-3'>
-                    {(() => {
-                      const date = new Date(item.transaction_date);
-                      const formattedDate = date.toISOString().split('T')[0];
-                      return formattedDate;
-                    })()}
-                  </td>
-                  <td className='p-3'>
-                    {item.customer.firstName} {item.customer.lastName}
-                  </td>
-                  <td className='p-3'>{item.supplier.name}</td>
-                  <td className='p-3'>{item.transaction_type}</td>
-                  <td className='p-3'>{item.amount.toLocaleString()}</td>
-                  <td className='p-3'>{item.notes}</td>
-                  <td className='p-3 flex flex-col'>
-                    {item.attachments.length > 0
-                      ? item.attachments.map((attachment, index) => {
-                          // Extract file name from the attachment path
-                          const fileName = attachment.split('/').pop(); // Gets the file name from the path
-                          const fileType = fileName.split('.').pop(); // Extracts the file extension
-
-                          return (
-                            <div
-                              key={index}
-                              className='text-blue-500 cursor-pointer hover:underline'
-                              onClick={() => {
-                                showModal(attachment);
-                              }}
-                            >
-                              {`Attachment-${index}(${fileType.toUpperCase()})`}{' '}
-                            </div>
-                          );
-                        })
-                      : 'No attachments'}
-                  </td>
-                  <td className='py-2 px-4'>
-                    {userRole === 'admin' ? (
-                      <>
-                        <Button
-                          color='primary'
-                          variant='solid'
-                          onClick={() => allowPendingTransaction(item._id, 'allow')}
-                        >
-                          {t('Allow')}
-                        </Button>
-                        <Button
-                          color='danger'
-                          variant='solid'
-                          onClick={() => allowPendingTransaction(item._id, 'disallow')}
-                          className='ml-[15px]'
-                        >
-                          {t('Disallow')}
-                        </Button>
-                      </>
-                    ) : (
-                      <button
-                        className='text-gray-800 py-1 rounded mr-1 dark:text-white ml-[20px]'
-                        onClick={() => {
-                          deletePendingTransaction(item._id);
-                        }}
-                      >
-                        <MdDelete />
-                      </button>
-                    )}
+            {loading === true ? (
+              <tbody>
+                <tr className='border-b dark:border-gray-600 dark:text-gray-300'>
+                  <td className='py-2 px-4 text-center h-[200px]' colSpan={10}>
+                    <LoadingOutlined className='text-[40px]' />
                   </td>
                 </tr>
-              ))}
-            </tbody>
+              </tbody>
+            ) : (
+              <tbody>
+                {transactionData.map((item, index) => (
+                  <tr
+                    key={item._id || `transaction-${index}`}
+                    className='border-b dark:border-gray-600 dark:text-gray-300'
+                  >
+                    <td className='p-3'>{index + 1 + transactionsPerPage * (currentPage - 1)}</td>
+                    <td className='p-3'>
+                      {(() => {
+                        const date = new Date(item.transaction_date);
+                        const formattedDate = date.toISOString().split('T')[0];
+                        return formattedDate;
+                      })()}
+                    </td>
+                    <td className='p-3'>
+                      {item.customer.firstName} {item.customer.lastName}
+                    </td>
+                    <td className='p-3'>{item.supplier.name}</td>
+                    <td className='p-3'>{item.transaction_type}</td>
+                    <td className='p-3'>{item.amount.toLocaleString()}</td>
+                    <td className='p-3'>{item.notes}</td>
+                    <td className='p-3 flex flex-col'>
+                      {item.attachments.length > 0
+                        ? item.attachments.map((attachment, index) => {
+                            // Extract file name from the attachment path
+                            const fileName = attachment.split('/').pop(); // Gets the file name from the path
+                            const fileType = fileName.split('.').pop(); // Extracts the file extension
+
+                            return (
+                              <div
+                                key={index}
+                                className='text-blue-500 cursor-pointer hover:underline'
+                                onClick={() => {
+                                  showModal(attachment);
+                                }}
+                              >
+                                {`Attachment-${index}(${fileType.toUpperCase()})`}{' '}
+                              </div>
+                            );
+                          })
+                        : 'No attachments'}
+                    </td>
+                    <td className='py-2 px-4'>
+                      {userRole === 'admin' ? (
+                        <>
+                          <Button
+                            color='primary'
+                            variant='solid'
+                            onClick={() => allowPendingTransaction(item._id, 'allow')}
+                          >
+                            {t('Allow')}
+                          </Button>
+                          <Button
+                            color='danger'
+                            variant='solid'
+                            onClick={() => allowPendingTransaction(item._id, 'disallow')}
+                            className='ml-[15px]'
+                          >
+                            {t('Disallow')}
+                          </Button>
+                        </>
+                      ) : (
+                        <button
+                          className='text-gray-800 py-1 rounded mr-1 dark:text-white ml-[20px]'
+                          onClick={() => {
+                            deletePendingTransaction(item._id);
+                          }}
+                        >
+                          <MdDelete />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            )}
           </table>
         </div>
 

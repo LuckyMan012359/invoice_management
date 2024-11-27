@@ -1,5 +1,4 @@
 const PendingTransaction = require('../models/pending_transaction.model');
-const transactionModel = require('../models/transaction.model');
 const Transaction = require('../models/transaction.model');
 const User = require('../models/user.model');
 const fs = require('fs');
@@ -276,31 +275,30 @@ exports.updatePendingTransaction = async (req, res) => {
 
     if (allowStatus === 'allow') {
       const latestTransaction = await Transaction.findOne({
-        customer_id: existingPendingTransaction.customer_id,
-      })
-        .sort({ created: -1 })
-        .skip(0)
-        .limit(1);
+        _id: existingPendingTransaction.original_transaction,
+      });
 
       let balance =
         existingPendingTransaction.transaction_type === 'invoice'
           ? Number(existingPendingTransaction.amount)
           : -Number(existingPendingTransaction.amount);
 
+      console.log(balance, Number(latestTransaction.balance), Number(latestTransaction.amount));
+
       if (
         latestTransaction &&
         latestTransaction._id.toString() ===
           existingPendingTransaction.original_transaction.toString()
       ) {
+        console.log(latestTransaction.transaction_type === 'invoice');
+
         balance =
           latestTransaction.transaction_type === 'invoice'
-            ? Number(latestTransaction.balance) -
-              Number(latestTransaction.amount) +
-              Number(existingPendingTransaction.amount)
-            : Number(latestTransaction.balance) +
-              Number(latestTransaction.amount) -
-              Number(existingPendingTransaction.amount);
+            ? Number(latestTransaction.balance) - Number(latestTransaction.amount) + balance
+            : Number(latestTransaction.balance) + Number(latestTransaction.amount) + balance;
       }
+
+      console.log(balance);
 
       let attachments = latestTransaction.attachments;
 
@@ -336,12 +334,39 @@ exports.updatePendingTransaction = async (req, res) => {
       latestTransaction.transaction_type = existingPendingTransaction.transaction_type;
       latestTransaction.amount = existingPendingTransaction.amount;
       latestTransaction.balance = balance;
-      latestTransaction.notes = existingPendingTransaction.notes;
+      latestTransaction.notes = '';
       latestTransaction.transaction_date = existingPendingTransaction.transaction_date;
 
       await latestTransaction.save();
 
       await PendingTransaction.findByIdAndDelete(pending_transaction_id);
+
+      const otherTransaction = await Transaction.find({
+        $and: [
+          {
+            customer_id: latestTransaction.customer_id,
+          },
+          {
+            created: { $gt: latestTransaction.created },
+          },
+        ],
+      }).sort({ created: -1 });
+
+      otherTransaction.map(async (transaction) => {
+        if (transaction.transaction_type === 'invoice') {
+          balance += transaction.amount;
+          console.log(balance);
+
+          transaction.balance = balance;
+        } else {
+          balance -= transaction.amount;
+          console.log(balance);
+
+          transaction.balance = balance;
+        }
+
+        await transaction.save();
+      });
 
       res.status(200).send({
         message: 'Allow pending transaction successfully',
