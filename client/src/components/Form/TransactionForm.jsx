@@ -25,8 +25,6 @@ const TransactionForm = ({
     const fetchData = async () => {
       const role = await getUserRole();
 
-      console.log(role);
-
       setUserRole(role);
     };
 
@@ -110,8 +108,6 @@ const TransactionForm = ({
       const formattedDate = new Date(rawDate).toISOString().split('T')[0];
       formattedData.append('transaction_date', formattedDate);
     }
-
-    console.log(e.target);
 
     if (e.target.attachments && e.target.attachments.files?.length > 0) {
       for (let i = 0; i < e.target.attachments.files.length; i++) {

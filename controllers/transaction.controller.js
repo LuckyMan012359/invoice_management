@@ -42,8 +42,6 @@ exports.createTransaction = async (req, res) => {
       attachments: attachments.map((file) => `uploads/attachments/${file.hashedName}`),
     });
 
-    console.log(transaction_date);
-
     await transaction.save();
 
     res.status(201).send({
@@ -238,8 +236,6 @@ exports.updateTransaction = async (req, res) => {
       transaction_date,
       isRemove,
     } = req.body;
-
-    console.log(transaction_id);
 
     if (
       !transaction_id ||

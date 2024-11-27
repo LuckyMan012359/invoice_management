@@ -17,11 +17,9 @@ export const Login = () => {
         email: event.target.email.value,
         password: event.target.password.value,
       });
-      console.log(response);
 
       if (response.status === 200) {
         toast.success('Login successful');
-        console.log(response);
 
         setCookie('token', response.data.accessToken, {
           expires: new Date(response.data.expires_at),

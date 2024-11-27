@@ -68,7 +68,6 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
       });
 
       setTotalPages(response.data.totalPage);
-      console.log(response.data.transactions);
       setTransactionData(response.data.transactions);
     };
     fetchData();
@@ -87,7 +86,6 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
     });
 
     setTotalPages(response.data.totalPage);
-    console.log(response.data.transactions);
     setTransactionData(response.data.transactions);
   };
 

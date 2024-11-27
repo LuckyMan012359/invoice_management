@@ -14,7 +14,6 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(cookies.token);
     if (location.pathname === '/') {
       navigate('/login');
     }
