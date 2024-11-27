@@ -1,4 +1,5 @@
 const Supplier = require('../models/supplier.model');
+const Trasnaction = require('../models/transaction.model');
 const User = require('../models/user.model');
 
 exports.createSupplier = async (req, res) => {
@@ -46,7 +47,7 @@ exports.readSupplier = async (req, res) => {
     const limit = parseInt(pageSize);
     const skip = (parseInt(pageNum) - 1) * limit;
 
-    const customers = await Supplier.find(filter)
+    const suppliers = await Supplier.find(filter)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -54,8 +55,41 @@ exports.readSupplier = async (req, res) => {
 
     const totalCount = await Supplier.find(filter).countDocuments(filter);
 
+    const resultSuppliers = await Promise.all(
+      suppliers.map(async (supplier) => {
+        const transactions = await Trasnaction.find({ supplier_id: supplier._id });
+
+        if (transactions && transactions.length > 0) {
+          const { invoiceTotal, paymentTotal } = transactions.reduce(
+            (totals, item) => {
+              if (item.transaction_type === 'invoice') {
+                totals.invoiceTotal += item.amount || 0;
+              } else {
+                totals.paymentTotal += item.amount || 0;
+              }
+              return totals;
+            },
+            { invoiceTotal: 0, paymentTotal: 0 },
+          );
+
+          supplier = supplier.toObject();
+          supplier.totalPurchase = invoiceTotal;
+          supplier.totalPayment = paymentTotal;
+          supplier.totalBalance = invoiceTotal - paymentTotal;
+        } else {
+          supplier = supplier.toObject();
+          supplier.totalPurchase = 0;
+          supplier.totalPayment = 0;
+          supplier.totalBalance = 0;
+          supplier.totalBalance = 0;
+        }
+
+        return supplier;
+      }),
+    );
+
     return res.status(200).send({
-      data: customers,
+      data: resultSuppliers,
       meta: {
         totalRecords: totalCount,
         currentPage: parseInt(pageNum),

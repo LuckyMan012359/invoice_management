@@ -175,9 +175,9 @@ export const Customers = () => {
                   <td className='py-2 px-4'>
                     {customer.firstName} {customer.lastName}
                   </td>
-                  <td className='py-2 px-4'>{customer.total_purchases || 0}</td>
-                  <td className='py-2 px-4'>{customer.total_payments || 0}</td>
-                  <td className='py-2 px-4'>{customer.balance || 0}</td>
+                  <td className='py-2 px-4'>{customer.totalPurchase || 0}</td>
+                  <td className='py-2 px-4'>{customer.totalPayment || 0}</td>
+                  <td className='py-2 px-4'>{customer.totalBalance || 0}</td>
                   <td className='py-2 px-4 flex gap-[25px]'>
                     <button
                       className='text-gray-800 py-1 rounded mr-1 dark:text-white'
