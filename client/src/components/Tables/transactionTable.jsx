@@ -5,6 +5,8 @@ import Datepicker from 'react-tailwindcss-datepicker';
 import TransactionForm from '../../components/Form/TransactionForm';
 import axiosInstance from '../../utils/axiosInstance';
 
+import { LoadingOutlined } from '@ant-design/icons';
+
 import { Modal } from 'antd';
 
 import { FaRegEdit } from 'react-icons/fa';
@@ -32,6 +34,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
   const [keyword, setKeyword] = useState('');
   const [transactionData, setTransactionData] = useState([]);
   const [transactionId, setTransactionId] = useState('');
+
+  const [loading, setLoading] = useState(false);
 
   const [transaction, setTransaction] = useState({
     date: '',
@@ -85,6 +89,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+
       const response = await axiosInstance('/transaction/get_transactions', 'get', {
         customer: '',
         supplier: '',
@@ -96,11 +102,14 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
       setTotalPages(response.data.totalPage);
       setTransactionData(response.data.transactions);
+      setLoading(false);
     };
     fetchData();
   }, [isChanged, currentPage, transactionsPerPage]);
 
   const filterData = async () => {
+    setLoading(true);
+
     const filterDate = date.endDate ? formatDate(date.endDate) : '';
 
     const response = await axiosInstance('/transaction/get_transactions', 'get', {
@@ -114,6 +123,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
     setTotalPages(response.data.totalPage);
     setTransactionData(response.data.transactions);
+    setLoading(false);
   };
 
   const deleteTransaction = async (id) => {
@@ -265,83 +275,93 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                 <th className='p-3'>{t('Action')}</th>
               </tr>
             </thead>
-            <tbody>
-              {transactionData.map((item, index) => (
-                <tr
-                  key={item._id || `transaction-${index}`}
-                  className='border-b dark:border-gray-600 dark:text-gray-300'
-                >
-                  <td className='p-3'>{index + 1 + transactionsPerPage * (currentPage - 1)}</td>
-                  <td className='p-3'>
-                    {(() => {
-                      const date = new Date(item.transaction_date);
-                      const formattedDate = date.toISOString().split('T')[0];
-                      return formattedDate;
-                    })()}
-                  </td>
-                  <td className='p-3'>
-                    {item.customer.firstName} {item.customer.lastName}
-                  </td>
-                  <td className='p-3'>{item.supplier.name}</td>
-                  <td className='p-3'>{item.transaction_type}</td>
-                  <td className='p-3'>{item.amount.toLocaleString()}</td>
-                  <td className='p-3'>{item.balance.toLocaleString()}</td>
-                  <td className='p-3'>{item.notes}</td>
-                  <td className='p-3 flex flex-col'>
-                    {item.attachments.length > 0
-                      ? item.attachments.map((attachment, index) => {
-                          const fileName = attachment.split('/').pop();
-                          const fileType = fileName.split('.').pop();
-
-                          return (
-                            <div
-                              key={index}
-                              className='text-blue-500 cursor-pointer hover:underline'
-                              onClick={() => {
-                                showModal(attachment);
-                              }}
-                            >
-                              {`Attachment-${index}(${fileType.toUpperCase()})`}{' '}
-                            </div>
-                          );
-                        })
-                      : 'No attachments'}
-                  </td>
-                  <td className='py-2 px-4'>
-                    <button
-                      className='text-gray-800 py-1 rounded mr-1 dark:text-white'
-                      onClick={() => {
-                        setType('Edit');
-                        setTransaction({
-                          date: item.transaction_date,
-                          customer: item.customer._id,
-                          supplier: item.supplier._id,
-                          transaction: item.transaction_type,
-                          amount: item.amount,
-                          balance: item.balance,
-                          note: item.notes,
-                        });
-                        setTransactionId(item._id);
-                        setShowTransactionForm(true);
-                      }}
-                    >
-                      <FaRegEdit />
-                    </button>
-
-                    {role !== 'customer' && (
-                      <button
-                        className='text-gray-800 py-1 rounded mr-1 dark:text-white ml-[20px]'
-                        onClick={() => {
-                          deleteTransaction(item._id);
-                        }}
-                      >
-                        <MdDelete />
-                      </button>
-                    )}
+            {loading === true ? (
+              <tbody>
+                <tr className='border-b dark:border-gray-600 dark:text-gray-300'>
+                  <td className='py-2 px-4 text-center h-[200px]' colSpan={10}>
+                    <LoadingOutlined className='text-[40px]' />
                   </td>
                 </tr>
-              ))}
-            </tbody>
+              </tbody>
+            ) : (
+              <tbody>
+                {transactionData.map((item, index) => (
+                  <tr
+                    key={item._id || `transaction-${index}`}
+                    className='border-b dark:border-gray-600 dark:text-gray-300'
+                  >
+                    <td className='p-3'>{index + 1 + transactionsPerPage * (currentPage - 1)}</td>
+                    <td className='p-3'>
+                      {(() => {
+                        const date = new Date(item.transaction_date);
+                        const formattedDate = date.toISOString().split('T')[0];
+                        return formattedDate;
+                      })()}
+                    </td>
+                    <td className='p-3'>
+                      {item.customer.firstName} {item.customer.lastName}
+                    </td>
+                    <td className='p-3'>{item.supplier.name}</td>
+                    <td className='p-3'>{item.transaction_type}</td>
+                    <td className='p-3'>{item.amount.toLocaleString()}</td>
+                    <td className='p-3'>{item.balance.toLocaleString()}</td>
+                    <td className='p-3'>{item.notes}</td>
+                    <td className='p-3 flex flex-col'>
+                      {item.attachments.length > 0
+                        ? item.attachments.map((attachment, index) => {
+                            const fileName = attachment.split('/').pop();
+                            const fileType = fileName.split('.').pop();
+
+                            return (
+                              <div
+                                key={index}
+                                className='text-blue-500 cursor-pointer hover:underline'
+                                onClick={() => {
+                                  showModal(attachment);
+                                }}
+                              >
+                                {`Attachment-${index}(${fileType.toUpperCase()})`}{' '}
+                              </div>
+                            );
+                          })
+                        : 'No attachments'}
+                    </td>
+                    <td className='py-2 px-4'>
+                      <button
+                        className='text-gray-800 py-1 rounded mr-1 dark:text-white'
+                        onClick={() => {
+                          setType('Edit');
+                          setTransaction({
+                            date: item.transaction_date,
+                            customer: item.customer._id,
+                            supplier: item.supplier._id,
+                            transaction: item.transaction_type,
+                            amount: item.amount,
+                            balance: item.balance,
+                            note: item.notes,
+                          });
+                          setTransactionId(item._id);
+                          setShowTransactionForm(true);
+                        }}
+                      >
+                        <FaRegEdit />
+                      </button>
+
+                      {role !== 'customer' && (
+                        <button
+                          className='text-gray-800 py-1 rounded mr-1 dark:text-white ml-[20px]'
+                          onClick={() => {
+                            deleteTransaction(item._id);
+                          }}
+                        >
+                          <MdDelete />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            )}
           </table>
         </div>
 

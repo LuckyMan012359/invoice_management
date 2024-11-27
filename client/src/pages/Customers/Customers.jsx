@@ -5,6 +5,7 @@ import { FaRegEdit } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import axiosInstance from '../../utils/axiosInstance';
 import { toast } from 'react-toastify';
+import { LoadingOutlined } from '@ant-design/icons';
 
 export const Customers = () => {
   const { t } = useTranslation();
@@ -28,8 +29,12 @@ export const Customers = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [isChanged, setIsChanged] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+
       try {
         const response = await axiosInstance('/customer/get_customers', 'get', {
           pageNum: currentPage,
@@ -40,6 +45,8 @@ export const Customers = () => {
         setFilteredCustomers(response.data.data);
 
         setTotalPages(response.data.meta.totalPages);
+
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching customers:', error.response || error.message);
       }
@@ -188,49 +195,61 @@ export const Customers = () => {
                 <th className='py-2 px-4 text-left'>{t('Actions')}</th>
               </tr>
             </thead>
-            <tbody>
-              {filteredCustomers.map((customer, index) => (
-                <tr
-                  key={customer.id || `customer-${index}`}
-                  className='border-b dark:border-gray-600 dark:text-gray-300'
-                >
-                  <td className='py-2 px-4'>
-                    {customer.firstName} {customer.lastName}
-                  </td>
-                  {customer.role === 'admin' ? (
-                    <>
-                      <td className='py-2 px-4 text-center' colSpan={3}>
-                        Admin
-                      </td>
-                    </>
-                  ) : (
-                    <>
-                      <td className='py-2 px-4'>{customer.totalPurchase.toLocaleString() || 0}</td>
-                      <td className='py-2 px-4'>{customer.totalPayment.toLocaleString() || 0}</td>
-                      <td className='py-2 px-4'>{customer.totalBalance.toLocaleString() || 0}</td>
-                    </>
-                  )}
-                  <td className='py-2 px-4 flex gap-[25px]'>
-                    <button
-                      className='text-gray-800 py-1 rounded mr-1 dark:text-white'
-                      onClick={() => {
-                        setType('Edit');
-                        setShowCustomerForm(true);
-                        setCustomer(customer);
-                      }}
-                    >
-                      <FaRegEdit />
-                    </button>
-                    <button
-                      className='text-gray-800 py-1 rounded mr-1 dark:text-white'
-                      onClick={() => deleteCustomer(customer._id)}
-                    >
-                      <MdDelete />
-                    </button>
+            {loading === true ? (
+              <tbody>
+                <tr className='border-b dark:border-gray-600 dark:text-gray-300'>
+                  <td className='py-2 px-4 text-center h-[200px]' colSpan={10}>
+                    <LoadingOutlined className='text-[40px]' />
                   </td>
                 </tr>
-              ))}
-            </tbody>
+              </tbody>
+            ) : (
+              <tbody>
+                {filteredCustomers.map((customer, index) => (
+                  <tr
+                    key={customer.id || `customer-${index}`}
+                    className='border-b dark:border-gray-600 dark:text-gray-300'
+                  >
+                    <td className='py-2 px-4'>
+                      {customer.firstName} {customer.lastName}
+                    </td>
+                    {customer.role === 'admin' ? (
+                      <>
+                        <td className='py-2 px-4 text-center' colSpan={3}>
+                          Admin
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td className='py-2 px-4'>
+                          {customer.totalPurchase.toLocaleString() || 0}
+                        </td>
+                        <td className='py-2 px-4'>{customer.totalPayment.toLocaleString() || 0}</td>
+                        <td className='py-2 px-4'>{customer.totalBalance.toLocaleString() || 0}</td>
+                      </>
+                    )}
+                    <td className='py-2 px-4 flex gap-[25px]'>
+                      <button
+                        className='text-gray-800 py-1 rounded mr-1 dark:text-white'
+                        onClick={() => {
+                          setType('Edit');
+                          setShowCustomerForm(true);
+                          setCustomer(customer);
+                        }}
+                      >
+                        <FaRegEdit />
+                      </button>
+                      <button
+                        className='text-gray-800 py-1 rounded mr-1 dark:text-white'
+                        onClick={() => deleteCustomer(customer._id)}
+                      >
+                        <MdDelete />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            )}
           </table>
         </div>
 

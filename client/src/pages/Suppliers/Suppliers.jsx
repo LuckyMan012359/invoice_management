@@ -5,6 +5,7 @@ import { MdDelete } from 'react-icons/md';
 import axiosInstance from '../../utils/axiosInstance';
 import { toast } from 'react-toastify';
 import SupplierForm from '../../components/Form/SupplierForm';
+import { LoadingOutlined } from '@ant-design/icons';
 
 export const Suppliers = () => {
   const { t } = useTranslation();
@@ -23,8 +24,12 @@ export const Suppliers = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [isChanged, setIsChanged] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+
       const response = await axiosInstance('/supplier/get_suppliers', 'get', {
         pageNum: currentPage,
         pageSize: suppliersPerPage,
@@ -33,6 +38,8 @@ export const Suppliers = () => {
       setFilteredSuppliers(response.data.data);
 
       setTotalPages(response.data.meta.totalPages);
+
+      setLoading(false);
     };
 
     fetchData();
@@ -149,34 +156,47 @@ export const Suppliers = () => {
                 <th className='py-2 px-4 text-left'>{t('Actions')}</th>
               </tr>
             </thead>
-            <tbody>
-              {filteredSuppliers.map((supplier) => (
-                <tr key={supplier.id} className='border-b dark:border-gray-600 dark:text-gray-300'>
-                  <td className='py-2 px-4'>{supplier.name}</td>
-                  <td className='py-2 px-4'>{supplier.totalPurchase}</td>
-                  <td className='py-2 px-4'>{supplier.totalPayment}</td>
-                  <td className='py-2 px-4'>{supplier.totalBalance}</td>
-                  <td className='py-2 px-4 flex gap-[20px]'>
-                    <button
-                      className='text-gray-800 py-1 rounded mr-1 dark:text-white'
-                      onClick={() => {
-                        setType('Edit');
-                        setShowSupplierForm(true);
-                        setSupplier(supplier);
-                      }}
-                    >
-                      <FaRegEdit />
-                    </button>
-                    <button
-                      className='text-gray-800 py-1 rounded mr-1 dark:text-white'
-                      onClick={() => deleteSupplier(supplier._id)}
-                    >
-                      <MdDelete />
-                    </button>
+            {loading === true ? (
+              <tbody>
+                <tr className='border-b dark:border-gray-600 dark:text-gray-300'>
+                  <td className='py-2 px-4 text-center h-[200px]' colSpan={10}>
+                    <LoadingOutlined className='text-[40px]' />
                   </td>
                 </tr>
-              ))}
-            </tbody>
+              </tbody>
+            ) : (
+              <tbody>
+                {filteredSuppliers.map((supplier) => (
+                  <tr
+                    key={supplier.id}
+                    className='border-b dark:border-gray-600 dark:text-gray-300'
+                  >
+                    <td className='py-2 px-4'>{supplier.name}</td>
+                    <td className='py-2 px-4'>{supplier.totalPurchase}</td>
+                    <td className='py-2 px-4'>{supplier.totalPayment}</td>
+                    <td className='py-2 px-4'>{supplier.totalBalance}</td>
+                    <td className='py-2 px-4 flex gap-[20px]'>
+                      <button
+                        className='text-gray-800 py-1 rounded mr-1 dark:text-white'
+                        onClick={() => {
+                          setType('Edit');
+                          setShowSupplierForm(true);
+                          setSupplier(supplier);
+                        }}
+                      >
+                        <FaRegEdit />
+                      </button>
+                      <button
+                        className='text-gray-800 py-1 rounded mr-1 dark:text-white'
+                        onClick={() => deleteSupplier(supplier._id)}
+                      >
+                        <MdDelete />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            )}
           </table>
         </div>
 
