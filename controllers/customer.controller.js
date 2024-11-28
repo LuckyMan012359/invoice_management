@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const Trasnaction = require('../models/transaction.model');
+const Transaction = require('../models/transaction.model');
 const User = require('../models/user.model');
 
 exports.createCustomer = async (req, res) => {
@@ -63,7 +63,7 @@ exports.readCustomer = async (req, res) => {
 
     const resultCustomer = await Promise.all(
       customers.map(async (customer) => {
-        const transactions = await Trasnaction.find({ customer_id: customer._id });
+        const transactions = await Transaction.find({ customer_id: customer._id });
 
         if (transactions && transactions.length > 0) {
           const { invoiceTotal, paymentTotal } = transactions.reduce(
@@ -169,8 +169,41 @@ exports.readOnlyCustomer = async (req, res) => {
 
     const customers = await User.find(filter).exec();
 
+    const resultCustomer = await Promise.all(
+      customers.map(async (customer) => {
+        const transactions = await Transaction.find({ customer_id: customer._id });
+
+        if (transactions && transactions.length > 0) {
+          const { invoiceTotal, paymentTotal } = transactions.reduce(
+            (totals, item) => {
+              if (item.transaction_type === 'invoice') {
+                totals.invoiceTotal += item.amount || 0;
+              } else {
+                totals.paymentTotal += item.amount || 0;
+              }
+              return totals;
+            },
+            { invoiceTotal: 0, paymentTotal: 0 },
+          );
+
+          customer = customer.toObject();
+          customer.totalPurchase = invoiceTotal;
+          customer.totalPayment = paymentTotal;
+          customer.totalBalance = invoiceTotal - paymentTotal;
+        } else {
+          customer = customer.toObject();
+          customer.totalPurchase = 0;
+          customer.totalPayment = 0;
+          customer.totalBalance = 0;
+          customer.totalBalance = 0;
+        }
+
+        return customer;
+      }),
+    );
+
     return res.status(200).send({
-      data: customers,
+      data: resultCustomer,
     });
   } catch (error) {
     console.error(error);
