@@ -40,8 +40,8 @@ function Header() {
   }, []);
 
   return (
-    <header className='bg-white dark:bg-gray-800 shadow-md py-4 transition-colors duration-300 border-b-0 dark:border-b-2'>
-      <div className='container mx-auto px-4 flex justify-between items-center'>
+    <header className='bg-white dark:bg-gray-800 shadow-md py-4 w-full z-10 transition-colors duration-300 border-b-0 dark:border-b-2 fixed top-0 left-0'>
+      <div className='container mx-auto px-4 flex justify-between items-center h-full'>
         <div
           className='text-xl font-bold text-gray-800 dark:text-white cursor-pointer'
           onClick={() => {
@@ -70,7 +70,7 @@ function Header() {
           <DropdownUser />
         </div>
       </div>
-      <nav className='container mx-auto px-4 mt-5 flex space-x-4'>
+      <nav className='container mx-auto px-[12px] mt-5 flex space-x-4'>
         <Link to='/dashboard' className='text-gray-800 dark:text-gray-200 hover:text-gray-500'>
           {t('Dashboard')}
         </Link>

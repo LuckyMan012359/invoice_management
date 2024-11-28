@@ -82,13 +82,6 @@ const ColumnChartComponent = ({ type }) => {
         },
       },
     },
-    title: {
-      text: type === 'invoice' ? `${t('Invoices Data')}` : `${t('Payments Data')}`,
-      align: 'center',
-      style: {
-        color: isDarkMode ? '#FFFFFF' : '#0D1526',
-      },
-    },
     tooltip: {
       y: {
         formatter: (val) => val.toLocaleString(), // Format numbers in tooltips
@@ -107,9 +100,16 @@ const ColumnChartComponent = ({ type }) => {
   ];
 
   return (
-    <div className='dark:text-white'>
-      <Chart options={chartOptions} series={seriesData} type='bar' height={350} />
-    </div>
+    <>
+      <div className='w-full text-center text-[#000] text-[20px] mt-[50px] mb-[20px] dark:text-[#fff]'>
+        {type === 'invoice' ? t('Total Purchases') : t('Total Payments')}
+      </div>
+      <div className='dark:text-white overflow-auto'>
+        <div className='w-full max-xl:w-[1180px]'>
+          <Chart options={chartOptions} series={seriesData} type='bar' height={350} />
+        </div>
+      </div>
+    </>
   );
 };
 

@@ -9,7 +9,7 @@ const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
-    <ClickOutside onClick={() => setDropdownOpen(false)} className='relative'>
+    <ClickOutside onClick={() => setDropdownOpen(false)} className='relative w-full'>
       <Link
         onClick={() => setDropdownOpen(!dropdownOpen)}
         className='flex items-center gap-4'
@@ -43,9 +43,9 @@ const DropdownUser = () => {
 
       {dropdownOpen && (
         <div
-          className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm z-[1] border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark`}
+          className={`absolute right-0 mt-4 flex w-[220px] flex-col rounded-md z-[1] border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-[#fff]`}
         >
-          <ul className='flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark'>
+          <ul className='flex flex-col py-4 gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark'>
             <li>
               <Link
                 to='/profile'
