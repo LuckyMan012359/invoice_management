@@ -13,7 +13,7 @@ export const Transactions = () => {
   const [isChanged, setIsChanged] = useState(false);
 
   return (
-    <div className='h-screen px-[100px] py-[50px] bg-gray-100 dark:bg-gray-900'>
+    <div className='h-auto px-[100px] pb-[50px] pt-[200px] max-xl:px-[50px] max-sm:px-[15px] bg-gray-100 dark:bg-gray-900'>
       <div className='mx-auto bg-white shadow-md rounded-lg p-6 space-y-6 dark:bg-gray-800'>
         <Tabs defaultActiveKey='1'>
           <TabPane

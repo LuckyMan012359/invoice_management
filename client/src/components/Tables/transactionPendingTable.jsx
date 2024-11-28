@@ -178,7 +178,7 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
   return (
     <div className='w-full h-full'>
       <div className='mx-auto bg-white p-6 space-y-6 dark:bg-gray-800'>
-        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4'>
           <div>
             <label className='block text-gray-700 dark:text-gray-300'>
               {t('Records per Page')}
@@ -240,54 +240,54 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
             />
           </div>
         </div>
-        <div className='flex justify-end gap-4'>
-          <button
-            className='px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none'
-            onClick={() => {
-              filterData();
-              setCurrentPage(1);
-            }}
-          >
-            {t('Search')}
-          </button>
-          <button
-            className='px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none'
-            onClick={resetFilter}
-          >
-            {t('Reset')}
-          </button>
-          <button
-            className='px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none'
-            onClick={exportToExcel}
-          >
-            {t('Export to Excel')}
-          </button>
+        <div className='flex justify-end gap-4 max-md:flex-col'>
+          <div className='flex justify-end gap-4 max-md:justify-center'>
+            <button
+              className='px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none max-md:w-full'
+              onClick={() => {
+                filterData();
+                setCurrentPage(1);
+              }}
+            >
+              {t('Search')}
+            </button>
+            <button
+              className='px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none max-md:w-full'
+              onClick={resetFilter}
+            >
+              {t('Reset')}
+            </button>
+          </div>
+          <div className='flex justify-end gap-4 max-md:justify-center'>
+            <button
+              className='px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none max-md:w-full'
+              onClick={exportToExcel}
+            >
+              {t('Export to Excel')}
+            </button>
+          </div>
         </div>
 
         <div className='overflow-x-auto'>
-          <table className='w-full text-left bg-white rounded-lg dark:bg-gray-800'>
-            <thead>
-              <tr className='text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700'>
-                <th className='p-3'>#</th>
-                <th className='p-3'>{t('Date')}</th>
-                <th className='p-3'>{t('Customer')}</th>
-                <th className='p-3'>{t('Supplier')}</th>
-                <th className='p-3'>{t('Transaction')}</th>
-                <th className='p-3'>{t('Amount')}</th>
-                <th className='p-3'>{t('Note')}</th>
-                <th className='p-3'>{t('Attachments')}</th>
-                <th className='p-3'>{t('Action')}</th>
-              </tr>
-            </thead>
-            {loading === true ? (
-              <tbody>
-                <tr className='border-b dark:border-gray-600 dark:text-gray-300'>
-                  <td className='py-2 px-4 text-center h-[200px]' colSpan={10}>
-                    <LoadingOutlined className='text-[40px]' />
-                  </td>
+          {loading === true ? (
+            <div className='w-full h-[200px] flex justify-center items-center'>
+              <LoadingOutlined className='text-[40px]' />
+            </div>
+          ) : (
+            <table className='w-full text-left bg-white rounded-lg dark:bg-gray-800'>
+              <thead>
+                <tr className='text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700'>
+                  <th className='p-3'>#</th>
+                  <th className='p-3'>{t('Date')}</th>
+                  <th className='p-3'>{t('Customer')}</th>
+                  <th className='p-3'>{t('Supplier')}</th>
+                  <th className='p-3'>{t('Transaction')}</th>
+                  <th className='p-3'>{t('Amount')}</th>
+                  <th className='p-3'>{t('Note')}</th>
+                  <th className='p-3'>{t('Attachments')}</th>
+                  <th className='p-3'>{t('Action')}</th>
                 </tr>
-              </tbody>
-            ) : (
+              </thead>
               <tbody>
                 {transactionData.map((item, index) => (
                   <tr
@@ -307,7 +307,14 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
                     </td>
                     <td className='p-3'>{item.supplier.name}</td>
                     <td className='p-3'>{item.transaction_type}</td>
-                    <td className='p-3'>{item.amount.toLocaleString()}</td>
+                    <td
+                      className={`p-3 ${
+                        item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
+                      }`}
+                    >
+                      {item.transaction_type !== 'invoice' && '-'}
+                      {item.amount.toLocaleString()}
+                    </td>
                     <td className='p-3'>{item.notes}</td>
                     <td className='p-3 flex flex-col'>
                       {item.attachments.length > 0
@@ -363,8 +370,8 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
                   </tr>
                 ))}
               </tbody>
-            )}
-          </table>
+            </table>
+          )}
         </div>
 
         <div className='mt-4 flex justify-between'>
