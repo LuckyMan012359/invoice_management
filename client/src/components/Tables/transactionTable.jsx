@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Datepicker from 'react-tailwindcss-datepicker';
 import TransactionForm from '../../components/Form/TransactionForm';
 import axiosInstance from '../../utils/axiosInstance';
-
+import * as XLSX from 'xlsx';
 import { LoadingOutlined } from '@ant-design/icons';
 
 import { Modal } from 'antd';
@@ -33,6 +33,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
   const [supplier, setSupplier] = useState('');
   const [keyword, setKeyword] = useState('');
   const [transactionData, setTransactionData] = useState([]);
+  const [totalTransactionsData, setTotalTransactionsData] = useState([]);
   const [transactionId, setTransactionId] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -102,6 +103,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
       setTotalPages(response.data.totalPage);
       setTransactionData(response.data.transactions);
+      setTotalTransactionsData(response.data.totalTransactions);
       setLoading(false);
     };
     fetchData();
@@ -123,6 +125,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
     setTotalPages(response.data.totalPage);
     setTransactionData(response.data.transactions);
+    setTotalTransactionsData(response.data.totalTransactions);
     setLoading(false);
   };
 
@@ -160,6 +163,29 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedAttachment(null);
+  };
+
+  const exportToExcel = () => {
+    if (transactionData.length === 0) {
+      toast.warning('No transactions to export.');
+      return;
+    }
+
+    const excelData = totalTransactionsData.map((item) => ({
+      'Transaction Date': new Date(item.transaction_date).toLocaleDateString(),
+      'Customer Name': `${item.customer.firstName} ${item.customer.lastName}`,
+      'Supplier Name': item.supplier.name,
+      'Transaction Type': item.transaction_type,
+      Amount: item.amount,
+      Balance: item.balance,
+      Notes: item.notes,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Transactions');
+
+    XLSX.writeFile(workbook, 'Transactions.xlsx');
   };
 
   return (
@@ -254,7 +280,10 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
               {t('Add New Record')}
             </button>
           )}
-          <button className='px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none'>
+          <button
+            className='px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none'
+            onClick={exportToExcel}
+          >
             {t('Export to Excel')}
           </button>
         </div>
