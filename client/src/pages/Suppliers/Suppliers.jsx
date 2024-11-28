@@ -101,40 +101,42 @@ export const Suppliers = () => {
   };
 
   return (
-    <div className='h-screen p-6 bg-gray-100 dark:bg-gray-900 overflow-hidden'>
+    <div className='h-auto px-[100px] pb-[50px] pt-[200px] max-xl:px-[50px] max-sm:px-[15px] bg-gray-100 dark:bg-gray-900 overflow-hidden'>
       <div className='max-w-6xl mx-auto bg-white shadow-md rounded-lg p-6 space-y-6 dark:bg-gray-800'>
-        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4'>
-          <div>
-            <label className='block text-gray-700 dark:text-gray-300'>
-              {t('Suppliers per Page')}
-            </label>
-            <select
-              className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
-              value={suppliersPerPage}
-              onChange={(e) => setSuppliersPerPage(Number(e.target.value))}
-            >
-              <option value='15'>15</option>
-              <option value='30'>30</option>
-              <option value='50'>50</option>
-            </select>
+        <div className='flex justify-between max-md:flex-col gap-4 mb-4'>
+          <div className='flex justify-start gap-4 max-md:w-full max-sm:flex-col'>
+            <div className='w-full'>
+              <label className='block text-gray-700 dark:text-gray-300'>
+                {t('Suppliers per Page')}
+              </label>
+              <select
+                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                onChange={(e) =>
+                  setSuppliersPerPage(e.target.value === 'All' ? '' : Number(e.target.value))
+                }
+              >
+                <option value='15'>15</option>
+                <option value='30'>30</option>
+                <option value='50'>50</option>
+                <option value='All'>All</option>
+              </select>
+            </div>
+            <div className='flex flex-col w-full'>
+              <label className='block text-gray-700 dark:text-gray-300'>{t('Keyword')}</label>
+              <input
+                type='text'
+                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                placeholder={t('Filter by keyword')}
+                value={keyword}
+                onChange={(e) => {
+                  setKeyword(e.target.value);
+                }}
+              />
+            </div>
           </div>
-          <div className='flex flex-col'>
-            <label className='block text-gray-700 dark:text-gray-300'>{t('Keyword')}</label>
-            <input
-              type='text'
-              className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
-              placeholder={t('Filter by keyword')}
-              value={keyword}
-              onChange={(e) => {
-                setKeyword(e.target.value);
-              }}
-            />
-          </div>
-          <div className='hidden lg:block'></div>
-          <div className='hidden lg:block'></div>
           <div className='flex items-end justify-end'>
             <button
-              className='px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none'
+              className='px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none max-md:w-full'
               onClick={() => {
                 setShowSupplierForm(true);
                 setType('Add');
@@ -146,25 +148,22 @@ export const Suppliers = () => {
         </div>
 
         <div className='overflow-x-auto'>
-          <table className='w-full text-left bg-white rounded-lg dark:bg-gray-800'>
-            <thead>
-              <tr className='text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700'>
-                <th className='py-2 px-4 text-left'>{t('Name')}</th>
-                <th className='py-2 px-4 text-left'>{t('Total Purchases')}</th>
-                <th className='py-2 px-4 text-left'>{t('Total Payments')}</th>
-                <th className='py-2 px-4 text-left'>{t('Balance')}</th>
-                <th className='py-2 px-4 text-left'>{t('Actions')}</th>
-              </tr>
-            </thead>
-            {loading === true ? (
-              <tbody>
-                <tr className='border-b dark:border-gray-600 dark:text-gray-300'>
-                  <td className='py-2 px-4 text-center h-[200px]' colSpan={10}>
-                    <LoadingOutlined className='text-[40px]' />
-                  </td>
+          {loading === true ? (
+            <div className='w-full h-[200px] flex justify-center items-center'>
+              <LoadingOutlined className='text-[40px]' />
+            </div>
+          ) : (
+            <table className='w-full text-left bg-white rounded-lg max-2xl:min-w-[1200px] dark:bg-gray-800'>
+              <thead>
+                <tr className='text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700'>
+                  <th className='py-2 px-4 text-left'>{t('Name')}</th>
+                  <th className='py-2 px-4 text-left'>{t('Total Purchases')}</th>
+                  <th className='py-2 px-4 text-left'>{t('Total Payments')}</th>
+                  <th className='py-2 px-4 text-left'>{t('Total Returns')}</th>
+                  <th className='py-2 px-4 text-left'>{t('Balance')}</th>
+                  <th className='py-2 px-4 text-left'>{t('Actions')}</th>
                 </tr>
-              </tbody>
-            ) : (
+              </thead>
               <tbody>
                 {filteredSuppliers.map((supplier) => (
                   <tr
@@ -172,9 +171,22 @@ export const Suppliers = () => {
                     className='border-b dark:border-gray-600 dark:text-gray-300'
                   >
                     <td className='py-2 px-4'>{supplier.name}</td>
-                    <td className='py-2 px-4'>{supplier.totalPurchase.toLocaleString()}</td>
-                    <td className='py-2 px-4'>{supplier.totalPayment.toLocaleString()}</td>
-                    <td className='py-2 px-4'>{supplier.totalBalance.toLocaleString()}</td>
+                    <td className='py-2 px-4 text-[green]'>
+                      {supplier.totalPurchase.toLocaleString()}
+                    </td>
+                    <td className='py-2 px-4 text-[red]'>
+                      -{supplier.totalPayment.toLocaleString()}
+                    </td>
+                    <td className='py-2 px-4 text-[red]'>
+                      -{supplier.totalReturn.toLocaleString()}
+                    </td>
+                    <td
+                      className={`py-2 px-4 ${
+                        supplier.totalBalance >= 0 ? 'text-[green]' : 'text-[red]'
+                      }`}
+                    >
+                      {supplier.totalBalance.toLocaleString()}
+                    </td>
                     <td className='py-2 px-4 flex gap-[20px]'>
                       <button
                         className='text-gray-800 py-1 rounded mr-1 dark:text-white'
@@ -196,8 +208,8 @@ export const Suppliers = () => {
                   </tr>
                 ))}
               </tbody>
-            )}
-          </table>
+            </table>
+          )}
         </div>
 
         <div className='mt-4 flex justify-between'>

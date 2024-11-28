@@ -58,27 +58,30 @@ exports.readSupplier = async (req, res) => {
         const transactions = await Trasnaction.find({ supplier_id: supplier._id });
 
         if (transactions && transactions.length > 0) {
-          const { invoiceTotal, paymentTotal } = transactions.reduce(
+          const { invoiceTotal, paymentTotal, returnTotal } = transactions.reduce(
             (totals, item) => {
               if (item.transaction_type === 'invoice') {
                 totals.invoiceTotal += item.amount || 0;
-              } else {
+              } else if (item.transaction_type === 'payment') {
                 totals.paymentTotal += item.amount || 0;
+              } else {
+                totals.returnTotal += item.amount || 0;
               }
               return totals;
             },
-            { invoiceTotal: 0, paymentTotal: 0 },
+            { invoiceTotal: 0, paymentTotal: 0, returnTotal: 0 },
           );
 
           supplier = supplier.toObject();
           supplier.totalPurchase = invoiceTotal;
           supplier.totalPayment = paymentTotal;
-          supplier.totalBalance = invoiceTotal - paymentTotal;
+          supplier.totalReturn = returnTotal;
+          supplier.totalBalance = invoiceTotal - paymentTotal - returnTotal;
         } else {
           supplier = supplier.toObject();
           supplier.totalPurchase = 0;
           supplier.totalPayment = 0;
-          supplier.totalBalance = 0;
+          supplier.totalPayment = 0;
           supplier.totalBalance = 0;
         }
 

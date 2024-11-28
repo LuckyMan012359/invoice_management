@@ -147,13 +147,16 @@ exports.readTransaction = async (req, res) => {
           'supplier.name': 1,
         },
       },
-      {
-        $skip: (parseInt(pageNum, 10) - 1) * pageSize,
-      },
-      {
-        $limit: parseInt(pageSize, 10),
-      },
     ];
+
+    console.log(pageNum, pageSize);
+
+    if (pageNum && pageSize) {
+      pipeline.push(
+        { $skip: (parseInt(pageNum, 10) - 1) * parseInt(pageSize, 10) },
+        { $limit: parseInt(pageSize, 10) },
+      );
+    }
 
     const totalPipeline = [
       {

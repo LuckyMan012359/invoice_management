@@ -198,11 +198,14 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
             </label>
             <select
               className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
-              onChange={(e) => setTransactionsPerPage(Number(e.target.value))}
+              onChange={(e) =>
+                setTransactionsPerPage(e.target.value === 'All' ? '' : Number(e.target.value))
+              }
             >
               <option value='15'>15</option>
               <option value='30'>30</option>
               <option value='50'>50</option>
+              <option value='All'>All</option>
             </select>
           </div>
           <div>
