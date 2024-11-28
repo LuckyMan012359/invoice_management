@@ -19,9 +19,7 @@ const ColumnChartComponent = ({ type }) => {
           keyword: '',
         });
 
-        const data = response.data?.data || []; // Ensure data exists
-
-        console.log(data);
+        const data = response.data?.data || [];
 
         const sortedData =
           type === 'invoice'

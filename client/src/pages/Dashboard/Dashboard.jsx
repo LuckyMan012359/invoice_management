@@ -50,7 +50,7 @@ export const Dashboard = () => {
               </p>
             </div>
             <div className='rounded-md h-24 border-2 shadow-md'>
-              <p className='p-2'>{t('Total Payments')}</p>
+              <p className='p-2'>{t('Total Returns')}</p>
               <p className='flex items-center justify-center text-2xl'>
                 ${userInfo.totalReturn.toLocaleString()}
               </p>
