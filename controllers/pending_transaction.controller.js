@@ -254,6 +254,7 @@ exports.readPendingTransaction = async (req, res) => {
       transactions,
       totalPage: Math.ceil(count / parseInt(pageSize, 10)),
       totalCount: count,
+      totalTransactions,
     });
   } catch (error) {
     console.error('Error reading transactions:', error);
