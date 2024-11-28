@@ -33,7 +33,7 @@ export const Dashboard = () => {
   }, [userRole]);
 
   return (
-    <div className='h-full w-full px-[100px] mt-[200px] max-2xl:px-[50px]'>
+    <div className='h-full w-full px-[100px] mt-[200px] mb-[70px] max-2xl:px-[50px]'>
       <div className='grid grid-cols-3 max-xl:grid-cols-2 max-lg:grid-cols-1 gap-[70px] m-5 dark:text-white'>
         {userRole === 'customer' && userInfo && (
           <>
