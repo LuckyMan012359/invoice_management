@@ -34,7 +34,7 @@ export const Dashboard = () => {
 
   return (
     <div className='w-full h-auto px-[100px] pb-[50px] pt-[200px] max-2xl:px-[50px]'>
-      <div className='grid grid-cols-3 max-xl:grid-cols-2 max-lg:grid-cols-1 gap-[70px] m-5 dark:text-white'>
+      <div className='grid grid-cols-4 max-2xl:grid-cols-3 max-xl:grid-cols-2 max-lg:grid-cols-1 gap-[70px] m-5 dark:text-white'>
         {userRole === 'customer' && userInfo && (
           <>
             <div className='rounded-md h-24 border-2 flex flex-col shadow-md'>
@@ -50,6 +50,12 @@ export const Dashboard = () => {
               </p>
             </div>
             <div className='rounded-md h-24 border-2 shadow-md'>
+              <p className='p-2'>{t('Total Payments')}</p>
+              <p className='flex items-center justify-center text-2xl'>
+                ${userInfo.totalReturn.toLocaleString()}
+              </p>
+            </div>
+            <div className='rounded-md h-24 border-2 shadow-md'>
               <p className='p-2'>{t('Total Balance')}</p>
               <p className='flex items-center justify-center text-2xl'>
                 ${userInfo.totalBalance.toLocaleString()}
@@ -60,6 +66,7 @@ export const Dashboard = () => {
       </div>
       <ColumnChartComponent type='invoice' />
       <ColumnChartComponent type='payment' />
+      <ColumnChartComponent type='return' />
     </div>
   );
 };

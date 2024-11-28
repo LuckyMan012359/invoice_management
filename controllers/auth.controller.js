@@ -124,26 +124,30 @@ exports.getUserInfo = async (req, res) => {
     const transactions = await Transaction.find({ customer_id: user._id });
 
     if (transactions && transactions.length > 0) {
-      const { invoiceTotal, paymentTotal } = transactions.reduce(
+      const { invoiceTotal, paymentTotal, returnTotal } = transactions.reduce(
         (totals, item) => {
           if (item.transaction_type === 'invoice') {
             totals.invoiceTotal += item.amount || 0;
-          } else {
+          } else if (item.transaction_type === 'payment') {
             totals.paymentTotal += item.amount || 0;
+          } else {
+            totals.returnTotal += item.amount || 0;
           }
           return totals;
         },
-        { invoiceTotal: 0, paymentTotal: 0 },
+        { invoiceTotal: 0, paymentTotal: 0, returnTotal: 0 },
       );
 
       user = user.toObject();
       user.totalPurchase = invoiceTotal;
       user.totalPayment = paymentTotal;
-      user.totalBalance = invoiceTotal - paymentTotal;
+      user.totalReturn = returnTotal;
+      user.totalBalance = invoiceTotal - paymentTotal - returnTotal;
     } else {
       user = user.toObject();
       user.totalPurchase = 0;
       user.totalPayment = 0;
+      user.totalReturn = 0;
       user.totalBalance = 0;
     }
 

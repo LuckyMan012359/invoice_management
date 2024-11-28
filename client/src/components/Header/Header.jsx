@@ -40,7 +40,7 @@ function Header() {
   }, []);
 
   return (
-    <header className='bg-white dark:bg-gray-800 shadow-md py-4 w-full z-10 transition-colors duration-300 border-b-0 dark:border-b-2 fixed top-0 left-0'>
+    <header className='bg-white dark:bg-gray-800 opacity-[1] shadow-md py-4 w-full z-[100] transition-colors duration-300 border-b-0 dark:border-b-2 fixed top-0 left-0'>
       <div className='container mx-auto px-4 flex justify-between items-center h-full'>
         <div
           className='text-xl font-bold text-gray-800 dark:text-white cursor-pointer'
