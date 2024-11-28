@@ -162,3 +162,37 @@ exports.getUserInfo = async (req, res) => {
     });
   }
 };
+
+exports.updateUserInfo = async (req, res) => {
+  try {
+    const { firstName, lastName, phoneNumber, homeAddress, password } = req.body;
+
+    const updateFields = {
+      firstName,
+      lastName,
+      phoneNumber,
+      homeAddress,
+    };
+
+    if (password && password.trim() !== '') {
+      updateFields.password = bcrypt.hashSync(password, 8);
+    }
+
+    const user = await User.findOneAndUpdate({ email: req.user.email }, updateFields, {
+      new: true,
+    });
+
+    console.log(user);
+
+    res.status(200).send({
+      message: 'Updated Successfully',
+      user: user,
+    });
+  } catch (error) {
+    console.error('Error updating user info:', error);
+    res.status(500).send({
+      message: 'An error occurred while updating user info',
+      error: error.message,
+    });
+  }
+};
