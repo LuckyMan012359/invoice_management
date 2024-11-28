@@ -53,6 +53,7 @@ const ColumnChartComponent = ({ type }) => {
     },
     dataLabels: {
       enabled: true,
+      formatter: (val) => val.toLocaleString(), // Format numbers in data labels
       style: {
         colors: isDarkMode ? ['#FFFFFF'] : ['#000000'],
       },
@@ -75,8 +76,9 @@ const ColumnChartComponent = ({ type }) => {
         },
       },
       labels: {
+        formatter: (val) => val.toLocaleString(), // Format numbers on Y-axis
         style: {
-          colors: isDarkMode ? ['#FFFFFF'] : '#000000',
+          colors: isDarkMode ? ['#FFFFFF'] : ['#000000'],
         },
       },
     },
@@ -85,6 +87,11 @@ const ColumnChartComponent = ({ type }) => {
       align: 'center',
       style: {
         color: isDarkMode ? '#FFFFFF' : '#0D1526',
+      },
+    },
+    tooltip: {
+      y: {
+        formatter: (val) => val.toLocaleString(), // Format numbers in tooltips
       },
     },
   };

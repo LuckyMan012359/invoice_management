@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const indexRoute = require('./routes/index');
 const userRoute = require('./routes/user.route');
 const transactionRouter = require('./routes/transaction.route');
 const customerRouter = require('./routes/customer.route');
@@ -35,7 +34,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/', indexRoute);
 app.use('/api/user', userRoute);
 app.use('/api/transaction', transactionRouter);
 app.use('/api/customer', customerRouter);

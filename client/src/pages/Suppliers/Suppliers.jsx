@@ -172,9 +172,9 @@ export const Suppliers = () => {
                     className='border-b dark:border-gray-600 dark:text-gray-300'
                   >
                     <td className='py-2 px-4'>{supplier.name}</td>
-                    <td className='py-2 px-4'>{supplier.totalPurchase}</td>
-                    <td className='py-2 px-4'>{supplier.totalPayment}</td>
-                    <td className='py-2 px-4'>{supplier.totalBalance}</td>
+                    <td className='py-2 px-4'>{supplier.totalPurchase.toLocaleString()}</td>
+                    <td className='py-2 px-4'>{supplier.totalPayment.toLocaleString()}</td>
+                    <td className='py-2 px-4'>{supplier.totalBalance.toLocaleString()}</td>
                     <td className='py-2 px-4 flex gap-[20px]'>
                       <button
                         className='text-gray-800 py-1 rounded mr-1 dark:text-white'

@@ -42,7 +42,12 @@ function Header() {
   return (
     <header className='bg-white dark:bg-gray-800 shadow-md py-4 transition-colors duration-300 border-b-0 dark:border-b-2'>
       <div className='container mx-auto px-4 flex justify-between items-center'>
-        <div className='text-xl font-bold text-gray-800 dark:text-white'>
+        <div
+          className='text-xl font-bold text-gray-800 dark:text-white cursor-pointer'
+          onClick={() => {
+            window.location.href = '/dashboard';
+          }}
+        >
           Invoice Management System
         </div>
         <div className='flex items-center gap-3 2xsm:gap-7'>
