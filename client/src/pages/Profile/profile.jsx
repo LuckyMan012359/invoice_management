@@ -130,7 +130,7 @@ const Profile = () => {
                 onChange={(e) => setHomeAddress(e.target.value)}
               />
             </div>
-            <div className='flex w-full justify-between'>
+            <div className='flex w-full justify-between items-center'>
               <label className='block text-gray-700 dark:text-gray-300'>
                 {t('Change Password')}
               </label>
