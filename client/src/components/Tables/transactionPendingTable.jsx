@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Datepicker from 'react-tailwindcss-datepicker';
 import axiosInstance from '../../utils/axiosInstance';
 import { LoadingOutlined } from '@ant-design/icons';
+import * as XLSX from 'xlsx';
 
 import { toast } from 'react-toastify';
 
@@ -29,6 +30,7 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
   const [supplier, setSupplier] = useState('');
   const [keyword, setKeyword] = useState('');
   const [transactionData, setTransactionData] = useState([]);
+  const [totalTransactionsData, setTotalTransactionsData] = useState([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAttachment, setSelectedAttachment] = useState(null);
@@ -74,13 +76,15 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
 
       setTotalPages(response.data.totalPage);
       setTransactionData(response.data.transactions);
-
+      setTotalTransactionsData(response.data.totalTransactions);
       setLoading(false);
     };
     fetchData();
   }, [isChanged, currentPage, transactionsPerPage]);
 
   const filterData = async () => {
+    setLoading(true);
+
     const filterDate = date.endDate ? formatDate(date.endDate) : '';
 
     const response = await axiosInstance('/pending/get_pending_transactions', 'get', {
@@ -94,6 +98,8 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
 
     setTotalPages(response.data.totalPage);
     setTransactionData(response.data.transactions);
+    setTotalTransactionsData(response.data.totalTransactions);
+    setLoading(false);
   };
 
   const resetFilter = () => {
@@ -145,6 +151,28 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
     }
 
     setIsChanged(!isChanged);
+  };
+
+  const exportToExcel = () => {
+    if (transactionData.length === 0) {
+      toast.warning('No pending transactions to export.');
+      return;
+    }
+
+    const excelData = totalTransactionsData.map((item) => ({
+      'Transaction Date': new Date(item.transaction_date).toLocaleDateString(),
+      'Customer Name': `${item.customer.firstName} ${item.customer.lastName}`,
+      'Supplier Name': item.supplier.name,
+      'Transaction Type': item.transaction_type,
+      Amount: item.amount,
+      Notes: item.notes,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Transactions');
+
+    XLSX.writeFile(workbook, 'Transactions.xlsx');
   };
 
   return (
@@ -228,7 +256,10 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
           >
             {t('Reset')}
           </button>
-          <button className='px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none'>
+          <button
+            className='px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none'
+            onClick={exportToExcel}
+          >
             {t('Export to Excel')}
           </button>
         </div>
