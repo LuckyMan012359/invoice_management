@@ -134,10 +134,18 @@ export const Customers = () => {
     setIsChanged(false);
   };
 
-  const deleteCustomer = async (deleteCustomerID) => {
+  const deleteCustomer = async (deleteCustomer) => {
+    if (
+      deleteCustomer.totalPurchase !== 0 &&
+      deleteCustomer.totalPayment !== 0 &&
+      deleteCustomer.totalReturn !== 0
+    ) {
+      toast.error("You can't delete this customer because he has transaction.");
+      return;
+    }
     setIsChanged(false);
     const response = await axiosInstance(`/customer/delete_customer`, 'delete', {
-      deleteCustomerID: deleteCustomerID,
+      deleteCustomerID: deleteCustomer._id,
     });
     if (response.status === 200) {
       toast.success(response.data.message);
@@ -259,7 +267,7 @@ export const Customers = () => {
                       </button>
                       <button
                         className='text-gray-800 py-1 rounded mr-1 dark:text-white'
-                        onClick={() => deleteCustomer(customer._id)}
+                        onClick={() => deleteCustomer(customer)}
                       >
                         <MdDelete />
                       </button>

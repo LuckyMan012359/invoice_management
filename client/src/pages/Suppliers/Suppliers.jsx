@@ -88,9 +88,17 @@ export const Suppliers = () => {
     });
   };
 
-  const deleteSupplier = async (deleteSupplierID) => {
+  const deleteSupplier = async (deleteSupplier) => {
+    if (
+      deleteSupplier.totalPurchase !== 0 &&
+      deleteSupplier.totalPayment !== 0 &&
+      deleteSupplier.totalReturn !== 0
+    ) {
+      toast.error("You can't delete this supplier because this has transaction.");
+      return;
+    }
     const response = await axiosInstance(`/supplier/delete_supplier`, 'delete', {
-      deleteSupplierID,
+      deleteSupplierID: deleteSupplier._id,
     });
     if (response.status === 200) {
       toast.success(response.data.message);
@@ -200,7 +208,7 @@ export const Suppliers = () => {
                       </button>
                       <button
                         className='text-gray-800 py-1 rounded mr-1 dark:text-white'
-                        onClick={() => deleteSupplier(supplier._id)}
+                        onClick={() => deleteSupplier(supplier)}
                       >
                         <MdDelete />
                       </button>
