@@ -20,6 +20,10 @@ export const Customers = () => {
     phoneNumber: '',
     homeAddress: '',
     password: '',
+    totalBalance: 0,
+    totalPayment: 0,
+    totalPurchase: 0,
+    totalReturn: 0,
   });
   const [keyword, setKeyword] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -122,6 +126,10 @@ export const Customers = () => {
       phoneNumber: '',
       homeAddress: '',
       password: '',
+      totalBalance: 0,
+      totalPayment: 0,
+      totalPurchase: 0,
+      totalReturn: 0,
     });
     setIsChanged(false);
   };
