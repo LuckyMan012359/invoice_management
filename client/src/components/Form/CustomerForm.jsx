@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Switch, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
+import Select from 'react-select';
+import { useSelector } from 'react-redux';
 
 const CustomerForm = ({
   showCustomerForm,
@@ -15,17 +17,61 @@ const CustomerForm = ({
 }) => {
   const { t } = useTranslation();
 
-  console.log(
-    type === 'Edit' &&
-      (customer.totalBalance !== 0 ||
-        customer.totalPayment !== 0 ||
-        customer.totalPurchase !== 0 ||
-        customer.totalReturn !== 0),
-  );
-
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
+  const isDarkMode = useSelector((state) => state.darkMode.isDarkMode);
+
   if (!showCustomerForm) return null;
+
+  const roleOptions = [
+    { value: 'admin', label: 'Admin' },
+    { value: 'customer', label: 'Customer' },
+  ];
+
+  const handleSelectChange = (selectedOption, field) => {
+    setCustomer((prev) => ({
+      ...prev,
+      [field]: selectedOption ? selectedOption.value : '',
+    }));
+  };
+
+  const selectStyles = {
+    control: (styles, { isFocused }) => ({
+      ...styles,
+      backgroundColor: isDarkMode === true && '#374151',
+      borderColor: isFocused ? 'var(--focus-border-color)' : 'var(--border-color)',
+      boxShadow: isFocused ? '0 0 0 1px var(--focus-border-color)' : 'none',
+      '&:hover': {
+        borderColor: 'var(--hover-border-color)',
+      },
+      color: isDarkMode ? '#fff' : '#000', // Change the text color based on dark mode
+    }),
+    menu: (styles) => ({
+      ...styles,
+      backgroundColor: isDarkMode ? '#1f2937' : '#fff', // Dark mode background for the menu
+      color: isDarkMode ? '#fff' : '#000', // Text color in the menu
+    }),
+    option: (styles, { isSelected, isFocused }) => ({
+      ...styles,
+      backgroundColor: isSelected
+        ? isDarkMode
+          ? '#4B5563'
+          : '#E5E7EB' // selected option background color
+        : isFocused
+        ? isDarkMode
+          ? '#374151'
+          : '#F3F4F6' // focused option background color
+        : 'transparent',
+      color: isDarkMode ? '#fff' : '#000', // Change text color for options
+      '&:hover': {
+        backgroundColor: isFocused ? (isDarkMode ? '#374151' : '#F3F4F6') : undefined,
+      },
+    }),
+    singleValue: (styles) => ({
+      ...styles,
+      color: isDarkMode ? '#fff' : '#000', // Text color for the selected value
+    }),
+  };
 
   return (
     <div className='fixed inset-0 flex items-center justify-center z-[101] bg-black bg-opacity-50'>
@@ -81,48 +127,36 @@ const CustomerForm = ({
                 placement='bottom'
                 title="You can't change customer's role because he has transaction."
               >
-                <select
-                  required
-                  disabled={
+                <Select
+                  options={roleOptions}
+                  value={roleOptions.find((option) => option.value === customer.transactionType)}
+                  onChange={(option) => handleSelectChange(option, 'transactionType')}
+                  styles={selectStyles}
+                  placeholder='Select a transaction type'
+                  isDisabled={
                     type === 'Edit' &&
                     (customer.totalBalance !== 0 ||
                       customer.totalPayment !== 0 ||
                       customer.totalPurchase !== 0 ||
                       customer.totalReturn !== 0)
                   }
-                  name='transactionType'
-                  value={customer.role}
-                  onChange={(e) => setCustomer((prev) => ({ ...prev, role: e.target.value }))}
-                  className='block appearance-none w-full bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-white rounded-md py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-700 focus:border-blue-500 dark:focus:border-blue-400'
-                >
-                  <option value='' disabled>
-                    Select customer's role
-                  </option>
-                  <option value='admin'>Admin</option>
-                  <option value='customer'>Customer</option>
-                </select>
+                />
               </Tooltip>
             ) : (
-              <select
-                required
-                disabled={
+              <Select
+                options={roleOptions}
+                value={roleOptions.find((option) => option.value === customer.transactionType)}
+                onChange={(option) => handleSelectChange(option, 'transactionType')}
+                styles={selectStyles}
+                placeholder='Select a transaction type'
+                isDisabled={
                   type === 'Edit' &&
                   (customer.totalBalance !== 0 ||
                     customer.totalPayment !== 0 ||
                     customer.totalPurchase !== 0 ||
                     customer.totalReturn !== 0)
                 }
-                name='transactionType'
-                value={customer.role}
-                onChange={(e) => setCustomer((prev) => ({ ...prev, role: e.target.value }))}
-                className='block appearance-none w-full bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-white rounded-md py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-700 focus:border-blue-500 dark:focus:border-blue-400'
-              >
-                <option value='' disabled>
-                  Select customer's role
-                </option>
-                <option value='admin'>Admin</option>
-                <option value='customer'>Customer</option>
-              </select>
+              />
             )}
           </div>
 

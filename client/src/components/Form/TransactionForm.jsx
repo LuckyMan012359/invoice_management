@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import axiosInstance from '../../utils/axiosInstance';
 import { toast } from 'react-toastify';
 import getUserRole from '../../utils/getUserRole';
+import Select from 'react-select';
+import { useSelector } from 'react-redux';
 
 const TransactionForm = ({
   customers,
@@ -20,6 +22,8 @@ const TransactionForm = ({
   const { t, i18n } = useTranslation();
 
   const [userRole, setUserRole] = useState('');
+
+  const isDarkMode = useSelector((state) => state.darkMode.isDarkMode);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -162,6 +166,67 @@ const TransactionForm = ({
 
   if (!showTransactionForm) return null;
 
+  const handleSelectChange = (selectedOption, name) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: selectedOption ? selectedOption.value : '',
+    }));
+  };
+
+  const customerOptions = customers.map((customer) => ({
+    value: customer._id,
+    label: `${customer.firstName} ${customer.lastName}`,
+  }));
+
+  const supplierOptions = suppliers.map((supplier) => ({
+    value: supplier._id,
+    label: supplier.name,
+  }));
+
+  const transactionTypeOptions = [
+    { value: 'invoice', label: 'INVOICE' },
+    { value: 'payment', label: 'PAYMENTS' },
+    { value: 'return', label: 'RETURN' },
+  ];
+
+  const selectStyles = {
+    control: (styles, { isFocused }) => ({
+      ...styles,
+      backgroundColor: 'var(--bg-color)', // Assuming you set a CSS variable for background color
+      borderColor: isFocused ? 'var(--focus-border-color)' : 'var(--border-color)',
+      boxShadow: isFocused ? '0 0 0 1px var(--focus-border-color)' : 'none',
+      '&:hover': {
+        borderColor: 'var(--hover-border-color)',
+      },
+      color: isDarkMode ? '#fff' : '#000', // Change the text color based on dark mode
+    }),
+    menu: (styles) => ({
+      ...styles,
+      backgroundColor: isDarkMode ? '#1f2937' : '#fff', // Dark mode background for the menu
+      color: isDarkMode ? '#fff' : '#000', // Text color in the menu
+    }),
+    option: (styles, { isSelected, isFocused }) => ({
+      ...styles,
+      backgroundColor: isSelected
+        ? isDarkMode
+          ? '#4B5563'
+          : '#E5E7EB' // selected option background color
+        : isFocused
+        ? isDarkMode
+          ? '#374151'
+          : '#F3F4F6' // focused option background color
+        : 'transparent',
+      color: isDarkMode ? '#fff' : '#000', // Change text color for options
+      '&:hover': {
+        backgroundColor: isFocused ? (isDarkMode ? '#374151' : '#F3F4F6') : undefined,
+      },
+    }),
+    singleValue: (styles) => ({
+      ...styles,
+      color: isDarkMode ? '#fff' : '#000', // Text color for the selected value
+    }),
+  };
+
   return (
     <div className='fixed inset-0 flex items-center justify-center z-[101] bg-black bg-opacity-50'>
       <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-lg h-auto overflow-y-auto scrollbar-transparent'>
@@ -183,86 +248,40 @@ const TransactionForm = ({
 
           <div className='mb-4'>
             <label className='block text-gray-700 dark:text-gray-300'>{t('Customer')}</label>
-            <div className='relative'>
-              <select
-                name='customerId'
-                value={formData.customerId}
-                onChange={handleChange}
-                required
-                className='block appearance-none w-full bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-white rounded-md py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-700 focus:border-blue-500 dark:focus:border-blue-400'
-                disabled={userRole === 'customer'}
-              >
-                <option value='' disabled>
-                  Select a customer
-                </option>
-                {customers.map((customer) => (
-                  <option key={customer._id} value={customer._id}>
-                    {customer.firstName} {customer.lastName}
-                  </option>
-                ))}
-              </select>
-              <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300'>
-                <svg
-                  className='fill-current h-4 w-4'
-                  xmlns='http://www.w3.org/2000/svg'
-                  viewBox='0 0 20 20'
-                >
-                  <path d='M5.5 8.5L10 13l4.5-4.5H5.5z' />
-                </svg>
-              </div>
-            </div>
+            <Select
+              options={customerOptions}
+              value={customerOptions.find((option) => option.value === formData.customerId)}
+              onChange={(option) => handleSelectChange(option, 'customerId')}
+              styles={selectStyles}
+              placeholder='Select a customer'
+              isDisabled={userRole === 'customer'}
+            />
           </div>
 
           <div className='mb-4'>
             <label className='block text-gray-700 dark:text-gray-300'>{t('Supplier')}</label>
-            <div className='relative'>
-              <select
-                name='supplierId'
-                value={formData.supplierId}
-                onChange={handleChange}
-                required
-                className='block appearance-none w-full bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-white rounded-md py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-700 focus:border-blue-500 dark:focus:border-blue-400'
-                disabled={userRole === 'customer'}
-              >
-                <option value='' disabled>
-                  Select a supplier
-                </option>
-                {suppliers.map((supplier) => (
-                  <option key={supplier._id} value={supplier._id}>
-                    {supplier.name}
-                  </option>
-                ))}
-              </select>
-              <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300'>
-                <svg
-                  className='fill-current h-4 w-4'
-                  xmlns='http://www.w3.org/2000/svg'
-                  viewBox='0 0 20 20'
-                >
-                  <path d='M5.5 8.5L10 13l4.5-4.5H5.5z' />
-                </svg>
-              </div>
-            </div>
+            <Select
+              options={supplierOptions}
+              value={supplierOptions.find((option) => option.value === formData.supplierId)}
+              onChange={(option) => handleSelectChange(option, 'supplierId')}
+              styles={selectStyles}
+              placeholder='Select a supplier'
+            />
           </div>
 
           <div className='mb-4'>
             <label className='block text-gray-700 dark:text-gray-300'>
               {t('Transaction Type')}
             </label>
-            <select
-              name='transactionType'
-              value={formData.transactionType}
-              onChange={handleChange}
-              required
-              className='block appearance-none w-full bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-white rounded-md py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-white dark:focus:bg-gray-700 focus:border-blue-500 dark:focus:border-blue-400'
-            >
-              <option value='' disabled>
-                Select a transaction type
-              </option>
-              <option value='invoice'>INVOICE</option>
-              <option value='payment'>PAYMENTS</option>
-              <option value='return'>RETURN</option>
-            </select>
+            <Select
+              options={transactionTypeOptions}
+              value={transactionTypeOptions.find(
+                (option) => option.value === formData.transactionType,
+              )}
+              onChange={(option) => handleSelectChange(option, 'transactionType')}
+              styles={selectStyles}
+              placeholder='Select a transaction type'
+            />
           </div>
 
           <div className='mb-4'>
