@@ -45,5 +45,11 @@
   "No file chosen": "No se ha seleccionado ningún archivo",
   "files": "archivos",
   "Add": "Agregar",
-  "Edit": "Editar"
+  "Edit": "Editar",
+  "Total Returns": "Rendimientos Totales",
+  "Pending Transactions": "Transacciones pendientes",
+  "First Name": "Nombre",
+  "Last Name": "Apellido",
+  "Password": "Contraseña",
+  "Change Password": "Cambiar Contraseña"
 }

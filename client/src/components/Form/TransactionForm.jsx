@@ -161,14 +161,12 @@ const TransactionForm = ({
   if (!showTransactionForm) return null;
 
   return (
-    <div className='fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50'>
+    <div className='fixed inset-0 flex items-center justify-center z-[101] bg-black bg-opacity-50'>
       <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-lg h-auto overflow-y-auto scrollbar-transparent'>
         <h2 className='text-2xl font-bold mb-4 dark:text-white'>{`${type} Transaction`}</h2>
         <form onSubmit={handleSubmit} encType='multipart/form-data'>
           <div className='mb-4'>
-            <label className='block text-gray-700 dark:text-gray-300 dark:text-gray-300'>
-              {t('Date')}
-            </label>
+            <label className='block text-gray-700 dark:text-gray-300'>{t('Date')}</label>
             <Datepicker
               required
               i18n={i18n.language}

@@ -45,5 +45,11 @@
   "No file chosen": "No file chosen",
   "files": "files",
   "Add": "Add",
-  "Edit": "Edit"
+  "Edit": "Edit",
+  "Total Returns": "Total Returns",
+  "Pending Transactions": "Pending Transactions",
+  "First Name": "First Name",
+  "Last Name": "Last Name",
+  "Password": "Password",
+  "Change Password": "Change Password"
 }

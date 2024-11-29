@@ -6,14 +6,12 @@ const SupplierForm = ({ showSupplierForm, onClose, onSubmit, supplier, setSuppli
   if (!showSupplierForm) return null;
 
   return (
-    <div className='fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50'>
+    <div className='fixed inset-0 flex items-center justify-center z-[101] bg-black bg-opacity-50'>
       <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md'>
         <h2 className='text-2xl font-bold mb-4 dark:text-white'>Add New Supplier</h2>
         <form onSubmit={onSubmit}>
           <div className='mb-4'>
-            <label className='block text-gray-700 dark:text-gray-300 dark:text-gray-300'>
-              {t('Name')}
-            </label>
+            <label className='block text-gray-700 dark:text-gray-300'>{t('Name')}</label>
             <input
               type='text'
               className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'

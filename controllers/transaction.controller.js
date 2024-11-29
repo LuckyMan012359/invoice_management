@@ -431,3 +431,35 @@ exports.deleteTransaction = async (req, res) => {
     });
   }
 };
+
+exports.getTransactionData = async (req, res) => {
+  try {
+    const transactions = await Transaction.find({});
+
+    let TotalPurchases = 0;
+    let TotalPayments = 0;
+    let TotalReturns = 0;
+
+    transactions.map((item) => {
+      if (item.transaction_type === 'invoice') {
+        TotalPurchases += item.amount;
+      } else if (item.transaction_type === 'payment') {
+        TotalPayments += item.amount;
+      } else {
+        TotalReturns += item.amount;
+      }
+    });
+
+    res.status(200).send({
+      TotalPurchases: TotalPurchases,
+      TotalPayments: TotalPayments,
+      TotalReturns: TotalReturns,
+    });
+  } catch (error) {
+    console.error('Error getting transactions data', error);
+    res.status(500).send({
+      message: 'An error occured while getting all transaction.',
+      error: error.message,
+    });
+  }
+};

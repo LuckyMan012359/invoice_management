@@ -10,6 +10,7 @@ const {
   readTransaction,
   updateTransaction,
   deleteTransaction,
+  getTransactionData,
 } = require('../controllers/transaction.controller.js');
 const verifyToken = require('../middlewares/authJWT.js');
 
@@ -108,5 +109,7 @@ router.put(
 );
 
 router.delete('/delete_transaction', verifyToken, deleteTransaction);
+
+router.get('/total_transaction_value', verifyToken, getTransactionData);
 
 module.exports = router;
