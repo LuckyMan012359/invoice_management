@@ -136,8 +136,8 @@ export const Customers = () => {
 
   const deleteCustomer = async (deleteCustomer) => {
     if (
-      deleteCustomer.totalPurchase !== 0 &&
-      deleteCustomer.totalPayment !== 0 &&
+      deleteCustomer.totalPurchase !== 0 ||
+      deleteCustomer.totalPayment !== 0 ||
       deleteCustomer.totalReturn !== 0
     ) {
       toast.error("You can't delete this customer because he has transaction.");

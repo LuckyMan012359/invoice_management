@@ -90,8 +90,8 @@ export const Suppliers = () => {
 
   const deleteSupplier = async (deleteSupplier) => {
     if (
-      deleteSupplier.totalPurchase !== 0 &&
-      deleteSupplier.totalPayment !== 0 &&
+      deleteSupplier.totalPurchase !== 0 ||
+      deleteSupplier.totalPayment !== 0 ||
       deleteSupplier.totalReturn !== 0
     ) {
       toast.error("You can't delete this supplier because this has transaction.");
