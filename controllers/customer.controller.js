@@ -196,7 +196,11 @@ exports.readOnlyCustomer = async (req, res) => {
       role: { $ne: 'admin' },
     };
 
-    const cacheKey = 'only_customers';
+    if (req.user.role !== 'admin') {
+      filter.email = req.user.email;
+    }
+
+    const cacheKey = `only_customers:${req.user.email}`;
 
     const cachedData = getCache('customer', cacheKey);
     if (cachedData) {
