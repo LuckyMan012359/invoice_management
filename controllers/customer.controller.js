@@ -43,7 +43,7 @@ exports.readCustomer = async (req, res) => {
   try {
     const adminUser = await User.findOne({ email: req.user.email }).exec();
 
-    const cacheKey = `customers:${pageNum}:${pageSize}:${keyword}`;
+    const cacheKey = `customers:${req.user.email}:${req.user.role}:${pageNum}:${pageSize}:${keyword}`;
 
     const cachedData = getCache('customer', cacheKey);
 

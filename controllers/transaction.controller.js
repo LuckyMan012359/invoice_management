@@ -67,7 +67,7 @@ exports.readTransaction = async (req, res) => {
   try {
     const { customer, supplier, keyword, date, pageNum, pageSize } = req.query;
 
-    const cacheKey = `transactions:${customer}:${supplier}:${keyword}:${date}:${pageNum}:${pageSize}`;
+    const cacheKey = `transactions:${req.user.email}:${req.user.role}:${customer}:${supplier}:${keyword}:${date}:${pageNum}:${pageSize}`;
 
     const cachedData = getCache('transaction', cacheKey);
     if (cachedData) {

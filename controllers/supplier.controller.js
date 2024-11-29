@@ -37,7 +37,7 @@ exports.readSupplier = async (req, res) => {
   const { pageNum, pageSize, keyword } = req.query;
 
   try {
-    const cacheKey = `suppliers:${pageNum}:${pageSize}:${keyword}`;
+    const cacheKey = `suppliers:${req.user.email}:${req.user.role}:${pageNum}:${pageSize}:${keyword}`;
 
     const cachedData = getCache('supplier', cacheKey);
 
