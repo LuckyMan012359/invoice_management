@@ -46,10 +46,11 @@
   "files": "archivos",
   "Add": "Agregar",
   "Edit": "Editar",
-  "Total Returns": "Rendimientos Totales",
+  "Total Returns": "Devoluciones totales",
   "Pending Transactions": "Transacciones pendientes",
   "First Name": "Nombre",
   "Last Name": "Apellido",
   "Password": "Contraseña",
-  "Change Password": "Cambiar Contraseña"
+  "Change Password": "Cambiar Contraseña",
+  "New Password": "Nueva contraseña"
 }
