@@ -2,6 +2,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user.model');
 const Transaction = require('../models/transaction.model');
+const NodeCache = require('node-cache');
+const { getCache, setCache, deleteCache } = require('../config/cacheController');
+const userCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 
 exports.signup = (req, res) => {
   const { firstName, lastName, email, role, password, homeAddress, phoneNumber } = req.body;
@@ -84,41 +87,15 @@ exports.signin = (req, res) => {
     });
 };
 
-exports.hiddencontent = (req, res) => {
-  if (!req.user) {
-    res.status(403).send({
-      message: 'Invalid JWT token',
-    });
-  }
-  if (req.user == 'admin') {
-    res.status(200).send({
-      message: 'Congratulations! but there is no hidden content',
-    });
-  } else {
-    res.status(403).send({
-      message: 'Unauthorised access',
-    });
-  }
-};
-
-exports.userRole = async (req, res) => {
-  try {
-    const user = await User.findOne({ email: req.user.email }).exec();
-
-    res.status(200).send({
-      role: user.role,
-    });
-  } catch (error) {
-    console.error('Error reading user info:', error);
-    res.status(500).send({
-      message: 'An error occurred while getting user info',
-      error: error.message,
-    });
-  }
-};
-
 exports.getUserInfo = async (req, res) => {
   try {
+    const cacheKey = `user:${req.user.email}`;
+
+    const cachedData = getCache('customer', cacheKey);
+    if (cachedData) {
+      return res.status(200).send({ user: cachedData });
+    }
+
     let user = await User.findOne({ email: req.user.email }).exec();
 
     const transactions = await Transaction.find({ customer_id: user._id });
@@ -150,6 +127,8 @@ exports.getUserInfo = async (req, res) => {
       user.totalReturn = 0;
       user.totalBalance = 0;
     }
+
+    setCache('customer', cacheKey, user);
 
     res.status(200).send({
       user: user,
@@ -183,6 +162,10 @@ exports.updateUserInfo = async (req, res) => {
     });
 
     console.log(user);
+
+    deleteCache('customer');
+    deleteCache('transaction');
+    deleteCache('pending_transaction');
 
     res.status(200).send({
       message: 'Updated Successfully',

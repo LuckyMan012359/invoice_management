@@ -1,6 +1,6 @@
+const { deleteCache, getCache, setCache } = require('../config/cacheController');
 const Supplier = require('../models/supplier.model');
 const Trasnaction = require('../models/transaction.model');
-const User = require('../models/user.model');
 
 exports.createSupplier = async (req, res) => {
   const { name, email, phoneNumber, homeAddress } = req.body;
@@ -21,6 +21,11 @@ exports.createSupplier = async (req, res) => {
     });
 
     await supplierData.save();
+
+    deleteCache('transaction');
+    deleteCache('pending_transaction');
+    deleteCache('supplier');
+
     return res.status(201).send({ message: 'Supplier created successfully' });
   } catch (error) {
     console.error(error);
@@ -32,6 +37,14 @@ exports.readSupplier = async (req, res) => {
   const { pageNum, pageSize, keyword } = req.query;
 
   try {
+    const cacheKey = `suppliers:${pageNum}:${pageSize}:${keyword}`;
+
+    const cachedData = getCache('supplier', cacheKey);
+
+    if (cachedData) {
+      return res.status(200).send(cachedData);
+    }
+
     const filter = keyword
       ? {
           $or: [
@@ -89,7 +102,7 @@ exports.readSupplier = async (req, res) => {
       }),
     );
 
-    return res.status(200).send({
+    const result = {
       data: resultSuppliers,
       meta: {
         totalRecords: totalCount,
@@ -97,7 +110,11 @@ exports.readSupplier = async (req, res) => {
         pageSize: parseInt(pageSize),
         totalPages: Math.ceil(totalCount / limit),
       },
-    });
+    };
+
+    setCache('supplier', cacheKey, result);
+
+    return res.status(200).send(result);
   } catch (error) {
     console.error(error);
     return res.status(500).send({ message: 'An error occurred while fetching customers.' });
@@ -122,6 +139,10 @@ exports.updateSupplier = async (req, res) => {
 
     await Supplier.updateOne({ _id }, { $set: updateFields });
 
+    deleteCache('transaction');
+    deleteCache('pending_transaction');
+    deleteCache('supplier');
+
     return res.status(200).send({ message: 'Customer updated successfully' });
   } catch (error) {
     console.error(error);
@@ -141,6 +162,10 @@ exports.deleteSupplier = async (req, res) => {
     if (!deletedCustomer) {
       return res.status(404).send({ message: 'Customer not found.' });
     }
+
+    deleteCache('transaction');
+    deleteCache('pending_transaction');
+    deleteCache('supplier');
 
     return res
       .status(200)

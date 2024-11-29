@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
 import { useCookies } from 'react-cookie';
 import { toast } from 'react-toastify';
-// import { validateFormField } from '../../utils/validateFormField';
 
 export const Login = () => {
   const router = useNavigate();

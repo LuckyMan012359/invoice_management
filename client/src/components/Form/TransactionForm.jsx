@@ -120,6 +120,8 @@ const TransactionForm = ({
     }
 
     try {
+      console.log(userRole);
+
       if (userRole === 'admin') {
         if (type === 'Add') {
           const response = await axiosInstance(

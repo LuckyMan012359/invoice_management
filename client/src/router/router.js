@@ -3,7 +3,7 @@ import { Dashboard } from '../pages/Dashboard/Dashboard';
 import { Transactions } from '../pages/Transaction/Transactions';
 import { Customers } from '../pages/Customers/Customers';
 import { Suppliers } from '../pages/Suppliers/Suppliers';
-import Profile from '../pages/Profile/profile';
+import Profile from '../components/Profile/profile';
 
 export const router = [
   {

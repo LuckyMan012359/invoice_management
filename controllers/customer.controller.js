@@ -1,3 +1,4 @@
+const { deleteCache, getCache, setCache } = require('../config/cacheController');
 const bcrypt = require('bcryptjs');
 const Transaction = require('../models/transaction.model');
 const User = require('../models/user.model');
@@ -24,6 +25,11 @@ exports.createCustomer = async (req, res) => {
     });
 
     await userData.save();
+
+    deleteCache('customer');
+    deleteCache('transaction');
+    deleteCache('pending_transaction');
+
     return res.status(201).send({ message: 'Customer created successfully' });
   } catch (error) {
     console.error(error);
@@ -36,6 +42,14 @@ exports.readCustomer = async (req, res) => {
 
   try {
     const adminUser = await User.findOne({ email: req.user.email }).exec();
+
+    const cacheKey = `customers:${pageNum}:${pageSize}:${keyword}`;
+
+    const cachedData = getCache('customer', cacheKey);
+
+    if (cachedData) {
+      return res.status(200).send(cachedData);
+    }
 
     let filter = {
       email: { $ne: adminUser.email },
@@ -97,7 +111,7 @@ exports.readCustomer = async (req, res) => {
       }),
     );
 
-    return res.status(200).send({
+    const result = {
       data: resultCustomer,
       meta: {
         totalRecords: totalCount,
@@ -105,7 +119,11 @@ exports.readCustomer = async (req, res) => {
         pageSize: parseInt(pageSize),
         totalPages: Math.ceil(totalCount / limit),
       },
-    });
+    };
+
+    setCache('customer', cacheKey, result);
+
+    return res.status(200).send(result);
   } catch (error) {
     console.error(error);
     return res.status(500).send({ message: 'An error occurred while fetching customers.' });
@@ -135,6 +153,10 @@ exports.updateCustomer = async (req, res) => {
 
     await User.updateOne({ _id }, { $set: updateFields });
 
+    deleteCache('customer');
+    deleteCache('transaction');
+    deleteCache('pending_transaction');
+
     return res.status(200).send({ message: 'Customer updated successfully' });
   } catch (error) {
     console.error(error);
@@ -155,6 +177,10 @@ exports.deleteCustomer = async (req, res) => {
       return res.status(404).send({ message: 'Customer not found.' });
     }
 
+    deleteCache('customer');
+    deleteCache('transaction');
+    deleteCache('pending_transaction');
+
     return res
       .status(200)
       .send({ message: 'Customer deleted successfully.', customer: deletedCustomer });
@@ -169,6 +195,13 @@ exports.readOnlyCustomer = async (req, res) => {
     let filter = {
       role: { $ne: 'admin' },
     };
+
+    const cacheKey = 'only_customers';
+
+    const cachedData = getCache('customer', cacheKey);
+    if (cachedData) {
+      return res.status(200).send(cachedData);
+    }
 
     const customers = await User.find(filter).exec();
 
@@ -208,9 +241,13 @@ exports.readOnlyCustomer = async (req, res) => {
       }),
     );
 
-    return res.status(200).send({
+    const result = {
       data: resultCustomer,
-    });
+    };
+
+    setCache('customer', cacheKey, result);
+
+    return res.status(200).send(result);
   } catch (error) {
     console.error(error);
     return res.status(500).send({ message: 'An error occurred while fetching customers.' });

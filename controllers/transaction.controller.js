@@ -1,3 +1,4 @@
+const { deleteCache, getCache, setCache } = require('../config/cacheController');
 const Transaction = require('../models/transaction.model');
 const User = require('../models/user.model');
 const fs = require('fs');
@@ -44,6 +45,11 @@ exports.createTransaction = async (req, res) => {
 
     await transaction.save();
 
+    deleteCache('customer');
+    deleteCache('transaction');
+    deleteCache('pending_transaction');
+    deleteCache('supplier');
+
     res.status(201).send({
       message: 'Transaction created successfully!',
       transaction,
@@ -61,8 +67,14 @@ exports.readTransaction = async (req, res) => {
   try {
     const { customer, supplier, keyword, date, pageNum, pageSize } = req.query;
 
-    const match = {};
+    const cacheKey = `transactions:${customer}:${supplier}:${keyword}:${date}:${pageNum}:${pageSize}`;
 
+    const cachedData = getCache('transaction', cacheKey);
+    if (cachedData) {
+      return res.status(200).send(cachedData);
+    }
+
+    const match = {};
     const user = await User.findOne({ email: req.user.email }).exec();
 
     if (user.role === 'customer') {
@@ -149,8 +161,6 @@ exports.readTransaction = async (req, res) => {
       },
     ];
 
-    console.log(pageNum, pageSize);
-
     if (pageNum && pageSize) {
       pipeline.push(
         { $skip: (parseInt(pageNum, 10) - 1) * parseInt(pageSize, 10) },
@@ -207,18 +217,20 @@ exports.readTransaction = async (req, res) => {
     ];
 
     const transactions = await Transaction.aggregate(pipeline);
-
     const totalTransactions = await Transaction.aggregate(totalPipeline);
-
     const count = totalTransactions.length > 0 ? totalTransactions.length : 0;
 
-    res.status(200).send({
+    const result = {
       message: 'Transactions retrieved successfully',
       transactions,
       totalPage: Math.ceil(count / parseInt(pageSize, 10)),
       totalCount: count,
       totalTransactions,
-    });
+    };
+
+    setCache('transaction', cacheKey, result);
+
+    res.status(200).send(result);
   } catch (error) {
     console.error('Error reading transactions:', error);
     res.status(500).send({
@@ -314,6 +326,11 @@ exports.updateTransaction = async (req, res) => {
 
     await existingTransaction.save();
 
+    deleteCache('customer');
+    deleteCache('transaction');
+    deleteCache('pending_transaction');
+    deleteCache('supplier');
+
     const otherTransactions = await Transaction.find({
       $and: [
         {
@@ -382,6 +399,11 @@ exports.deleteTransaction = async (req, res) => {
 
     const deletedTransaction = await Transaction.findByIdAndDelete(transaction_id);
 
+    deleteCache('customer');
+    deleteCache('transaction');
+    deleteCache('pending_transaction');
+    deleteCache('supplier');
+
     const otherTransactions = await Transaction.find({
       created: { $gt: deletedTransaction.created },
     }).sort({ created: -1 });
@@ -434,6 +456,14 @@ exports.deleteTransaction = async (req, res) => {
 
 exports.getTransactionData = async (req, res) => {
   try {
+    const cacheKey = 'total_transaction_value';
+    const cachedData = getCache('transaction', cacheKey);
+
+    if (cachedData) {
+      console.log('Returning cached transaction data');
+      return res.status(200).send(cachedData);
+    }
+
     const transactions = await Transaction.find({});
 
     let TotalPurchases = 0;
@@ -450,15 +480,19 @@ exports.getTransactionData = async (req, res) => {
       }
     });
 
-    res.status(200).send({
-      TotalPurchases: TotalPurchases,
-      TotalPayments: TotalPayments,
-      TotalReturns: TotalReturns,
-    });
+    const responseData = {
+      TotalPurchases,
+      TotalPayments,
+      TotalReturns,
+    };
+
+    setCache('transaction', cacheKey, responseData);
+
+    return res.status(200).send(responseData);
   } catch (error) {
     console.error('Error getting transactions data', error);
-    res.status(500).send({
-      message: 'An error occured while getting all transaction.',
+    return res.status(500).send({
+      message: 'An error occurred while getting all transactions.',
       error: error.message,
     });
   }

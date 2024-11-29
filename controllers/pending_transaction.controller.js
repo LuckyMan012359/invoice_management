@@ -1,3 +1,4 @@
+const { deleteCache, getCache, setCache } = require('../config/cacheController');
 const PendingTransaction = require('../models/pending_transaction.model');
 const Transaction = require('../models/transaction.model');
 const User = require('../models/user.model');
@@ -52,6 +53,9 @@ exports.createPendingTransaction = async (req, res) => {
 
       await transaction.save();
 
+      deleteCache('transaction');
+      deleteCache('pending_transaction');
+
       res.status(201).send({
         message: 'Transaction pending successfully!',
         transaction,
@@ -102,6 +106,13 @@ exports.createPendingTransaction = async (req, res) => {
 exports.readPendingTransaction = async (req, res) => {
   try {
     const { customer, supplier, keyword, date, pageNum, pageSize } = req.query;
+
+    const cacheKey = `pending_transactions:${customer}:${supplier}:${keyword}:${date}:${pageNum}:${pageSize}`;
+
+    const cachedData = getCache('pending_transaction', cacheKey);
+    if (cachedData) {
+      return res.status(200).send(cachedData);
+    }
 
     const match = {};
 
@@ -249,13 +260,17 @@ exports.readPendingTransaction = async (req, res) => {
 
     const count = totalTransactions.length > 0 ? totalTransactions.length : 0;
 
-    res.status(200).send({
+    const result = {
       message: 'Transactions retrieved successfully',
       transactions,
       totalPage: Math.ceil(count / parseInt(pageSize, 10)),
       totalCount: count,
       totalTransactions,
-    });
+    };
+
+    setCache('pending_transaction', cacheKey, result);
+
+    res.status(200).send(result);
   } catch (error) {
     console.error('Error reading transactions:', error);
     res.status(500).send({
@@ -341,6 +356,9 @@ exports.updatePendingTransaction = async (req, res) => {
       await latestTransaction.save();
 
       await PendingTransaction.findByIdAndDelete(pending_transaction_id);
+
+      deleteCache('transaction');
+      deleteCache('pending_transaction');
 
       const otherTransaction = await Transaction.find({
         $and: [
@@ -432,6 +450,8 @@ exports.deletePendingTransaction = async (req, res) => {
     }
 
     await PendingTransaction.findByIdAndDelete(transaction_id);
+
+    deleteCache('pending_transaction');
 
     res.status(200).send({
       message: 'Transaction and associated attachments deleted successfully!',
