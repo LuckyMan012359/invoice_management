@@ -56,8 +56,8 @@ function Header() {
             className='bg-transparent text-gray-600 px-3 py-2 dark:text-gray-300 focus:outline-none border-b-2 border-transparent dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-400 dark:bg-gray-800'
             defaultValue={i18n.language}
           >
-            <option value='en'>English</option>
             <option value='es'>Español</option>
+            <option value='en'>English</option>
           </select>
 
           <button
