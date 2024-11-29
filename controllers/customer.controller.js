@@ -200,7 +200,7 @@ exports.readOnlyCustomer = async (req, res) => {
       filter.email = req.user.email;
     }
 
-    const cacheKey = `only_customers:${req.user.email}`;
+    const cacheKey = `only_customers:${req.user.email}:${req.user.role}`;
 
     const cachedData = getCache('customer', cacheKey);
     if (cachedData) {
