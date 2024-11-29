@@ -58,9 +58,7 @@ const Profile = () => {
 
     if (response.status === 200) {
       toast.success(response.data.message);
-      setTimeout(() => {
-        window.location.reload();
-      }, 5000);
+      window.location.reload();
     } else {
       toast.error(response.data.message);
     }
