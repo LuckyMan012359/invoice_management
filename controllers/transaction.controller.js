@@ -456,7 +456,7 @@ exports.deleteTransaction = async (req, res) => {
 
 exports.getTransactionData = async (req, res) => {
   try {
-    const cacheKey = 'total_transaction_value';
+    const cacheKey = `total_transaction_value:${req.user.email}:${req.user.role}`;
     const cachedData = getCache('transaction', cacheKey);
 
     if (cachedData) {
@@ -464,7 +464,15 @@ exports.getTransactionData = async (req, res) => {
       return res.status(200).send(cachedData);
     }
 
-    const transactions = await Transaction.find({});
+    let filter = {};
+
+    if (req.user.role !== 'admin') {
+      filter = {
+        customer_id: req.user._id,
+      };
+    }
+
+    const transactions = await Transaction.find(filter);
 
     let TotalPurchases = 0;
     let TotalPayments = 0;
