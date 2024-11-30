@@ -101,6 +101,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
         pageSize: transactionsPerPage,
       });
 
+      console.log(response.data.transactions);
+
       setTotalPages(response.data.totalPage);
       setTransactionData(response.data.transactions);
       setTotalTransactionsData(response.data.totalTransactions);

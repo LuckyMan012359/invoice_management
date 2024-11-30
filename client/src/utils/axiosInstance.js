@@ -3,25 +3,26 @@ import { Cookies } from 'react-cookie';
 
 const axiosInstance = async (url, method, data, config = {}) => {
   const cookies = new Cookies();
+
+  // Axios configuration
   const instance = axios.create({
-    baseURL: process.env.REACT_APP_API_URL,
-    validateStatus: (status) => {
-      return true;
-    },
+    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api', // Fallback to local API
+    validateStatus: (status) => status >= 200 && status < 300, // Accept only successful responses
   });
 
+  // Request interceptor to add Authorization header
   instance.interceptors.request.use(
     (config) => {
-      if (cookies.get('token')) {
-        config.headers.Authorization = `Bearer ${cookies.get('token')}`;
+      const token = cookies.get('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
       }
       return config;
     },
-    (error) => {
-      return Promise.reject(error);
-    },
+    (error) => Promise.reject(error),
   );
 
+  // Configure the request
   const requestConfig = {
     ...config,
     method,
@@ -29,7 +30,14 @@ const axiosInstance = async (url, method, data, config = {}) => {
     ...(method !== 'get' && method !== 'delete' ? { data } : { params: data }),
   };
 
-  return await instance.request(requestConfig);
+  // Execute the request
+  try {
+    const response = await instance.request(requestConfig);
+    return response.data; // Return data directly
+  } catch (error) {
+    console.error('Network Error:', error); // Log the error for debugging
+    throw error; // Re-throw for proper error handling
+  }
 };
 
 export default axiosInstance;

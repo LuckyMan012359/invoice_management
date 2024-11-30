@@ -94,7 +94,7 @@ exports.readSupplier = async (req, res) => {
           supplier = supplier.toObject();
           supplier.totalPurchase = 0;
           supplier.totalPayment = 0;
-          supplier.totalPayment = 0;
+          supplier.totalReturn = 0;
           supplier.totalBalance = 0;
         }
 
@@ -143,7 +143,7 @@ exports.updateSupplier = async (req, res) => {
     deleteCache('pending_transaction');
     deleteCache('supplier');
 
-    return res.status(200).send({ message: 'Customer updated successfully' });
+    return res.status(200).send({ message: 'Supplier updated successfully' });
   } catch (error) {
     console.error(error);
     return res.status(500).send({ message: 'An error occurred while updating the customer.' });
@@ -169,7 +169,7 @@ exports.deleteSupplier = async (req, res) => {
 
     return res
       .status(200)
-      .send({ message: 'Customer deleted successfully.', customer: deletedCustomer });
+      .send({ message: 'Supplier deleted successfully.', customer: deletedCustomer });
   } catch (error) {
     console.error('Error deleting customer:', error);
     return res.status(500).send({ message: 'An error occurred while deleting the customer.' });

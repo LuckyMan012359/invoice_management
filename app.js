@@ -15,7 +15,9 @@ const PORT = process.env.PORT || 8080;
 connectDB();
 app.use(
   cors({
-    origin: {},
+    origin: ['https://negociacionalex.lat'], // Allow only your frontend domain
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed methods
+    credentials: true, // Allow cookies and headers
   }),
 );
 app.use(express.json());

@@ -35,6 +35,8 @@ export const Suppliers = () => {
         pageSize: suppliersPerPage,
         keyword: keyword,
       });
+      console.log(response.data.data);
+
       setFilteredSuppliers(response.data.data);
 
       setTotalPages(response.data.meta.totalPages);

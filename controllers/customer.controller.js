@@ -7,6 +7,10 @@ exports.createCustomer = async (req, res) => {
   const { firstName, lastName, email, phoneNumber, role, homeAddress, password } = req.body;
 
   try {
+    console.log(req.body);
+
+    console.log(role);
+
     const existingCustomer = await User.findOne({ email }).exec();
     if (existingCustomer) {
       return res
@@ -154,6 +158,7 @@ exports.updateCustomer = async (req, res) => {
     await User.updateOne({ _id }, { $set: updateFields });
 
     deleteCache('customer');
+    deleteCache('supplier');
     deleteCache('transaction');
     deleteCache('pending_transaction');
 
