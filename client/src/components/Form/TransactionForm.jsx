@@ -134,7 +134,7 @@ const TransactionForm = ({
             formattedData,
           );
           toast.success(response.data.message);
-          setShowTransactionForm(false);
+
           setIsChanged(!isChanged);
         } else {
           const response = await axiosInstance(
@@ -143,7 +143,9 @@ const TransactionForm = ({
             formattedData,
           );
           toast.success(response.data.message);
+
           setShowTransactionForm(false);
+
           setIsChanged(!isChanged);
         }
       } else {
@@ -155,8 +157,8 @@ const TransactionForm = ({
           formattedData,
         );
         toast.success(response.data.message);
-        setShowTransactionForm(false);
         setIsChanged(!isChanged);
+        setShowTransactionForm(false);
       }
       resetForm();
     } catch (error) {
@@ -192,38 +194,38 @@ const TransactionForm = ({
   const selectStyles = {
     control: (styles, { isFocused }) => ({
       ...styles,
-      backgroundColor: 'var(--bg-color)', // Assuming you set a CSS variable for background color
+      backgroundColor: 'var(--bg-color)',
       borderColor: isFocused ? 'var(--focus-border-color)' : 'var(--border-color)',
       boxShadow: isFocused ? '0 0 0 1px var(--focus-border-color)' : 'none',
       '&:hover': {
         borderColor: 'var(--hover-border-color)',
       },
-      color: isDarkMode ? '#fff' : '#000', // Change the text color based on dark mode
+      color: isDarkMode ? '#fff' : '#000',
     }),
     menu: (styles) => ({
       ...styles,
-      backgroundColor: isDarkMode ? '#1f2937' : '#fff', // Dark mode background for the menu
-      color: isDarkMode ? '#fff' : '#000', // Text color in the menu
+      backgroundColor: isDarkMode ? '#1f2937' : '#fff',
+      color: isDarkMode ? '#fff' : '#000',
     }),
     option: (styles, { isSelected, isFocused }) => ({
       ...styles,
       backgroundColor: isSelected
         ? isDarkMode
           ? '#4B5563'
-          : '#E5E7EB' // selected option background color
+          : '#E5E7EB'
         : isFocused
         ? isDarkMode
           ? '#374151'
-          : '#F3F4F6' // focused option background color
+          : '#F3F4F6'
         : 'transparent',
-      color: isDarkMode ? '#fff' : '#000', // Change text color for options
+      color: isDarkMode ? '#fff' : '#000',
       '&:hover': {
         backgroundColor: isFocused ? (isDarkMode ? '#374151' : '#F3F4F6') : undefined,
       },
     }),
     singleValue: (styles) => ({
       ...styles,
-      color: isDarkMode ? '#fff' : '#000', // Text color for the selected value
+      color: isDarkMode ? '#fff' : '#000',
     }),
   };
 

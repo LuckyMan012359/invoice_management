@@ -73,9 +73,9 @@ export const Suppliers = () => {
         toast.error(response.data.message);
       }
       setIsChanged(!isChanged);
+      setShowSupplierForm(false);
     }
     resetForm();
-    setShowSupplierForm(false);
   };
 
   const resetForm = () => {

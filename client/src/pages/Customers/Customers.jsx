@@ -77,6 +77,8 @@ export const Customers = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log(customer);
+
     const passwordError = validatePassword(customer.password);
 
     if (passwordError) {
@@ -111,10 +113,10 @@ export const Customers = () => {
       } else {
         toast.error(response.data.message);
       }
+      setShowCustomerForm(false);
     }
 
     resetForm();
-    setShowCustomerForm(false);
     setIsChanged(true);
   };
 
@@ -131,7 +133,6 @@ export const Customers = () => {
       totalPurchase: 0,
       totalReturn: 0,
     });
-    setIsChanged(false);
   };
 
   const deleteCustomer = async (deleteCustomer) => {
