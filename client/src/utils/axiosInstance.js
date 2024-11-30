@@ -33,7 +33,7 @@ const axiosInstance = async (url, method, data, config = {}) => {
   // Execute the request
   try {
     const response = await instance.request(requestConfig);
-    return response.data; // Return data directly
+    return response; // Return data directly
   } catch (error) {
     console.error('Network Error:', error); // Log the error for debugging
     throw error; // Re-throw for proper error handling
