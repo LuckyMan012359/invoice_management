@@ -7,7 +7,9 @@ const axiosInstance = async (url, method, data, config = {}) => {
   // Axios configuration
   const instance = axios.create({
     baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api', // Fallback to local API
-    validateStatus: (status) => status >= 200 && status < 300, // Accept only successful responses
+    validateStatus: (status) => {
+      return true;
+    },
   });
 
   // Request interceptor to add Authorization header
