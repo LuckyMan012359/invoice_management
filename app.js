@@ -34,7 +34,7 @@ app.use(
 
 createInitialUserData();
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/attachments', express.static(path.join(__dirname, 'uploads', 'attachments')));
 
 app.use((req, res, next) => {
   console.log(`\x1b[42m ${req.method} ${req.url} request received.\x1b[0m`);
