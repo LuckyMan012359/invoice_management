@@ -150,6 +150,7 @@ exports.readTransaction = async (req, res) => {
           notes: 1,
           transaction_date: 1,
           attachments: 1,
+          created: 1,
           'customer._id': 1,
           'customer.email': 1,
           'customer.firstName': 1,
