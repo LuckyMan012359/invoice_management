@@ -13,6 +13,9 @@ require('dotenv').config();
 const PORT = process.env.PORT || 8080;
 
 connectDB();
+
+app.set('trust proxy', true);
+
 app.use(
   cors({
     origin: ['https://negociacionalex.lat'], // Allow requests only from this domain
