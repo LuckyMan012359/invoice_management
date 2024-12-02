@@ -152,8 +152,35 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
       pageSize: transactionsPerPage,
     });
 
+    let calculatedBalance = 0;
+
+    const userRole = await getUserRole();
+
+    const data = response.data.transactions.sort(
+      (a, b) => new Date(a.created) - new Date(b.created),
+    );
+
+    console.log(data);
+
+    const updatedTransactions = data.map((item) => {
+      if (userRole === 'admin') {
+        if (item.transaction_type === 'invoice') {
+          calculatedBalance += item.amount;
+        } else if (item.transaction_type === 'payment' || item.transaction_type === 'return') {
+          calculatedBalance -= item.amount;
+        }
+        return { ...item, calculatedBalance };
+      } else {
+        return item;
+      }
+    });
+
+    const resultTransactions = updatedTransactions.sort(
+      (a, b) => new Date(b.created) - new Date(a.created),
+    );
+
     setTotalPages(response.data.totalPage);
-    setTransactionData(response.data.transactions);
+    setTransactionData(resultTransactions);
     setTotalTransactionsData(response.data.totalTransactions);
     setLoading(false);
   };

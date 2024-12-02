@@ -49,10 +49,12 @@ const TransactionForm = ({
   const [removeAttachments, setRemoveAttachments] = useState(false);
 
   const resetForm = () => {
+    console.log(123456);
+
     setFormData({
-      customerId: '',
-      supplierId: '',
-      transactionType: '',
+      customerId: null,
+      supplierId: null,
+      transactionType: null,
       amount: '',
       notes: '',
       date: { startDate: '', endDate: '' },
@@ -131,6 +133,7 @@ const TransactionForm = ({
           await axiosInstance('/transaction/create_transaction', 'post', formattedData);
           toast.success(t('Transaction created successfully'));
 
+          resetForm();
           setIsChanged(!isChanged);
         } else {
           await axiosInstance('/transaction/update_transaction', 'put', formattedData);
@@ -140,6 +143,7 @@ const TransactionForm = ({
 
           setIsChanged(!isChanged);
         }
+        resetForm();
       } else {
         formattedData.append('original_transaction', transactionId);
 
@@ -147,8 +151,8 @@ const TransactionForm = ({
         toast.success(t('Transaction pending successfully'));
         setIsChanged(!isChanged);
         setShowTransactionForm(false);
+        resetForm();
       }
-      resetForm();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Something went wrong');
     }
@@ -163,20 +167,29 @@ const TransactionForm = ({
     }));
   };
 
-  const customerOptions = customers.map((customer) => ({
-    value: customer._id,
-    label: `${customer.firstName} ${customer.lastName}`,
-  }));
+  const customerOptions = [
+    { value: null, label: 'Select a customer', disabled: true },
+    ...customers.map((customer) => ({
+      value: customer._id,
+      label: `${customer.firstName} ${customer.lastName}`,
+      disabled: false,
+    })),
+  ];
 
-  const supplierOptions = suppliers.map((supplier) => ({
-    value: supplier._id,
-    label: supplier.name,
-  }));
+  const supplierOptions = [
+    { value: null, label: 'Select a supplier', disabled: true },
+    ...suppliers.map((supplier) => ({
+      value: supplier._id,
+      label: supplier.name,
+      disabled: false,
+    })),
+  ];
 
   const transactionTypeOptions = [
-    { value: 'invoice', label: 'INVOICE' },
-    { value: 'payment', label: 'PAYMENTS' },
-    { value: 'return', label: 'RETURN' },
+    { value: null, label: 'Select user role.', disabled: true },
+    { value: 'invoice', label: 'INVOICE', disabled: false },
+    { value: 'payment', label: 'PAYMENTS', disabled: false },
+    { value: 'return', label: 'RETURN', disabled: false },
   ];
 
   const selectStyles = {
@@ -245,6 +258,7 @@ const TransactionForm = ({
               styles={selectStyles}
               placeholder='Select a customer'
               isDisabled={userRole === 'customer'}
+              required
             />
           </div>
 
@@ -256,6 +270,7 @@ const TransactionForm = ({
               onChange={(option) => handleSelectChange(option, 'supplierId')}
               styles={selectStyles}
               placeholder='Select a supplier'
+              required
             />
           </div>
 
@@ -271,6 +286,7 @@ const TransactionForm = ({
               onChange={(option) => handleSelectChange(option, 'transactionType')}
               styles={selectStyles}
               placeholder='Select a transaction type'
+              required
             />
           </div>
 
