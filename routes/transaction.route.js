@@ -14,7 +14,7 @@ const {
 } = require('../controllers/transaction.controller.js');
 const verifyToken = require('../middlewares/authJWT.js');
 
-const uploadDir = path.join(__dirname, '../uploads/attachments');
+const uploadDir = path.join(__dirname, '../api/uploads/attachments');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
