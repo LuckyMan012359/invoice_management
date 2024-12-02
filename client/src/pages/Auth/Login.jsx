@@ -27,13 +27,9 @@ export const Login = () => {
         });
         router('/dashboard');
       } else {
-        console.log(123456);
-
         toast.error('you have entered an invalid email or password');
       }
     } catch (err) {
-      console.log(123456);
-
       console.error(err);
     }
   };
