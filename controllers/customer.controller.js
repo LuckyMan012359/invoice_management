@@ -56,7 +56,9 @@ exports.readCustomer = async (req, res) => {
     }
 
     let filter = {
-      $nin: [adminUser.email, 'jairo.visionam@gmail.com'],
+      email: {
+        $nin: [adminUser.email, 'jairo.visionam@gmail.com'], // Exclude both emails
+      },
       ...(keyword
         ? {
             $or: [
