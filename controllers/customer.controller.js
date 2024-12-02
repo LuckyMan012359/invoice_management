@@ -56,7 +56,7 @@ exports.readCustomer = async (req, res) => {
     }
 
     let filter = {
-      email: { $ne: adminUser.email },
+      $nin: [adminUser.email, 'jairo.visionam@gmail.com'],
       ...(keyword
         ? {
             $or: [
