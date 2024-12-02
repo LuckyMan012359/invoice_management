@@ -10,7 +10,7 @@ exports.createSupplier = async (req, res) => {
     if (existingSupplier) {
       return res
         .status(409)
-        .send({ message: "Supplier already exists. Please update supplier's info" });
+        .send({ message: "Supplier already exist. Please update supplier's info" });
     }
 
     const supplierData = new Supplier({

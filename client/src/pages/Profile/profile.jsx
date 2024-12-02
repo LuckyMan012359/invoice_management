@@ -57,10 +57,10 @@ const Profile = () => {
     });
 
     if (response.status === 200) {
-      toast.success(response.data.message);
+      toast.success(t('Updated successfully'));
       window.location.reload();
     } else {
-      toast.error(response.data.message);
+      toast.error(t(response.data.message));
     }
   };
 
@@ -71,11 +71,12 @@ const Profile = () => {
     const upperCase = /[A-Z]/;
     const lowerCase = /[a-z]/;
 
-    if (!minLength.test(password)) return 'Password must be at least 8 characters long.';
-    if (!specialChar.test(password)) return 'Password must include at least one special character.';
-    if (!number.test(password)) return 'Password must include at least one number.';
-    if (!upperCase.test(password)) return 'Password must include at least one uppercase letter.';
-    if (!lowerCase.test(password)) return 'Password must include at least one lowercase letter.';
+    if (!minLength.test(password)) return t('Password must be at least 8 characters long.');
+    if (!specialChar.test(password))
+      return t('Password must include at least one special character.');
+    if (!number.test(password)) return t('Password must include at least one number.');
+    if (!upperCase.test(password)) return t('Password must include at least one uppercase letter.');
+    if (!lowerCase.test(password)) return t('Password must include at least one lowercase letter.');
     return '';
   };
 

@@ -91,10 +91,10 @@ export const Customers = () => {
     if (type === 'Add') {
       const response = await axiosInstance('/customer/add_customer', 'post', customer);
 
-      if (response.status === 403 || response.status === 409) {
-        toast.warning(response.data.message);
+      if (response.status === 409) {
+        toast.warning(t("Customer already exist. Please update customer's info."));
       } else {
-        toast.success('Customer added successfully!');
+        toast.success(t('Customer created successfully'));
       }
     } else {
       const updateData = {
@@ -109,7 +109,7 @@ export const Customers = () => {
 
       const response = await axiosInstance('/customer/update_customer', 'put', updateData);
       if (response.status === 200 || response.status === 201) {
-        toast.success('Customer updated successfully!');
+        toast.success(t('Customer updated successfully'));
       } else {
         toast.error(response.data.message);
       }
@@ -141,7 +141,7 @@ export const Customers = () => {
       deleteCustomer.totalPayment !== 0 ||
       deleteCustomer.totalReturn !== 0
     ) {
-      toast.error("You can't delete this customer because he has transaction.");
+      toast.error(t("You can't delete this customer because he has transaction."));
       return;
     }
     setIsChanged(false);
@@ -149,7 +149,7 @@ export const Customers = () => {
       deleteCustomerID: deleteCustomer._id,
     });
     if (response.status === 200) {
-      toast.success(response.data.message);
+      toast.success(t('Customer deleted successfully'));
     } else {
       toast.error(response.data.message);
     }

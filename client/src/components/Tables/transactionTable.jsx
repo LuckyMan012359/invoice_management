@@ -137,7 +137,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     });
 
     if (response.status === 200) {
-      toast.success(response.data.message);
+      toast.success(t('Transaction and associated attachments deleted successfully'));
     } else {
       toast.warning(response.data.message);
     }

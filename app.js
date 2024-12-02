@@ -23,6 +23,8 @@ app.use(
     credentials: true, // Allow credentials like cookies, authorization headers
   }),
 );
+
+// app.use(cors({}));
 app.use(express.json());
 app.use(
   express.urlencoded({

@@ -128,21 +128,13 @@ const TransactionForm = ({
 
       if (userRole === 'admin') {
         if (type === 'Add') {
-          const response = await axiosInstance(
-            '/transaction/create_transaction',
-            'post',
-            formattedData,
-          );
-          toast.success(response.data.message);
+          await axiosInstance('/transaction/create_transaction', 'post', formattedData);
+          toast.success(t('Transaction created successfully'));
 
           setIsChanged(!isChanged);
         } else {
-          const response = await axiosInstance(
-            '/transaction/update_transaction',
-            'put',
-            formattedData,
-          );
-          toast.success(response.data.message);
+          await axiosInstance('/transaction/update_transaction', 'put', formattedData);
+          toast.success(t('Transaction updated successfully'));
 
           setShowTransactionForm(false);
 
@@ -151,12 +143,8 @@ const TransactionForm = ({
       } else {
         formattedData.append('original_transaction', transactionId);
 
-        const response = await axiosInstance(
-          '/pending/create_pending_transaction',
-          'post',
-          formattedData,
-        );
-        toast.success(response.data.message);
+        await axiosInstance('/pending/create_pending_transaction', 'post', formattedData);
+        toast.success(t('Transaction pending successfully'));
         setIsChanged(!isChanged);
         setShowTransactionForm(false);
       }

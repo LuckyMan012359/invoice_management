@@ -130,7 +130,7 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
     });
 
     if (response.status === 200) {
-      toast.success(response.data.message);
+      toast.success(t('Transaction and associated attachments deleted successfully'));
     } else {
       toast.warning(response.data.message);
     }
@@ -145,7 +145,11 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
     });
 
     if (response.status === 200) {
-      toast.success(response.data.message);
+      if (allowStatus === 'allow') {
+        toast.success(t('Allow pending transaction successfully'));
+      } else {
+        toast.success(t('Disallow pending transaction successfully'));
+      }
     } else {
       toast.warning(response.data.message);
     }

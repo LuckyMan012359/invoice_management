@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axiosInstance';
 import { useCookies } from 'react-cookie';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 export const Login = () => {
+  const { t } = useTranslation();
   const router = useNavigate();
   const [, setCookie] = useCookies(['token']);
   const [showPassword, setShowPassword] = useState(false);
@@ -18,7 +20,7 @@ export const Login = () => {
       });
 
       if (response.status === 200) {
-        toast.success('Login successful');
+        toast.success(t('Login successful'));
 
         setCookie('token', response.data.accessToken, {
           expires: new Date(response.data.expires_at),

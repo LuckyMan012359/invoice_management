@@ -53,10 +53,10 @@ export const Suppliers = () => {
       const response = await axiosInstance('/supplier/add_supplier', 'post', supplier);
 
       if (response.status === 201) {
-        toast.success('Customer added successfully!');
+        toast.success(t('Supplier created successfully'));
         setIsChanged(!isChanged);
       } else {
-        toast.warning(response.data.message);
+        toast.warning(t(response.data.message));
         setIsChanged(!isChanged);
       }
     } else {
@@ -70,9 +70,9 @@ export const Suppliers = () => {
 
       const response = await axiosInstance('/supplier/update_supplier', 'put', updateData);
       if (response.status === 200 || response.status === 201) {
-        toast.success('Customer updated successfully!');
+        toast.success(t('Supplier updated successfully!'));
       } else {
-        toast.error(response.data.message);
+        toast.error(t(response.data.message));
       }
       setIsChanged(!isChanged);
       setShowSupplierForm(false);
@@ -96,14 +96,16 @@ export const Suppliers = () => {
       deleteSupplier.totalPayment !== 0 ||
       deleteSupplier.totalReturn !== 0
     ) {
-      toast.error("You can't delete this supplier because this has transaction.");
+      toast.error(t("You can't delete this supplier because this has transaction."));
       return;
     }
     const response = await axiosInstance(`/supplier/delete_supplier`, 'delete', {
       deleteSupplierID: deleteSupplier._id,
     });
     if (response.status === 200) {
-      toast.success(response.data.message);
+      toast.success(t('Supplier deleted successfully'));
+    } else if (response.status === 409) {
+      toast.error(t("Supplier already exist. Please update supplier's info"));
     } else {
       toast.error(response.data.message);
     }

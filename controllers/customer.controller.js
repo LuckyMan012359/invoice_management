@@ -15,7 +15,7 @@ exports.createCustomer = async (req, res) => {
     if (existingCustomer) {
       return res
         .status(409)
-        .send({ message: "Customer already exists. Please update customer's info" });
+        .send({ message: "Customer already exist. Please update customer's info." });
     }
 
     const userData = new User({
