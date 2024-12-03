@@ -49,15 +49,13 @@ const TransactionForm = ({
   const [removeAttachments, setRemoveAttachments] = useState(false);
 
   const resetForm = () => {
-    console.log(123456);
-
     setFormData({
       customerId: null,
       supplierId: null,
       transactionType: null,
       amount: '',
       notes: '',
-      date: { startDate: '', endDate: '' },
+      date: { startDate: null, endDate: null },
       attachments: [],
     });
 
@@ -81,6 +79,10 @@ const TransactionForm = ({
       });
     }
   }, [type, transaction]);
+
+  useEffect(() => {
+    console.log(formData);
+  }, [formData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -168,28 +170,28 @@ const TransactionForm = ({
   };
 
   const customerOptions = [
-    { value: null, label: 'Select a customer', disabled: true },
+    { value: null, label: 'Select a customer', isDisabled: true },
     ...customers.map((customer) => ({
       value: customer._id,
       label: `${customer.firstName} ${customer.lastName}`,
-      disabled: false,
+      isDisabled: false,
     })),
   ];
 
   const supplierOptions = [
-    { value: null, label: 'Select a supplier', disabled: true },
+    { value: null, label: 'Select a supplier', isDisabled: true },
     ...suppliers.map((supplier) => ({
       value: supplier._id,
       label: supplier.name,
-      disabled: false,
+      isDisabled: false,
     })),
   ];
 
   const transactionTypeOptions = [
-    { value: null, label: 'Select user role.', disabled: true },
-    { value: 'invoice', label: 'INVOICE', disabled: false },
-    { value: 'payment', label: 'PAYMENTS', disabled: false },
-    { value: 'return', label: 'RETURN', disabled: false },
+    { value: null, label: 'Select user role.', isDisabled: true },
+    { value: 'invoice', label: t('invoice'), isDisabled: false },
+    { value: 'payment', label: t('payment'), isDisabled: false },
+    { value: 'return', label: t('return'), isDisabled: false },
   ];
 
   const selectStyles = {
@@ -229,6 +231,11 @@ const TransactionForm = ({
       color: isDarkMode ? '#fff' : '#000',
     }),
   };
+
+  const formattedOptions = transactionTypeOptions.map((option) => ({
+    ...option,
+    label: option.label.toUpperCase(),
+  }));
 
   return (
     <div className='fixed inset-0 flex items-center justify-center z-[101] bg-black bg-opacity-50'>
@@ -279,10 +286,8 @@ const TransactionForm = ({
               {t('Transaction Type')}
             </label>
             <Select
-              options={transactionTypeOptions}
-              value={transactionTypeOptions.find(
-                (option) => option.value === formData.transactionType,
-              )}
+              options={formattedOptions}
+              value={formattedOptions.find((option) => option.value === formData.transactionType)}
               onChange={(option) => handleSelectChange(option, 'transactionType')}
               styles={selectStyles}
               placeholder='Select a transaction type'

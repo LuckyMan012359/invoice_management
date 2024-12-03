@@ -204,8 +204,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     setSupplier('');
     setKeyword('');
     setDate({
-      startDate: '',
-      endDate: '',
+      startDate: null,
+      endDate: null,
     });
 
     setIsChanged(!isChanged);

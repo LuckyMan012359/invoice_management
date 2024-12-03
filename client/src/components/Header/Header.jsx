@@ -48,7 +48,7 @@ function Header() {
             window.location.href = '/dashboard';
           }}
         >
-          Invoice Management System
+          {t('Billing Management')}
         </div>
         <div className='flex items-center gap-3 2xsm:gap-7'>
           <select

@@ -75,5 +75,9 @@
   "Password must include at least one special character.": "Password must include at least one special character.",
   "Password must include at least one number.": "Password must include at least one number.",
   "Password must include at least one uppercase letter.": "Password must include at least one uppercase letter.",
-  "Password must include at least one lowercase letter.": "Password must include at least one lowercase letter."
+  "Password must include at least one lowercase letter.": "Password must include at least one lowercase letter.",
+  "Billing Management": "Billing Management",
+  "payment": "payment",
+  "invoice": "invoice",
+  "return": "return"
 }
