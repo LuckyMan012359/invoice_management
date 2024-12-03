@@ -102,6 +102,11 @@ const TransactionForm = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!formData.customerId || !formData.supplierId || !formData.transactionType) {
+      toast.error('Please fill all fields');
+      return;
+    }
+
     const formattedData = new FormData();
     formattedData.append('customer_id', formData.customerId);
     formattedData.append('supplier_id', formData.supplierId);
@@ -170,7 +175,7 @@ const TransactionForm = ({
   };
 
   const customerOptions = [
-    { value: null, label: 'Select a customer', isDisabled: true },
+    { value: null, label: t('Select a customer'), isDisabled: true },
     ...customers.map((customer) => ({
       value: customer._id,
       label: `${customer.firstName} ${customer.lastName}`,
@@ -179,7 +184,7 @@ const TransactionForm = ({
   ];
 
   const supplierOptions = [
-    { value: null, label: 'Select a supplier', isDisabled: true },
+    { value: null, label: t('Select a supplier'), isDisabled: true },
     ...suppliers.map((supplier) => ({
       value: supplier._id,
       label: supplier.name,
@@ -188,7 +193,7 @@ const TransactionForm = ({
   ];
 
   const transactionTypeOptions = [
-    { value: null, label: 'Select user role.', isDisabled: true },
+    { value: null, label: t('Select a transaction type'), isDisabled: true },
     { value: 'invoice', label: t('invoice'), isDisabled: false },
     { value: 'payment', label: t('payment'), isDisabled: false },
     { value: 'return', label: t('return'), isDisabled: false },
@@ -240,7 +245,9 @@ const TransactionForm = ({
   return (
     <div className='fixed inset-0 flex items-center justify-center z-[101] bg-black bg-opacity-50'>
       <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-lg h-auto overflow-y-auto scrollbar-transparent'>
-        <h2 className='text-2xl font-bold mb-4 dark:text-white'>{`${type} Transaction`}</h2>
+        <h2 className='text-2xl font-bold mb-4 dark:text-white'>{`${
+          type === 'Add' ? t('Add Transaction') : t('Edit Transaction')
+        }`}</h2>
         <form onSubmit={handleSubmit} encType='multipart/form-data'>
           <div className='mb-4'>
             <label className='block text-gray-700 dark:text-gray-300'>{t('Date')}</label>
@@ -263,7 +270,7 @@ const TransactionForm = ({
               value={customerOptions.find((option) => option.value === formData.customerId)}
               onChange={(option) => handleSelectChange(option, 'customerId')}
               styles={selectStyles}
-              placeholder='Select a customer'
+              placeholder={t('Select a customer')}
               isDisabled={userRole === 'customer'}
               required
             />
@@ -276,8 +283,8 @@ const TransactionForm = ({
               value={supplierOptions.find((option) => option.value === formData.supplierId)}
               onChange={(option) => handleSelectChange(option, 'supplierId')}
               styles={selectStyles}
-              placeholder='Select a supplier'
-              required
+              placeholder={t('Select a supplier')}
+              required={(value) => value === null}
             />
           </div>
 
@@ -290,7 +297,7 @@ const TransactionForm = ({
               value={formattedOptions.find((option) => option.value === formData.transactionType)}
               onChange={(option) => handleSelectChange(option, 'transactionType')}
               styles={selectStyles}
-              placeholder='Select a transaction type'
+              placeholder={t('Select a transaction type')}
               required
             />
           </div>

@@ -7,8 +7,10 @@ import { UserOutlined } from '@ant-design/icons';
 import { TbLogout2 } from 'react-icons/tb';
 import axiosInstance from '../../utils/axiosInstance';
 import { MdKeyboardArrowDown } from 'react-icons/md';
+import { useTranslation } from 'react-i18next';
 
 const DropdownUser = () => {
+  const { t } = useTranslation();
   const [, , removeCookie] = useCookies(['token']);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -41,7 +43,7 @@ const DropdownUser = () => {
             {userData.firstName} {userData.lastName}
           </span>
           <span className='block text-xs dark:text-white'>
-            {userData.role === 'admin' ? 'Administrator' : 'Customer'}
+            {userData.role === 'admin' ? t('Administrator') : t('Customer')}
           </span>
         </span>
 
@@ -63,7 +65,7 @@ const DropdownUser = () => {
                 className='flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base'
               >
                 <UserOutlined className='text-[20px]' />
-                My Profile
+                {t('My profile')}
               </Link>
             </li>
           </ul>
@@ -72,7 +74,7 @@ const DropdownUser = () => {
             onClick={() => removeCookie('token', { path: '/' })}
           >
             <TbLogout2 className='text-[23px]' />
-            Log Out
+            {t('Log out')}
           </button>
         </div>
       )}

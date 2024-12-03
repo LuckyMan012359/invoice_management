@@ -24,8 +24,9 @@ const CustomerForm = ({
   if (!showCustomerForm) return null;
 
   const roleOptions = [
-    { value: 'admin', label: 'Admin' },
-    { value: 'customer', label: 'Customer' },
+    { value: 'default', label: t('Select a user role'), isDisabled: true },
+    { value: 'admin', label: t('Admin') },
+    { value: 'customer', label: t('Customer') },
   ];
 
   const handleSelectChange = (selectedOption, field) => {
@@ -76,7 +77,9 @@ const CustomerForm = ({
   return (
     <div className='fixed inset-0 flex items-center justify-center z-[101] bg-black bg-opacity-50'>
       <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md'>
-        <h2 className='text-2xl font-bold mb-4 dark:text-white'>Add New Customer</h2>
+        <h2 className='text-2xl font-bold mb-4 dark:text-white'>
+          {type === 'Add' ? t('Add New Customer') : t('Edit customer information')}
+        </h2>
         <form onSubmit={onSubmit}>
           <div className='mb-4'>
             <label className='block text-gray-700 dark:text-gray-300'>{t('First Name')}</label>
@@ -129,10 +132,10 @@ const CustomerForm = ({
               >
                 <Select
                   options={roleOptions}
-                  value={roleOptions.find((option) => option.value === customer.transactionType)}
+                  value={roleOptions.find((option) => option.value === customer.role)}
                   onChange={(option) => handleSelectChange(option, 'role')}
                   styles={selectStyles}
-                  placeholder='Select a transaction type'
+                  placeholder={t('Select a user role')}
                   isDisabled={
                     type === 'Edit' &&
                     (customer.totalBalance !== 0 ||
@@ -145,10 +148,10 @@ const CustomerForm = ({
             ) : (
               <Select
                 options={roleOptions}
-                value={roleOptions.find((option) => option.value === customer.transactionType)}
+                value={roleOptions.find((option) => option.value === customer.role)}
                 onChange={(option) => handleSelectChange(option, 'role')}
                 styles={selectStyles}
-                placeholder='Select a transaction type'
+                placeholder={t('Select a user role')}
                 isDisabled={
                   type === 'Edit' &&
                   (customer.totalBalance !== 0 ||
@@ -218,7 +221,7 @@ const CustomerForm = ({
             </div>
           ) : type === 'Add' ? (
             <div className='mb-4'>
-              <label className='block text-gray-700 dark:text-gray-300'>Password</label>
+              <label className='block text-gray-700 dark:text-gray-300'>{t('Password')}</label>
               <div className='flex items-center justify-end'>
                 <input
                   type={isPasswordVisible ? 'text' : 'password'}
@@ -249,10 +252,10 @@ const CustomerForm = ({
               className='bg-gray-500 text-white px-4 py-2 rounded mr-2'
               onClick={onClose}
             >
-              Cancel
+              {t('Cancel')}
             </button>
             <button type='submit' className='bg-green-500 text-white px-4 py-2 rounded'>
-              {type === 'Add' ? 'Add' : 'Edit'}
+              {type === 'Add' ? t('Add') : t('Edit')}
             </button>
           </div>
         </form>

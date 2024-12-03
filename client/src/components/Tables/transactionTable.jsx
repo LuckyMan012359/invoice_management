@@ -269,7 +269,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
             <input
               type='text'
               className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
-              placeholder='Filter by customer'
+              placeholder={t('Filter by customer')}
               value={customer}
               onChange={(e) => setCustomer(e.target.value)}
             />
@@ -279,7 +279,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
             <input
               type='text'
               className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
-              placeholder='Filter by supplier'
+              placeholder={t('Filter by supplier')}
               value={supplier}
               onChange={(e) => setSupplier(e.target.value)}
             />
@@ -289,7 +289,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
             <input
               type='text'
               className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
-              placeholder='Filter by keyword'
+              placeholder={t('Filter by keyword')}
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
             />
@@ -303,7 +303,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
               onChange={handleDateChange}
               asSingle={true}
               useRange={false}
-              placeholder='Select Date'
+              placeholder={t('Select Date')}
               displayFormat={'DD/MM/YYYY'}
               showFooter={true}
               containerClassName='relative'
@@ -391,7 +391,13 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                       {item.customer.firstName} {item.customer.lastName}
                     </td>
                     <td className='p-3'>{item.supplier.name}</td>
-                    <td className='p-3'>{item.transaction_type}</td>
+                    <td className='p-3'>
+                      {item.transaction_type === 'invoice'
+                        ? t('invoice')
+                        : item.transaction_type === 'payment'
+                        ? t('payment')
+                        : t('return')}
+                    </td>
                     <td
                       className={`p-3 ${
                         item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
@@ -430,11 +436,11 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                                   showModal(attachment);
                                 }}
                               >
-                                {`Attachment-${index}(${fileType.toUpperCase()})`}{' '}
+                                {`${t('Attachment')}-${index}(${fileType.toUpperCase()})`}{' '}
                               </div>
                             );
                           })
-                        : 'No attachments'}
+                        : t('No attachments')}
                     </td>
                     <td className='py-2 px-4'>
                       <button
@@ -528,7 +534,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
           ) : (
             <img
               src={`${imageUrl}/${selectedAttachment}`}
-              alt='Attachment Preview'
+              alt={t('Attachment Preview')}
               className='w-full h-auto rounded-md'
             />
           )

@@ -123,11 +123,13 @@ export const Customers = () => {
   const resetForm = () => {
     setCustomer({
       id: 0,
-      name: '',
+      firstName: '',
+      lastName: '',
       email: '',
       phoneNumber: '',
       homeAddress: '',
       password: '',
+      role: 'default',
       totalBalance: 0,
       totalPayment: 0,
       totalPurchase: 0,
@@ -232,7 +234,7 @@ export const Customers = () => {
                     {customer.role === 'admin' ? (
                       <>
                         <td className='py-2 px-4 text-center' colSpan={4}>
-                          Admin
+                          {t('Admin')}
                         </td>
                       </>
                     ) : (

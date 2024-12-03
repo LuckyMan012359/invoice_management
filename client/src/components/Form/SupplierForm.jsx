@@ -8,7 +8,9 @@ const SupplierForm = ({ showSupplierForm, onClose, onSubmit, supplier, setSuppli
   return (
     <div className='fixed inset-0 flex items-center justify-center z-[101] bg-black bg-opacity-50'>
       <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md'>
-        <h2 className='text-2xl font-bold mb-4 dark:text-white'>Add New Supplier</h2>
+        <h2 className='text-2xl font-bold mb-4 dark:text-white'>
+          {type === 'Add' ? t('Add New Supplier') : t('Edit supplier')}
+        </h2>
         <form onSubmit={onSubmit}>
           <div className='mb-4'>
             <label className='block text-gray-700 dark:text-gray-300'>{t('Name')}</label>
@@ -60,10 +62,10 @@ const SupplierForm = ({ showSupplierForm, onClose, onSubmit, supplier, setSuppli
               className='bg-gray-500 text-white px-4 py-2 rounded mr-2'
               onClick={onClose}
             >
-              Cancel
+              {t('Cancel')}
             </button>
             <button type='submit' className='bg-green-500 text-white px-4 py-2 rounded'>
-              {type === 'Add' ? 'Add' : 'Edit'}
+              {type === 'Add' ? t('Add') : t('Edit')}
             </button>
           </div>
         </form>
