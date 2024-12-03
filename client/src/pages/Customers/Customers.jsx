@@ -176,7 +176,7 @@ export const Customers = () => {
                 <option value='15'>15</option>
                 <option value='30'>30</option>
                 <option value='50'>50</option>
-                <option value='All'>All</option>
+                <option value='All'>{t('All')}</option>
               </select>
             </div>
             <div className='flex flex-col w-full'>

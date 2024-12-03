@@ -261,7 +261,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
               <option value='15'>15</option>
               <option value='30'>30</option>
               <option value='50'>50</option>
-              <option value='All'>All</option>
+              <option value='All'>{t('All')}</option>
             </select>
           </div>
           <div>
