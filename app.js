@@ -18,9 +18,9 @@ app.set('trust proxy', true);
 
 app.use(
   cors({
-    origin: ['https://negociacionalex.lat'], // Allow requests only from this domain
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed HTTP methods
-    credentials: true, // Allow credentials like cookies, authorization headers
+    origin: ['https://negociacionalex.lat'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
   }),
 );
 

@@ -406,6 +406,7 @@ exports.deleteTransaction = async (req, res) => {
     deleteCache('supplier');
 
     const otherTransactions = await Transaction.find({
+      customer_id: deletedTransaction.customer_id,
       created: { $gt: deletedTransaction.created },
     }).sort({ created: -1 });
 
