@@ -299,22 +299,28 @@ exports.updatePendingTransaction = async (req, res) => {
           ? Number(existingPendingTransaction.amount)
           : -Number(existingPendingTransaction.amount);
 
-      console.log(balance, Number(latestTransaction.balance), Number(latestTransaction.amount));
+      let _balance =
+        existingPendingTransaction.transaction_type === 'invoice'
+          ? Number(existingPendingTransaction.amount)
+          : -Number(existingPendingTransaction.amount);
 
       if (
         latestTransaction &&
         latestTransaction._id.toString() ===
           existingPendingTransaction.original_transaction.toString()
       ) {
-        console.log(latestTransaction.transaction_type === 'invoice');
-
         balance =
           latestTransaction.transaction_type === 'invoice'
             ? Number(latestTransaction.balance) - Number(latestTransaction.amount) + balance
             : Number(latestTransaction.balance) + Number(latestTransaction.amount) + balance;
+
+        _balance =
+          latestTransaction.transaction_type === 'invoice'
+            ? Number(latestTransaction.total_balance) - Number(latestTransaction.amount) + _balance
+            : Number(latestTransaction.total_balance) + Number(latestTransaction.amount) + _balance;
       }
 
-      console.log(balance);
+      console.log(balance, _balance);
 
       let attachments = latestTransaction.attachments;
 
@@ -346,10 +352,19 @@ exports.updatePendingTransaction = async (req, res) => {
         attachments = existingPendingTransaction.attachments;
       }
 
+      const translate_transaction_type =
+        existingPendingTransaction.transaction_type === 'invoice'
+          ? 'factura'
+          : existingPendingTransaction.transaction_type === 'payment'
+          ? 'pago'
+          : 'devolucion';
+
       latestTransaction.attachments = attachments;
       latestTransaction.transaction_type = existingPendingTransaction.transaction_type;
+      latestTransaction.translate_transaction_type = translate_transaction_type;
       latestTransaction.amount = existingPendingTransaction.amount;
       latestTransaction.balance = balance;
+      latestTransaction.total_balance = _balance;
       latestTransaction.notes = '';
       latestTransaction.transaction_date = existingPendingTransaction.transaction_date;
 
@@ -371,17 +386,33 @@ exports.updatePendingTransaction = async (req, res) => {
         ],
       }).sort({ created: -1 });
 
+      const _otherTransaction = await Transaction.find({
+        created: { $gt: latestTransaction.created },
+      });
+
       otherTransaction.map(async (transaction) => {
         if (transaction.transaction_type === 'invoice') {
           balance += transaction.amount;
-          console.log(balance);
 
           transaction.balance = balance;
         } else {
           balance -= transaction.amount;
-          console.log(balance);
 
           transaction.balance = balance;
+        }
+
+        await transaction.save();
+      });
+
+      _otherTransaction.map(async (transaction) => {
+        if (transaction.transaction_type === 'invoice') {
+          _balance += transaction.amount;
+
+          transaction.total_balance = _balance;
+        } else {
+          _balance -= transaction.amount;
+
+          transaction.total_balance = _balance;
         }
 
         await transaction.save();
