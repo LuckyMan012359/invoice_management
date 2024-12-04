@@ -51,6 +51,7 @@ exports.readSupplier = async (req, res) => {
             { name: { $regex: keyword, $options: 'i' } },
             { email: { $regex: keyword, $options: 'i' } },
             { phoneNumber: { $regex: keyword, $options: 'i' } },
+            { homeAddress: { $regex: keyword, $options: 'i' } },
           ],
         }
       : {};

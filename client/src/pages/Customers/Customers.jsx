@@ -46,7 +46,11 @@ export const Customers = () => {
           keyword: keyword,
         });
 
-        setFilteredCustomers(response.data.data);
+        const customerGroup = response.data.data.filter((user) => user.role === 'customer');
+        const adminGroup = response.data.data.filter((user) => user.role === 'admin');
+        const groupedData = [...customerGroup, ...adminGroup];
+
+        setFilteredCustomers(groupedData);
 
         setTotalPages(response.data.meta.totalPages);
 
@@ -77,8 +81,6 @@ export const Customers = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log(customer);
-
     const passwordError = validatePassword(customer.password);
 
     if (passwordError) {
@@ -86,6 +88,8 @@ export const Customers = () => {
 
       return;
     }
+
+    setLoading(true);
 
     setIsChanged(false);
     if (type === 'Add') {
@@ -146,6 +150,7 @@ export const Customers = () => {
       toast.error(t("You can't delete this customer because he has transaction."));
       return;
     }
+    setLoading(true);
     setIsChanged(false);
     const response = await axiosInstance(`/customer/delete_customer`, 'delete', {
       deleteCustomerID: deleteCustomer._id,
@@ -184,7 +189,9 @@ export const Customers = () => {
               <input
                 type='text'
                 className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
-                placeholder={t('Filter by keyword')}
+                placeholder={`${t('Filter by keyword')}(${t('First Name')}, ${t('Last Name')}, ${t(
+                  'Phone Number',
+                )}, ${t('Home Address')})`}
                 value={keyword}
                 onChange={(e) => {
                   setKeyword(e.target.value);
@@ -243,10 +250,12 @@ export const Customers = () => {
                           {customer.totalPurchase.toLocaleString() || 0}
                         </td>
                         <td className='py-2 px-4 text-[red]'>
-                          -{customer.totalPayment.toLocaleString() || 0}
+                          {customer.totalPayment > 0 && '-'}
+                          {customer.totalPayment.toLocaleString() || 0}
                         </td>
                         <td className='py-2 px-4 text-[red]'>
-                          -{customer.totalReturn.toLocaleString() || 0}
+                          {customer.totalReturn > 0 && '-'}
+                          {customer.totalReturn.toLocaleString() || 0}
                         </td>
                         <td
                           className={`py-2 px-4 ${

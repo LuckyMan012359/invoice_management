@@ -20,7 +20,6 @@ const DropdownUser = () => {
     const fetchData = async () => {
       try {
         const response = await axiosInstance('/user/get_user_info', 'get');
-        console.log(response.data.user);
 
         setUserData(response.data.user);
       } catch (error) {

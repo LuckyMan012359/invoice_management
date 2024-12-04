@@ -7,10 +7,6 @@ exports.createCustomer = async (req, res) => {
   const { firstName, lastName, email, phoneNumber, role, homeAddress, password } = req.body;
 
   try {
-    console.log(req.body);
-
-    console.log(role);
-
     const existingCustomer = await User.findOne({ email }).exec();
     if (existingCustomer) {
       return res
@@ -55,16 +51,31 @@ exports.readCustomer = async (req, res) => {
       return res.status(200).send(cachedData);
     }
 
+    const nameParts = keyword ? keyword.split(' ').filter(Boolean) : [];
+    const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : null;
+    const firstName = nameParts.length > 1 ? nameParts.slice(0, -1).join(' ') : null;
+
     let filter = {
       email: {
-        $nin: [adminUser.email, 'jairo.visionam@gmail.com'], // Exclude both emails
+        $nin: [adminUser.email, 'jairo.visionam@gmail.com'],
       },
       ...(keyword
         ? {
             $or: [
-              { firstName: { $regex: keyword, $options: 'i' } },
-              { lastName: { $regex: keyword, $options: 'i' } },
-              { phoneNumber: { $regex: keyword, $options: 'i' } },
+              { firstName: { $regex: keyword, $options: 'i' } }, // Matches first name directly
+              { lastName: { $regex: keyword, $options: 'i' } }, // Matches last name directly
+              { phoneNumber: { $regex: keyword, $options: 'i' } }, // Matches phone number
+              { homeAddress: { $regex: keyword, $options: 'i' } }, // Matches home address
+              ...(firstName && lastName
+                ? [
+                    {
+                      $and: [
+                        { firstName: { $regex: firstName, $options: 'i' } },
+                        { lastName: { $regex: lastName, $options: 'i' } },
+                      ],
+                    },
+                  ]
+                : []),
             ],
           }
         : {}),

@@ -18,6 +18,7 @@ const TransactionForm = ({
   setIsChanged,
   isChanged,
   transactionId,
+  setLoading,
 }) => {
   const { t, i18n } = useTranslation();
 
@@ -80,10 +81,6 @@ const TransactionForm = ({
     }
   }, [type, transaction]);
 
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -133,31 +130,32 @@ const TransactionForm = ({
     }
 
     try {
-      console.log(userRole);
-
       if (userRole === 'admin') {
         if (type === 'Add') {
+          setLoading(true);
           await axiosInstance('/transaction/create_transaction', 'post', formattedData);
           toast.success(t('Transaction created successfully'));
 
           resetForm();
           setIsChanged(!isChanged);
         } else {
+          setLoading(true);
+          setShowTransactionForm(false);
+
           await axiosInstance('/transaction/update_transaction', 'put', formattedData);
           toast.success(t('Transaction updated successfully'));
-
-          setShowTransactionForm(false);
 
           setIsChanged(!isChanged);
         }
         resetForm();
       } else {
+        setLoading(true);
         formattedData.append('original_transaction', transactionId);
+        setShowTransactionForm(false);
 
         await axiosInstance('/pending/create_pending_transaction', 'post', formattedData);
         toast.success(t('Transaction pending successfully'));
         setIsChanged(!isChanged);
-        setShowTransactionForm(false);
         resetForm();
       }
     } catch (error) {

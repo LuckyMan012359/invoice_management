@@ -161,8 +161,6 @@ exports.updateUserInfo = async (req, res) => {
       new: true,
     });
 
-    console.log(user);
-
     deleteCache('customer');
     deleteCache('transaction');
     deleteCache('pending_transaction');

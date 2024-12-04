@@ -320,8 +320,6 @@ exports.updatePendingTransaction = async (req, res) => {
             : Number(latestTransaction.total_balance) + Number(latestTransaction.amount) + _balance;
       }
 
-      console.log(balance, _balance);
-
       let attachments = latestTransaction.attachments;
 
       if (existingPendingTransaction.attachmentsUpdateStatus === '0') {

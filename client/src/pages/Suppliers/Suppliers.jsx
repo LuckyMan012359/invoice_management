@@ -35,7 +35,6 @@ export const Suppliers = () => {
         pageSize: suppliersPerPage,
         keyword: keyword,
       });
-      console.log(response.data.data);
 
       setFilteredSuppliers(response.data.data);
 
@@ -49,6 +48,7 @@ export const Suppliers = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     if (type === 'Add') {
       const response = await axiosInstance('/supplier/add_supplier', 'post', supplier);
 
@@ -99,6 +99,9 @@ export const Suppliers = () => {
       toast.error(t("You can't delete this supplier because this has transaction."));
       return;
     }
+
+    setLoading(true);
+
     const response = await axiosInstance(`/supplier/delete_supplier`, 'delete', {
       deleteSupplierID: deleteSupplier._id,
     });

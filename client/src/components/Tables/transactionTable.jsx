@@ -458,6 +458,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
         setIsChanged={setIsChanged}
         isChanged={isChanged}
         transactionId={transactionId}
+        setLoading={setLoading}
       />
 
       <Modal

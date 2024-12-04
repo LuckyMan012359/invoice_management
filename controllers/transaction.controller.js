@@ -115,9 +115,11 @@ exports.readTransaction = async (req, res) => {
     if (keyword) {
       match.$or = [
         { notes: { $regex: keyword, $options: 'i' } },
-        { amount: parseFloat(keyword) },
-        { balance: parseFloat(keyword) },
+        { amount: parseFloat(keyword.replace(/,/g, '')) },
+        { balance: parseFloat(keyword.replace(/,/g, '')) },
+        { total_balance: parseFloat(keyword.replace(/,/g, '')) },
         { transaction_type: { $regex: keyword, $options: 'i' } },
+        { translate_transaction_type: { $regex: keyword, $options: 'i' } },
       ];
     }
 
@@ -576,7 +578,6 @@ exports.getTransactionData = async (req, res) => {
     const cachedData = getCache('transaction', cacheKey);
 
     if (cachedData) {
-      console.log('Returning cached transaction data');
       return res.status(200).send(cachedData);
     }
 
