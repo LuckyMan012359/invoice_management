@@ -101,37 +101,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
         pageSize: transactionsPerPage,
       });
 
-      let calculatedBalance = 0;
-
-      const userRole = await getUserRole();
-
-      const data = response.data.transactions.sort(
-        (a, b) => new Date(a.created) - new Date(b.created),
-      );
-
-      console.log(data);
-
-      const updatedTransactions = data.map((item) => {
-        if (userRole === 'admin') {
-          if (item.transaction_type === 'invoice') {
-            calculatedBalance += item.amount;
-          } else if (item.transaction_type === 'payment' || item.transaction_type === 'return') {
-            calculatedBalance -= item.amount;
-          }
-          return { ...item, calculatedBalance };
-        } else {
-          return item;
-        }
-      });
-
-      const resultTransactions = updatedTransactions.sort(
-        (a, b) => new Date(b.created) - new Date(a.created),
-      );
-
-      console.log(updatedTransactions);
-
       setTotalPages(response.data.totalPage);
-      setTransactionData(resultTransactions);
+      setTransactionData(response.data.transactions);
       setTotalTransactionsData(response.data.totalTransactions);
       setLoading(false);
     };
@@ -152,35 +123,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
       pageSize: transactionsPerPage,
     });
 
-    let calculatedBalance = 0;
-
-    const userRole = await getUserRole();
-
-    const data = response.data.transactions.sort(
-      (a, b) => new Date(a.created) - new Date(b.created),
-    );
-
-    console.log(data);
-
-    const updatedTransactions = data.map((item) => {
-      if (userRole === 'admin') {
-        if (item.transaction_type === 'invoice') {
-          calculatedBalance += item.amount;
-        } else if (item.transaction_type === 'payment' || item.transaction_type === 'return') {
-          calculatedBalance -= item.amount;
-        }
-        return { ...item, calculatedBalance };
-      } else {
-        return item;
-      }
-    });
-
-    const resultTransactions = updatedTransactions.sort(
-      (a, b) => new Date(b.created) - new Date(a.created),
-    );
-
     setTotalPages(response.data.totalPage);
-    setTransactionData(resultTransactions);
+    setTransactionData(response.data.transactions);
     setTotalTransactionsData(response.data.totalTransactions);
     setLoading(false);
   };
@@ -409,7 +353,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                     <td
                       className={`p-3 ${
                         role === 'admin'
-                          ? item.calculatedBalance >= 0
+                          ? item.total_balance >= 0
                             ? 'text-[green]'
                             : 'text-[red]'
                           : item.balance >= 0
@@ -418,7 +362,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                       }`}
                     >
                       {role === 'admin'
-                        ? item.calculatedBalance.toLocaleString()
+                        ? item.total_balance.toLocaleString()
                         : item.balance.toLocaleString()}
                     </td>
                     <td className='p-3'>{item.notes}</td>

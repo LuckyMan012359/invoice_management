@@ -165,8 +165,10 @@ exports.readTransaction = async (req, res) => {
         $project: {
           _id: 1,
           transaction_type: 1,
+          translate_transaction_type: 1,
           amount: 1,
           balance: 1,
+          total_balance: 1,
           notes: 1,
           transaction_date: 1,
           attachments: 1,
@@ -297,13 +299,29 @@ exports.updateTransaction = async (req, res) => {
       .skip(0)
       .limit(1);
 
+    const _latestTransaction = await Transaction.findOne({
+      created: { $lt: existingTransaction.created },
+    })
+      .sort({ created: -1 })
+      .skip(0)
+      .limit(1);
+
     let balance = transaction_type === 'invoice' ? Number(amount) : -Number(amount);
+
+    let _balance = transaction_type === 'invoice' ? Number(amount) : -Number(amount);
 
     if (latestTransaction && latestTransaction._id.toString() !== transaction_id) {
       balance =
         transaction_type === 'invoice'
           ? latestTransaction.balance + Number(amount)
           : latestTransaction.balance - Number(amount);
+    }
+
+    if (_latestTransaction && _latestTransaction._id.toString() !== transaction_id) {
+      _balance =
+        transaction_type === 'invoice'
+          ? _latestTransaction.total_balance + Number(amount)
+          : _latestTransaction.total_balance - Number(amount);
     }
 
     let attachments = existingTransaction.attachments;
@@ -336,11 +354,20 @@ exports.updateTransaction = async (req, res) => {
       attachments = req.files.map((file) => `uploads/attachments/${file.filename}`);
     }
 
+    const translate_transaction_type =
+      transaction_type === 'invoice'
+        ? 'factura'
+        : transaction_type === 'payment'
+        ? 'pago'
+        : 'devolucion';
+
     existingTransaction.customer_id = customer_id;
     existingTransaction.supplier_id = supplier_id;
     existingTransaction.transaction_type = transaction_type;
+    existingTransaction.translate_transaction_type = translate_transaction_type;
     existingTransaction.amount = amount;
     existingTransaction.balance = balance;
+    existingTransaction.total_balance = _balance;
     existingTransaction.notes = notes;
     existingTransaction.transaction_date = transaction_date;
     existingTransaction.attachments = attachments;
@@ -366,14 +393,30 @@ exports.updateTransaction = async (req, res) => {
     otherTransactions.map(async (transaction) => {
       if (transaction.transaction_type === 'invoice') {
         balance += transaction.amount;
-        console.log(balance);
 
         transaction.balance = balance;
       } else {
         balance -= transaction.amount;
-        console.log(balance);
 
         transaction.balance = balance;
+      }
+
+      await transaction.save();
+    });
+
+    const _otherTransactions = await Transaction.find({
+      created: { $gt: existingTransaction.created },
+    });
+
+    _otherTransactions.map(async (transaction) => {
+      if (transaction.transaction_type === 'invoice') {
+        _balance += transaction.amount;
+
+        transaction.total_balance = _balance;
+      } else {
+        _balance -= transaction.amount;
+
+        transaction.total_balance = _balance;
       }
 
       await transaction.save();
@@ -428,40 +471,91 @@ exports.deleteTransaction = async (req, res) => {
     const otherTransactions = await Transaction.find({
       customer_id: deletedTransaction.customer_id,
       created: { $gt: deletedTransaction.created },
-    }).sort({ created: -1 });
+    });
+
+    const beforeTransaction = await Transaction.findOne({
+      customer_id: deletedTransaction.customer_id,
+      created: { $lt: deletedTransaction.created },
+    });
+
+    const _otherTransactions = await Transaction.find({
+      created: { $gt: deletedTransaction.created },
+    });
+
+    const _beforeTransaction = await Transaction.findOne({
+      created: { $lt: deletedTransaction.created },
+    });
 
     if (otherTransactions && otherTransactions.length > 0) {
-      otherTransactions.map(async (transaction) => {
-        if (deletedTransaction.transaction_type === 'invoice') {
-          transaction.balance -= deletedTransaction.amount;
-        } else {
-          transaction.balance += deletedTransaction.amount;
-        }
+      if (beforeTransaction) {
+        otherTransactions.map(async (transaction) => {
+          if (deletedTransaction.transaction_type === 'invoice') {
+            transaction.balance -= deletedTransaction.amount;
+          } else {
+            transaction.balance += deletedTransaction.amount;
+          }
 
-        await transaction.save();
-      });
-    } else {
-      let balance;
+          await transaction.save();
+        });
+      } else {
+        let balance;
 
-      otherTransactions.map(async (transaction, index) => {
-        if (index === 0) {
-          balance =
-            transaction.transaction_type === 'invoice'
-              ? transaction.amount
-              : transaction.amount * -1;
+        otherTransactions.map(async (transaction, index) => {
+          if (index === 0) {
+            balance =
+              transaction.transaction_type === 'invoice'
+                ? transaction.amount
+                : transaction.amount * -1;
 
-          transaction.balance = balance;
-        } else {
-          balance =
-            transaction.transaction_type === 'invoice'
-              ? balance + transaction.amount
-              : balance - transaction.amount;
+            transaction.balance = balance;
+          } else {
+            balance =
+              transaction.transaction_type === 'invoice'
+                ? balance + transaction.amount
+                : balance - transaction.amount;
 
-          transaction.balance = balance;
-        }
+            transaction.balance = balance;
+          }
 
-        await transaction.save();
-      });
+          await transaction.save();
+        });
+      }
+    }
+
+    if (_otherTransactions && _otherTransactions.length > 0) {
+      if (_beforeTransaction) {
+        _otherTransactions.map(async (transaction) => {
+          if (deletedTransaction.transaction_type === 'invoice') {
+            transaction.total_balance -= deletedTransaction.amount;
+          } else {
+            transaction.total_balance += deletedTransaction.amount;
+          }
+
+          await transaction.save();
+        });
+      } else {
+        let balance;
+
+        _otherTransactions.map(async (transaction, index) => {
+          if (index === 0) {
+            balance =
+              transaction.transaction_type === 'invoice'
+                ? transaction.amount
+                : transaction.amount * -1;
+
+            transaction.total_balance = balance;
+          } else {
+            balance =
+              transaction.transaction_type === 'invoice'
+                ? balance + transaction.amount
+                : balance - transaction.amount;
+
+            transaction.total_balance = balance;
+          }
+
+          await transaction.save();
+        });
+      }
     }
 
     res.status(200).send({
