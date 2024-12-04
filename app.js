@@ -16,15 +16,15 @@ connectDB();
 
 app.set('trust proxy', true);
 
-app.use(
-  cors({
-    origin: ['https://negociacionalex.lat'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
-  }),
-);
+// app.use(
+//   cors({
+//     origin: ['https://negociacionalex.lat'],
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     credentials: true,
+//   }),
+// );
 
-// app.use(cors({}));
+app.use(cors({}));
 app.use(express.json());
 app.use(
   express.urlencoded({

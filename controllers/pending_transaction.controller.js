@@ -414,6 +414,11 @@ exports.updatePendingTransaction = async (req, res) => {
         message: 'Disallow pending transaction successfully',
       });
     }
+
+    deleteCache('customer');
+    deleteCache('supplier');
+    deleteCache('transaction');
+    deleteCache('pending_transaction');
   } catch (error) {
     console.error('Error updating transaction:', error);
     res.status(500).send({

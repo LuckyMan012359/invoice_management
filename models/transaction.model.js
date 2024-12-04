@@ -20,11 +20,19 @@ const transactionSchema = new Schema({
     enum: ['invoice', 'payment', 'return'],
     required: true,
   },
+  translate_transaction_type: {
+    type: String,
+    enum: ['factura', 'pago', 'devolucion'],
+  },
   amount: {
     type: Number,
     required: true,
   },
   balance: {
+    type: Number,
+    required: true,
+  },
+  total_balance: {
     type: Number,
     required: true,
   },

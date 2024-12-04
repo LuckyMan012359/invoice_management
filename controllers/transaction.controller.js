@@ -13,13 +13,24 @@ exports.createTransaction = async (req, res) => {
       created: -1,
     });
 
+    const _latestTransaction = await Transaction.findOne().sort({ created: -1 });
+
     let balance = transaction_type === 'invoice' ? amount : amount * -1;
+    let _balance = balance;
 
     if (latestTransaction) {
       if (transaction_type === 'invoice') {
         balance = latestTransaction.balance + Number(amount);
       } else {
         balance = latestTransaction.balance - Number(amount);
+      }
+    }
+
+    if (_latestTransaction) {
+      if (transaction_type === 'invoice') {
+        _balance = _latestTransaction.total_balance + Number(amount);
+      } else {
+        _balance = _latestTransaction.total_balance - Number(amount);
       }
     }
 
@@ -32,12 +43,21 @@ exports.createTransaction = async (req, res) => {
         }))
       : [];
 
+    let translate_transaction_type =
+      transaction_type === 'invoice'
+        ? 'factura'
+        : transaction_type === 'payment'
+        ? 'pago'
+        : 'devolucion';
+
     const transaction = new Transaction({
       customer_id,
       supplier_id,
       transaction_type,
+      translate_transaction_type,
       amount,
       balance,
+      total_balance: _balance,
       notes,
       transaction_date,
       attachments: attachments.map((file) => `uploads/attachments/${file.hashedName}`),
