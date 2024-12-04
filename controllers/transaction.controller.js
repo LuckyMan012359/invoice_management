@@ -390,7 +390,7 @@ exports.updateTransaction = async (req, res) => {
           created: { $gt: existingTransaction.created },
         },
       ],
-    }).sort({ created: -1 });
+    });
 
     otherTransactions.map(async (transaction) => {
       if (transaction.transaction_type === 'invoice') {
