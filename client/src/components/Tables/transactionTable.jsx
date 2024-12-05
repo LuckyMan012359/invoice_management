@@ -309,9 +309,9 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                   <th className='p-3'>{t('Customer')}</th>
                   <th className='p-3'>{t('Supplier')}</th>
                   <th className='p-3'>{t('Transaction')}</th>
-                  <th className='p-3'>{t('Amount')}</th>
-                  <th className='p-3'>{t('Balance')}</th>
                   <th className='p-3'>{t('Note')}</th>
+                  <th className='p-3'>{t('Amount')}</th>
+                  {role === 'customer' && <th className='p-3'>{t('Balance')}</th>}
                   <th className='p-3'>{t('Attachments')}</th>
                   <th className='p-3'>{t('Action')}</th>
                 </tr>
@@ -342,6 +342,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                         ? t('payment')
                         : t('return')}
                     </td>
+                    <td className='p-3'>{item.notes}</td>
                     <td
                       className={`p-3 ${
                         item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
@@ -350,10 +351,11 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                       {item.transaction_type !== 'invoice' && '-'}
                       {item.amount.toLocaleString()}
                     </td>
-                    <td className={`p-3 ${item.balance >= 0 ? 'text-[green]' : 'text-[red]'}`}>
-                      {item.balance.toLocaleString()}
-                    </td>
-                    <td className='p-3'>{item.notes}</td>
+                    {role === 'customer' && (
+                      <td className={`p-3 ${item.balance >= 0 ? 'text-[green]' : 'text-[red]'}`}>
+                        {item.balance.toLocaleString()}
+                      </td>
+                    )}
                     <td className='p-3 flex flex-col'>
                       {item.attachments.length > 0
                         ? item.attachments.map((attachment, index) => {
