@@ -104,5 +104,11 @@
   "No attachments": "No attachments",
   "Attachment": "Attachment",
   "Please fill all fields": "Please fill all fields",
-  "All": "All"
+  "All": "All",
+  "Total": "Total",
+  "Payment": "Payment",
+  "Return": "Return",
+  "and": "and",
+  "Invoice": "Invoice",
+  "Profit": "Profit"
 }

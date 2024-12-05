@@ -105,5 +105,11 @@
   "No attachments": "Sin archivos adjuntos",
   "Attachment": "Archivo adjunto",
   "Please fill all fields": "Por favor, rellene todos los campos",
-  "All": "Toda"
+  "All": "Toda",
+  "Total": "Total",
+  "Payment": "Pago",
+  "Return": "Devolucion",
+  "and": "y",
+  "Invoice": "Factura",
+  "Profit": "Ganancia"
 }

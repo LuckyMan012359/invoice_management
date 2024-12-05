@@ -456,7 +456,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                     className='py-2 px-4 text-center text-[red]'
                     colSpan={role === 'admin' ? 3 : 4}
                   >
-                    {t('Payment')} and {t('Return')}: {expenses > 0 && '-'}
+                    {t('Payment')} {t('and')} {t('Return')}: {expenses > 0 && '-'}
                     {expenses}
                   </td>
                   <td className='py-2 px-4 text-center text-[green]' colSpan={2}>
