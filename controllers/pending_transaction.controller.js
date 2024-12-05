@@ -299,11 +299,6 @@ exports.updatePendingTransaction = async (req, res) => {
           ? Number(existingPendingTransaction.amount)
           : -Number(existingPendingTransaction.amount);
 
-      let _balance =
-        existingPendingTransaction.transaction_type === 'invoice'
-          ? Number(existingPendingTransaction.amount)
-          : -Number(existingPendingTransaction.amount);
-
       if (
         latestTransaction &&
         latestTransaction._id.toString() ===
@@ -313,11 +308,6 @@ exports.updatePendingTransaction = async (req, res) => {
           latestTransaction.transaction_type === 'invoice'
             ? Number(latestTransaction.balance) - Number(latestTransaction.amount) + balance
             : Number(latestTransaction.balance) + Number(latestTransaction.amount) + balance;
-
-        _balance =
-          latestTransaction.transaction_type === 'invoice'
-            ? Number(latestTransaction.total_balance) - Number(latestTransaction.amount) + _balance
-            : Number(latestTransaction.total_balance) + Number(latestTransaction.amount) + _balance;
       }
 
       let attachments = latestTransaction.attachments;
@@ -362,7 +352,6 @@ exports.updatePendingTransaction = async (req, res) => {
       latestTransaction.translate_transaction_type = translate_transaction_type;
       latestTransaction.amount = existingPendingTransaction.amount;
       latestTransaction.balance = balance;
-      latestTransaction.total_balance = _balance;
       latestTransaction.notes = '';
       latestTransaction.transaction_date = existingPendingTransaction.transaction_date;
 
@@ -384,10 +373,6 @@ exports.updatePendingTransaction = async (req, res) => {
         ],
       }).sort({ created: -1 });
 
-      const _otherTransaction = await Transaction.find({
-        created: { $gt: latestTransaction.created },
-      });
-
       otherTransaction.map(async (transaction) => {
         if (transaction.transaction_type === 'invoice') {
           balance += transaction.amount;
@@ -397,20 +382,6 @@ exports.updatePendingTransaction = async (req, res) => {
           balance -= transaction.amount;
 
           transaction.balance = balance;
-        }
-
-        await transaction.save();
-      });
-
-      _otherTransaction.map(async (transaction) => {
-        if (transaction.transaction_type === 'invoice') {
-          _balance += transaction.amount;
-
-          transaction.total_balance = _balance;
-        } else {
-          _balance -= transaction.amount;
-
-          transaction.total_balance = _balance;
         }
 
         await transaction.save();

@@ -32,10 +32,6 @@ const transactionSchema = new Schema({
     type: Number,
     required: true,
   },
-  total_balance: {
-    type: Number,
-    required: true,
-  },
   notes: {
     type: String,
   },

@@ -16,21 +16,12 @@ exports.createTransaction = async (req, res) => {
     const _latestTransaction = await Transaction.findOne().sort({ created: -1 });
 
     let balance = transaction_type === 'invoice' ? amount : amount * -1;
-    let _balance = balance;
 
     if (latestTransaction) {
       if (transaction_type === 'invoice') {
         balance = latestTransaction.balance + Number(amount);
       } else {
         balance = latestTransaction.balance - Number(amount);
-      }
-    }
-
-    if (_latestTransaction) {
-      if (transaction_type === 'invoice') {
-        _balance = _latestTransaction.total_balance + Number(amount);
-      } else {
-        _balance = _latestTransaction.total_balance - Number(amount);
       }
     }
 
@@ -57,7 +48,6 @@ exports.createTransaction = async (req, res) => {
       translate_transaction_type,
       amount,
       balance,
-      total_balance: _balance,
       notes,
       transaction_date,
       attachments: attachments.map((file) => `uploads/attachments/${file.hashedName}`),
@@ -112,15 +102,25 @@ exports.readTransaction = async (req, res) => {
       match['supplier.name'] = { $regex: supplier, $options: 'i' };
     }
 
-    if (keyword) {
-      match.$or = [
-        { notes: { $regex: keyword, $options: 'i' } },
-        { amount: parseFloat(keyword.replace(/-/g, '').replace(/,/g, '')) },
-        { balance: parseFloat(keyword.replace(/,/g, '')) },
-        { total_balance: parseFloat(keyword.replace(/,/g, '')) },
-        { transaction_type: { $regex: keyword, $options: 'i' } },
-        { translate_transaction_type: { $regex: keyword, $options: 'i' } },
-      ];
+    if (req.user.role === 'admin') {
+      if (keyword) {
+        match.$or = [
+          { notes: { $regex: keyword, $options: 'i' } },
+          { amount: parseFloat(keyword.replace(/-/g, '').replace(/,/g, '')) },
+          { transaction_type: { $regex: keyword, $options: 'i' } },
+          { translate_transaction_type: { $regex: keyword, $options: 'i' } },
+        ];
+      }
+    } else {
+      if (keyword) {
+        match.$or = [
+          { notes: { $regex: keyword, $options: 'i' } },
+          { amount: parseFloat(keyword.replace(/-/g, '').replace(/,/g, '')) },
+          { balance: parseFloat(keyword.replace(/,/g, '')) },
+          { transaction_type: { $regex: keyword, $options: 'i' } },
+          { translate_transaction_type: { $regex: keyword, $options: 'i' } },
+        ];
+      }
     }
 
     if (date) {
@@ -170,7 +170,6 @@ exports.readTransaction = async (req, res) => {
           translate_transaction_type: 1,
           amount: 1,
           balance: 1,
-          total_balance: 1,
           notes: 1,
           transaction_date: 1,
           attachments: 1,
@@ -301,29 +300,13 @@ exports.updateTransaction = async (req, res) => {
       .skip(0)
       .limit(1);
 
-    const _latestTransaction = await Transaction.findOne({
-      created: { $lt: existingTransaction.created },
-    })
-      .sort({ created: -1 })
-      .skip(0)
-      .limit(1);
-
     let balance = transaction_type === 'invoice' ? Number(amount) : -Number(amount);
-
-    let _balance = transaction_type === 'invoice' ? Number(amount) : -Number(amount);
 
     if (latestTransaction && latestTransaction._id.toString() !== transaction_id) {
       balance =
         transaction_type === 'invoice'
           ? latestTransaction.balance + Number(amount)
           : latestTransaction.balance - Number(amount);
-    }
-
-    if (_latestTransaction && _latestTransaction._id.toString() !== transaction_id) {
-      _balance =
-        transaction_type === 'invoice'
-          ? _latestTransaction.total_balance + Number(amount)
-          : _latestTransaction.total_balance - Number(amount);
     }
 
     let attachments = existingTransaction.attachments;
@@ -369,7 +352,6 @@ exports.updateTransaction = async (req, res) => {
     existingTransaction.translate_transaction_type = translate_transaction_type;
     existingTransaction.amount = amount;
     existingTransaction.balance = balance;
-    existingTransaction.total_balance = _balance;
     existingTransaction.notes = notes;
     existingTransaction.transaction_date = transaction_date;
     existingTransaction.attachments = attachments;
@@ -401,24 +383,6 @@ exports.updateTransaction = async (req, res) => {
         balance -= transaction.amount;
 
         transaction.balance = balance;
-      }
-
-      await transaction.save();
-    });
-
-    const _otherTransactions = await Transaction.find({
-      created: { $gt: existingTransaction.created },
-    });
-
-    _otherTransactions.map(async (transaction) => {
-      if (transaction.transaction_type === 'invoice') {
-        _balance += transaction.amount;
-
-        transaction.total_balance = _balance;
-      } else {
-        _balance -= transaction.amount;
-
-        transaction.total_balance = _balance;
       }
 
       await transaction.save();
@@ -480,14 +444,6 @@ exports.deleteTransaction = async (req, res) => {
       created: { $lt: deletedTransaction.created },
     });
 
-    const _otherTransactions = await Transaction.find({
-      created: { $gt: deletedTransaction.created },
-    });
-
-    const _beforeTransaction = await Transaction.findOne({
-      created: { $lt: deletedTransaction.created },
-    });
-
     if (otherTransactions && otherTransactions.length > 0) {
       if (beforeTransaction) {
         otherTransactions.map(async (transaction) => {
@@ -517,42 +473,6 @@ exports.deleteTransaction = async (req, res) => {
                 : balance - transaction.amount;
 
             transaction.balance = balance;
-          }
-
-          await transaction.save();
-        });
-      }
-    }
-
-    if (_otherTransactions && _otherTransactions.length > 0) {
-      if (_beforeTransaction) {
-        _otherTransactions.map(async (transaction) => {
-          if (deletedTransaction.transaction_type === 'invoice') {
-            transaction.total_balance -= deletedTransaction.amount;
-          } else {
-            transaction.total_balance += deletedTransaction.amount;
-          }
-
-          await transaction.save();
-        });
-      } else {
-        let balance;
-
-        _otherTransactions.map(async (transaction, index) => {
-          if (index === 0) {
-            balance =
-              transaction.transaction_type === 'invoice'
-                ? transaction.amount
-                : transaction.amount * -1;
-
-            transaction.total_balance = balance;
-          } else {
-            balance =
-              transaction.transaction_type === 'invoice'
-                ? balance + transaction.amount
-                : balance - transaction.amount;
-
-            transaction.total_balance = balance;
           }
 
           await transaction.save();
