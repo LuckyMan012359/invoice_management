@@ -36,6 +36,9 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
   const [totalTransactionsData, setTotalTransactionsData] = useState([]);
   const [transactionId, setTransactionId] = useState('');
 
+  const [incomes, setIncomes] = useState(0);
+  const [expenses, setExpenses] = useState(0);
+
   const [loading, setLoading] = useState(false);
 
   const [transaction, setTransaction] = useState({
@@ -101,6 +104,22 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
         pageSize: transactionsPerPage,
       });
 
+      const data = response.data.transactions;
+
+      let totalIncome = 0;
+      let totalExpenses = 0;
+
+      data.forEach((item) => {
+        if (item.transaction_type === 'invoice') {
+          totalIncome += item.amount;
+        } else {
+          totalExpenses += item.amount;
+        }
+      });
+
+      setIncomes(totalIncome);
+      setExpenses(totalExpenses);
+
       setTotalPages(response.data.totalPage);
       setTransactionData(response.data.transactions);
       setTotalTransactionsData(response.data.totalTransactions);
@@ -122,6 +141,22 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
       pageNum: currentPage,
       pageSize: transactionsPerPage,
     });
+
+    const data = response.data.transactions;
+
+    let totalIncome = 0;
+    let totalExpenses = 0;
+
+    data.forEach((item) => {
+      if (item.transaction_type === 'invoice') {
+        totalIncome += item.amount;
+      } else {
+        totalExpenses += item.amount;
+      }
+    });
+
+    setIncomes(totalIncome);
+    setExpenses(totalExpenses);
 
     setTotalPages(response.data.totalPage);
     setTransactionData(response.data.transactions);
@@ -410,6 +445,27 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                     </td>
                   </tr>
                 ))}
+                <tr>
+                  <td className='py-2 px-4 text-center text-[red]' colSpan={2}>
+                    {t('Total')}
+                  </td>
+                  <td className='py-2 px-4 text-center text-[green]' colSpan={2}>
+                    {t('Invoice')}: {incomes}
+                  </td>
+                  <td
+                    className='py-2 px-4 text-center text-[red]'
+                    colSpan={role === 'admin' ? 3 : 4}
+                  >
+                    {t('Payment')} and {t('Return')}: {expenses > 0 && '-'}
+                    {expenses}
+                  </td>
+                  <td className='py-2 px-4 text-center text-[green]' colSpan={2}>
+                    {t('Profit')}:{' '}
+                    <span className={incomes - expenses >= 0 ? `text-[green]` : `text-[red]`}>
+                      {incomes - expenses}
+                    </span>
+                  </td>
+                </tr>
               </tbody>
             </table>
           )}
