@@ -354,44 +354,51 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
               <tbody>
                 {transactionData.map((item, index) => (
-                  <tr
-                    key={item._id || `transaction-${index}`}
-                    className='border-b dark:border-gray-600 dark:text-gray-300'
-                  >
-                    <td className='p-3'>{index + 1 + transactionsPerPage * (currentPage - 1)}</td>
-                    <td className='p-3'>
+                  <tr key={item._id || `transaction-${index}`}>
+                    <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      {index + 1 + transactionsPerPage * (currentPage - 1)}
+                    </td>
+                    <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                       {(() => {
                         const date = new Date(item.transaction_date);
                         const formattedDate = date.toISOString().split('T')[0];
                         return formattedDate;
                       })()}
                     </td>
-                    <td className='p-3'>
+                    <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                       {item.customer.firstName} {item.customer.lastName}
                     </td>
-                    <td className='p-3'>{item.supplier.name}</td>
-                    <td className='p-3'>
+                    <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      {item.supplier.name}
+                    </td>
+                    <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                       {item.transaction_type === 'invoice'
                         ? t('invoice')
                         : item.transaction_type === 'payment'
                         ? t('payment')
                         : t('return')}
                     </td>
-                    <td className='p-3'>{item.notes}</td>
+                    <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      {item.notes}
+                    </td>
                     <td
                       className={`p-3 ${
                         item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
-                      }`}
+                      } border-[1px] dark:border-gray-600 dark:text-gray-300`}
                     >
                       {item.transaction_type !== 'invoice' && '-'}
                       {item.amount.toLocaleString()}
                     </td>
                     {role === 'customer' && (
-                      <td className={`p-3 ${item.balance >= 0 ? 'text-[green]' : 'text-[red]'}`}>
+                      <td
+                        className={`p-3 border-[1px] dark:border-gray-600 dark:text-gray-300 ${
+                          item.balance >= 0 ? 'text-[green]' : 'text-[red]'
+                        }`}
+                      >
                         {item.balance.toLocaleString()}
                       </td>
                     )}
-                    <td className='p-3 flex flex-col'>
+                    <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                       {item.attachments.length > 0
                         ? item.attachments.map((attachment, index) => {
                             const fileName = attachment.split('/').pop();
@@ -411,7 +418,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                           })
                         : t('No attachments')}
                     </td>
-                    <td className='py-2 px-4'>
+                    <td className='py-2 px-4 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                       <button
                         className='text-gray-800 py-1 rounded mr-1 dark:text-white'
                         onClick={() => {
@@ -446,23 +453,32 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                   </tr>
                 ))}
                 <tr>
-                  <td className='py-2 px-4 text-center text-[red]' colSpan={2}>
+                  <td
+                    className='py-2 px-4 text-center text-[red] border-[1px] dark:border-gray-600 dark:text-gray-300'
+                    colSpan={2}
+                  >
                     {t('Total')}
                   </td>
-                  <td className='py-2 px-4 text-center text-[green]' colSpan={2}>
-                    {t('Invoice')}: {incomes}
+                  <td
+                    className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600 dark:text-gray-300'
+                    colSpan={2}
+                  >
+                    {t('Invoice')}: {incomes.toLocaleString()}
                   </td>
                   <td
-                    className='py-2 px-4 text-center text-[red]'
+                    className='py-2 px-4 text-center text-[red] border-[1px] dark:border-gray-600 dark:text-gray-300'
                     colSpan={role === 'admin' ? 3 : 4}
                   >
-                    {t('Payment')} {t('and')} {t('Return')}: {expenses > 0 && '-'}
-                    {expenses}
+                    {t('Payment')} / {t('Return')}: {expenses > 0 && '-'}
+                    {expenses.toLocaleString()}
                   </td>
-                  <td className='py-2 px-4 text-center text-[green]' colSpan={2}>
+                  <td
+                    className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600 dark:text-gray-300'
+                    colSpan={2}
+                  >
                     {t('Profit')}:{' '}
                     <span className={incomes - expenses >= 0 ? `text-[green]` : `text-[red]`}>
-                      {incomes - expenses}
+                      {(incomes - expenses).toLocaleString()}
                     </span>
                   </td>
                 </tr>
