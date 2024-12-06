@@ -21,7 +21,17 @@ const DropdownUser = () => {
       try {
         const response = await axiosInstance('/user/get_user_info', 'get');
 
-        setUserData(response.data.user);
+        if (response.data.user) {
+          setUserData(response.data.user);
+        } else {
+          const data = {
+            firstName: '',
+            lastName: '',
+            role: '',
+          };
+
+          setUserData(data);
+        }
       } catch (error) {
         console.error('Error fetching user info:', error);
       }
