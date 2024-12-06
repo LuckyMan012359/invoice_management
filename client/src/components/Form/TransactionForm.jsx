@@ -241,8 +241,8 @@ const TransactionForm = ({
   }));
 
   return (
-    <div className='fixed inset-0 flex items-center justify-center z-[101] bg-black bg-opacity-50'>
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-lg h-auto overflow-y-auto scrollbar-transparent'>
+    <div className='fixed top-0 left-0 w-screen h-screen flex justify-center py-[50px] z-[101] bg-black overflow-y-scroll bg-opacity-50'>
+      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-lg h-[700px]'>
         <h2 className='text-2xl font-bold mb-4 dark:text-white'>{`${
           type === 'Add' ? t('Add Transaction') : t('Edit Transaction')
         }`}</h2>
@@ -258,6 +258,7 @@ const TransactionForm = ({
               useRange={false}
               displayFormat={'DD/MM/YYYY'}
               inputClassName='relative transition-all duration-300 py-2.5 pl-4 pr-14 w-full border dark:bg-gray-700 dark:border dark:border-white dark:text-white/80 rounded-lg tracking-wide font-light text-sm placeholder-gray-400 bg-white focus:ring disabled:opacity-40 disabled:cursor-not-allowed focus:border-blue-500 focus:ring-blue-500/20'
+              allowINput
             />
           </div>
 
