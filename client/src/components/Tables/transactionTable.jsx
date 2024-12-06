@@ -457,26 +457,26 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                   ))}
                   <tr>
                     <td
-                      className='py-2 px-4 text-center text-[red] border-[1px] dark:border-gray-600 dark:text-gray-300'
+                      className='py-2 px-4 text-center text-[red]  border-[1px] dark:border-gray-600'
                       colSpan={2}
                     >
                       {t('Total')}
                     </td>
                     <td
-                      className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600 dark:text-gray-300'
+                      className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600'
                       colSpan={2}
                     >
                       {t('Invoice')}: {incomes.toLocaleString()}
                     </td>
                     <td
-                      className='py-2 px-4 text-center text-[red] border-[1px] dark:border-gray-600 dark:text-gray-300'
+                      className='py-2 px-4 text-center text-[red] border-[1px] dark:border-gray-600'
                       colSpan={role === 'admin' ? 3 : 4}
                     >
                       {t('Payment')} / {t('Return')}: {expenses > 0 && '-'}
                       {expenses.toLocaleString()}
                     </td>
                     <td
-                      className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600 dark:text-gray-300'
+                      className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600'
                       colSpan={2}
                     >
                       {t('Profit')}:{' '}
