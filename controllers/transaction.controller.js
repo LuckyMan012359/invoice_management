@@ -9,11 +9,11 @@ exports.createTransaction = async (req, res) => {
     const { customer_id, supplier_id, transaction_type, amount, notes, transaction_date } =
       req.body;
 
+    console.log(transaction_date);
+
     const latestTransaction = await Transaction.findOne({ customer_id }).sort({
       created: -1,
     });
-
-    const _latestTransaction = await Transaction.findOne().sort({ created: -1 });
 
     let balance = transaction_type === 'invoice' ? amount : amount * -1;
 

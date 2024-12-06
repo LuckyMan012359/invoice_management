@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import Datepicker from 'react-tailwindcss-datepicker';
 import { useTranslation } from 'react-i18next';
 import axiosInstance from '../../utils/axiosInstance';
 import { toast } from 'react-toastify';
 import getUserRole from '../../utils/getUserRole';
 import Select from 'react-select';
 import { useSelector } from 'react-redux';
+import { ThemeProvider } from 'antd-style';
+import { DatePicker, ConfigProvider } from 'antd';
+import enUS from 'antd/es/locale/en_US';
+import esES from 'antd/es/locale/es_ES';
 
 const TransactionForm = ({
   customers,
@@ -26,6 +29,14 @@ const TransactionForm = ({
 
   const isDarkMode = useSelector((state) => state.darkMode.isDarkMode);
 
+  const [locale, setLocale] = useState();
+
+  useEffect(() => {
+    console.log(i18n.language);
+
+    setLocale(i18n.language === 'en' ? enUS : esES);
+  }, [i18n.language]);
+
   useEffect(() => {
     const fetchData = async () => {
       const role = await getUserRole();
@@ -42,7 +53,7 @@ const TransactionForm = ({
     transactionType: '',
     amount: '',
     notes: '',
-    date: { startDate: '', endDate: '' },
+    date: '',
     attachments: [],
   });
 
@@ -56,7 +67,7 @@ const TransactionForm = ({
       transactionType: null,
       amount: '',
       notes: '',
-      date: { startDate: null, endDate: null },
+      date: null,
       attachments: [],
     });
 
@@ -113,9 +124,9 @@ const TransactionForm = ({
     formattedData.append('transaction_id', transactionId ? transactionId : '');
     formattedData.append('isRemove', removeAttachments);
 
-    const rawDate = formData.date.startDate;
+    const rawDate = formData.date;
     if (rawDate) {
-      const formattedDate = new Date(rawDate).toISOString().split('T')[0];
+      const formattedDate = rawDate.format('YYYY-MM-DD'); // Use dayjs's format method
       formattedData.append('transaction_date', formattedDate);
     }
 
@@ -241,152 +252,159 @@ const TransactionForm = ({
   }));
 
   return (
-    <div className='fixed top-0 left-0 w-screen h-screen flex justify-center py-[50px] z-[101] bg-black overflow-y-scroll bg-opacity-50'>
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-lg h-[700px]'>
-        <h2 className='text-2xl font-bold mb-4 dark:text-white'>{`${
-          type === 'Add' ? t('Add Transaction') : t('Edit Transaction')
-        }`}</h2>
-        <form onSubmit={handleSubmit} encType='multipart/form-data'>
-          <div className='mb-4'>
-            <label className='block text-gray-700 dark:text-gray-300'>{t('Date')}</label>
-            <Datepicker
-              required
-              i18n={i18n.language}
-              value={formData.date}
-              onChange={handleDateChange}
-              asSingle={true}
-              useRange={false}
-              displayFormat={'DD/MM/YYYY'}
-              inputClassName='relative transition-all duration-300 py-2.5 pl-4 pr-14 w-full border dark:bg-gray-700 dark:border dark:border-white dark:text-white/80 rounded-lg tracking-wide font-light text-sm placeholder-gray-400 bg-white focus:ring disabled:opacity-40 disabled:cursor-not-allowed focus:border-blue-500 focus:ring-blue-500/20'
-              allowINput
-            />
-          </div>
-
-          <div className='mb-4'>
-            <label className='block text-gray-700 dark:text-gray-300'>{t('Customer')}</label>
-            <Select
-              options={customerOptions}
-              value={customerOptions.find((option) => option.value === formData.customerId)}
-              onChange={(option) => handleSelectChange(option, 'customerId')}
-              styles={selectStyles}
-              placeholder={t('Select a customer')}
-              isDisabled={userRole === 'customer'}
-              required
-            />
-          </div>
-
-          <div className='mb-4'>
-            <label className='block text-gray-700 dark:text-gray-300'>{t('Supplier')}</label>
-            <Select
-              options={supplierOptions}
-              value={supplierOptions.find((option) => option.value === formData.supplierId)}
-              onChange={(option) => handleSelectChange(option, 'supplierId')}
-              styles={selectStyles}
-              placeholder={t('Select a supplier')}
-              required={(value) => value === null}
-            />
-          </div>
-
-          <div className='mb-4'>
-            <label className='block text-gray-700 dark:text-gray-300'>
-              {t('Transaction Type')}
-            </label>
-            <Select
-              options={formattedOptions}
-              value={formattedOptions.find((option) => option.value === formData.transactionType)}
-              onChange={(option) => handleSelectChange(option, 'transactionType')}
-              styles={selectStyles}
-              placeholder={t('Select a transaction type')}
-              required
-            />
-          </div>
-
-          <div className='mb-4'>
-            <label className='block text-gray-700 dark:text-gray-300'>{t('Amount')}</label>
-            <input
-              type='number'
-              name='amount'
-              value={formData.amount}
-              onChange={handleChange}
-              className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
-              required
-            />
-          </div>
-
-          <div className='mb-4'>
-            <label className='block text-gray-700 dark:text-gray-300'>{t('Notes')}</label>
-            <textarea
-              name='notes'
-              value={formData.notes}
-              className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
-              onChange={handleChange}
-              required={userRole !== 'admin'}
-            />
-          </div>
-
-          {type === 'Edit' && (
-            <>
+    <ConfigProvider locale={locale}>
+      <ThemeProvider appearance={isDarkMode ? 'dark' : 'light'}>
+        <div className='fixed top-0 left-0 w-screen h-screen flex justify-center py-[50px] z-[101] bg-black overflow-y-scroll bg-opacity-50'>
+          <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-lg h-[700px]'>
+            <h2 className='text-2xl font-bold mb-4 dark:text-white'>{`${
+              type === 'Add' ? t('Add Transaction') : t('Edit Transaction')
+            }`}</h2>
+            <form onSubmit={handleSubmit} encType='multipart/form-data'>
               <div className='mb-4'>
-                <label className='inline-flex items-center'>
-                  <input
-                    type='checkbox'
-                    checked={removeAttachments}
-                    onChange={() => setRemoveAttachments(!removeAttachments)}
-                    className='form-checkbox'
-                  />
-                  <span className='ml-2 text-gray-700 dark:text-gray-300'>
-                    {t('Remove Attachments')}
-                  </span>
-                </label>
+                <label className='block text-gray-700 dark:text-gray-300'>{t('Date')}</label>
+                <DatePicker
+                  required
+                  i18n={i18n.language}
+                  value={formData.date}
+                  onChange={handleDateChange}
+                  displayFormat={'DD/MM/YYYY'}
+                  placeholder='DD/MM/YYYY'
+                  className='w-full'
+                  size='large'
+                />
               </div>
+
               <div className='mb-4'>
-                <label className='inline-flex items-center'>
-                  <input
-                    type='checkbox'
-                    checked={updateAttachments}
-                    onChange={() => setUpdateAttachments(!updateAttachments)}
-                    className='form-checkbox'
-                    disabled={removeAttachments === true}
-                  />
-                  <span className='ml-2 text-gray-700 dark:text-gray-300'>
-                    {t('Update Attachments')}
-                  </span>
-                </label>
+                <label className='block text-gray-700 dark:text-gray-300'>{t('Customer')}</label>
+                <Select
+                  options={customerOptions}
+                  value={customerOptions.find((option) => option.value === formData.customerId)}
+                  onChange={(option) => handleSelectChange(option, 'customerId')}
+                  styles={selectStyles}
+                  placeholder={t('Select a customer')}
+                  isDisabled={userRole === 'customer'}
+                  required
+                />
               </div>
-            </>
-          )}
 
-          {(updateAttachments || type === 'Add') && (
-            <div className='mb-4'>
-              <label className='block text-gray-700 dark:text-gray-300'>{t('Attachments')}</label>
-              <input
-                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
-                type='file'
-                multiple
-                accept='.jpg, .jpeg, .png, .webp, .jfif, .pdf'
-                name='attachments'
-              />
-            </div>
-          )}
+              <div className='mb-4'>
+                <label className='block text-gray-700 dark:text-gray-300'>{t('Supplier')}</label>
+                <Select
+                  options={supplierOptions}
+                  value={supplierOptions.find((option) => option.value === formData.supplierId)}
+                  onChange={(option) => handleSelectChange(option, 'supplierId')}
+                  styles={selectStyles}
+                  placeholder={t('Select a supplier')}
+                  required={(value) => value === null}
+                />
+              </div>
 
-          <div className='flex justify-end'>
-            <button
-              type='button'
-              className='bg-gray-500 text-white px-4 py-2 rounded mr-2'
-              onClick={() => {
-                onClose();
-                resetForm();
-              }}
-            >
-              {t('Cancel')}
-            </button>
-            <button type='submit' className='bg-green-500 text-white px-4 py-2 rounded'>
-              {type === 'Add' ? t('Add') : t('Edit')}
-            </button>
+              <div className='mb-4'>
+                <label className='block text-gray-700 dark:text-gray-300'>
+                  {t('Transaction Type')}
+                </label>
+                <Select
+                  options={formattedOptions}
+                  value={formattedOptions.find(
+                    (option) => option.value === formData.transactionType,
+                  )}
+                  onChange={(option) => handleSelectChange(option, 'transactionType')}
+                  styles={selectStyles}
+                  placeholder={t('Select a transaction type')}
+                  required
+                />
+              </div>
+
+              <div className='mb-4'>
+                <label className='block text-gray-700 dark:text-gray-300'>{t('Amount')}</label>
+                <input
+                  type='number'
+                  name='amount'
+                  value={formData.amount}
+                  onChange={handleChange}
+                  className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                  required
+                />
+              </div>
+
+              <div className='mb-4'>
+                <label className='block text-gray-700 dark:text-gray-300'>{t('Notes')}</label>
+                <textarea
+                  name='notes'
+                  value={formData.notes}
+                  className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                  onChange={handleChange}
+                  required={userRole !== 'admin'}
+                />
+              </div>
+
+              {type === 'Edit' && (
+                <>
+                  <div className='mb-4'>
+                    <label className='inline-flex items-center'>
+                      <input
+                        type='checkbox'
+                        checked={removeAttachments}
+                        onChange={() => setRemoveAttachments(!removeAttachments)}
+                        className='form-checkbox'
+                      />
+                      <span className='ml-2 text-gray-700 dark:text-gray-300'>
+                        {t('Remove Attachments')}
+                      </span>
+                    </label>
+                  </div>
+                  <div className='mb-4'>
+                    <label className='inline-flex items-center'>
+                      <input
+                        type='checkbox'
+                        checked={updateAttachments}
+                        onChange={() => setUpdateAttachments(!updateAttachments)}
+                        className='form-checkbox'
+                        disabled={removeAttachments === true}
+                      />
+                      <span className='ml-2 text-gray-700 dark:text-gray-300'>
+                        {t('Update Attachments')}
+                      </span>
+                    </label>
+                  </div>
+                </>
+              )}
+
+              {(updateAttachments || type === 'Add') && (
+                <div className='mb-4'>
+                  <label className='block text-gray-700 dark:text-gray-300'>
+                    {t('Attachments')}
+                  </label>
+                  <input
+                    className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                    type='file'
+                    multiple
+                    accept='.jpg, .jpeg, .png, .webp, .jfif, .pdf'
+                    name='attachments'
+                  />
+                </div>
+              )}
+
+              <div className='flex justify-end'>
+                <button
+                  type='button'
+                  className='bg-gray-500 text-white px-4 py-2 rounded mr-2'
+                  onClick={() => {
+                    onClose();
+                    resetForm();
+                  }}
+                >
+                  {t('Cancel')}
+                </button>
+                <button type='submit' className='bg-green-500 text-white px-4 py-2 rounded'>
+                  {type === 'Add' ? t('Add') : t('Edit')}
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      </ThemeProvider>
+    </ConfigProvider>
   );
 };
 
