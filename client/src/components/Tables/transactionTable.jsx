@@ -479,7 +479,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                       className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600'
                       colSpan={2}
                     >
-                      {t('Profit')}:{' '}
+                      {t('Balance')}:{' '}
                       <span className={incomes - expenses >= 0 ? `text-[green]` : `text-[red]`}>
                         {(incomes - expenses).toLocaleString()}
                       </span>
