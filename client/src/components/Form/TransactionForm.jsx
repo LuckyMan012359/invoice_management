@@ -257,7 +257,7 @@ const TransactionForm = ({
     <ConfigProvider locale={locale}>
       <ThemeProvider appearance={isDarkMode ? 'dark' : 'light'}>
         <div className='fixed top-0 left-0 w-screen h-screen flex justify-center py-[50px] z-[101] bg-black overflow-y-scroll bg-opacity-50'>
-          <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-lg h-[700px]'>
+          <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-lg h-[800px]'>
             <h2 className='text-2xl font-bold mb-4 dark:text-white'>{`${
               type === 'Add' ? t('Add Transaction') : t('Edit Transaction')
             }`}</h2>
