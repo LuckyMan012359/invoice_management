@@ -9,6 +9,7 @@ import { ThemeProvider } from 'antd-style';
 import { DatePicker, ConfigProvider } from 'antd';
 import enUS from 'antd/es/locale/en_US';
 import esES from 'antd/es/locale/es_ES';
+import dayjs from 'dayjs';
 
 const TransactionForm = ({
   customers,
@@ -83,10 +84,7 @@ const TransactionForm = ({
         transactionType: transaction.transaction || '',
         amount: transaction.amount || '',
         notes: transaction.note || '',
-        date: {
-          startDate: transaction.date ? new Date(transaction.date) : '',
-          endDate: transaction.date ? new Date(transaction.date) : '',
-        },
+        date: dayjs(transaction.date),
         attachments: [],
       });
     }
@@ -106,6 +104,10 @@ const TransactionForm = ({
       date: newValue,
     }));
   };
+
+  useEffect(() => {
+    console.log(formData.date);
+  }, [formData.date]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

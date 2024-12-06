@@ -424,6 +424,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                           className='text-gray-800 py-1 rounded mr-1 dark:text-white'
                           onClick={() => {
                             setType('Edit');
+                            console.log(item.transaction_date);
+
                             setTransaction({
                               date: item.transaction_date,
                               customer: item.customer._id,
