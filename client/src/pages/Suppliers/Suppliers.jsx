@@ -174,37 +174,32 @@ export const Suppliers = () => {
                   <th className='py-2 px-4 text-left'>{t('Name')}</th>
                   <th className='py-2 px-4 text-left'>{t('Total Purchases')}</th>
                   <th className='py-2 px-4 text-left'>{t('Total Payments')}</th>
-                  <th className='py-2 px-4 text-left'>{t('Total Returns')}</th>
                   <th className='py-2 px-4 text-left'>{t('Balance')}</th>
                   <th className='py-2 px-4 text-left'>{t('Actions')}</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredSuppliers.map((supplier) => (
-                  <tr
-                    key={supplier.id}
-                    className='border-b dark:border-gray-600 dark:text-gray-300'
-                  >
-                    <td className='py-2 px-4'>{supplier.name}</td>
-                    <td className='py-2 px-4 text-[green]'>
+                  <tr key={supplier.id}>
+                    <td className='py-2 px-4 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      {supplier.name}
+                    </td>
+                    <td className='py-2 px-4 text-[green] border-[1px] dark:border-gray-600'>
                       {supplier.totalPurchase.toLocaleString()}
                     </td>
-                    <td className='py-2 px-4 text-[red]'>
+                    <td className='py-2 px-4 text-[red] border-[1px] dark:border-gray-600'>
                       -{supplier.totalPayment.toLocaleString()}
-                    </td>
-                    <td className='py-2 px-4 text-[red]'>
-                      -{supplier.totalReturn.toLocaleString()}
                     </td>
                     <td
                       className={`py-2 px-4 ${
                         supplier.totalBalance >= 0 ? 'text-[green]' : 'text-[red]'
-                      }`}
+                      } border-[1px] dark:border-gray-600`}
                     >
                       {supplier.totalBalance.toLocaleString()}
                     </td>
-                    <td className='py-2 px-4 flex gap-[20px]'>
+                    <td className='py-2 px-4  border-[1px] dark:border-gray-600 dark:text-gray-300'>
                       <button
-                        className='text-gray-800 py-1 rounded mr-1 dark:text-white'
+                        className='text-gray-800 py-1 rounded mr-[15px] dark:text-white'
                         onClick={() => {
                           setType('Edit');
                           setShowSupplierForm(true);

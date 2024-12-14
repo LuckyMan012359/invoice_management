@@ -18,7 +18,7 @@ app.set('trust proxy', true);
 
 app.use(
   cors({
-    origin: ['https://negociacionalex.lat'],
+    origin: ['https://negociacionalex.lat', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   }),

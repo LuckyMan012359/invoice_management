@@ -35,6 +35,9 @@ export const Customers = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const [incomes, setIncomes] = useState(0);
+  const [expenses, setExpenses] = useState(0);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -53,6 +56,9 @@ export const Customers = () => {
         setFilteredCustomers(groupedData);
 
         setTotalPages(response.data.meta.totalPages);
+
+        setIncomes(response.data.incomes || 0);
+        setExpenses(response.data.expenses || 0);
 
         setLoading(false);
       } catch (error) {
@@ -224,51 +230,46 @@ export const Customers = () => {
                   <th className='py-2 px-4 text-left'>{t('Name')}</th>
                   <th className='py-2 px-4 text-left'>{t('Total Purchases')}</th>
                   <th className='py-2 px-4 text-left'>{t('Total Payments')}</th>
-                  <th className='py-2 px-4 text-left'>{t('Total Returns')}</th>
                   <th className='py-2 px-4 text-left'>{t('Balance')}</th>
                   <th className='py-2 px-4 text-left'>{t('Actions')}</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredCustomers.map((customer, index) => (
-                  <tr
-                    key={customer.id || `customer-${index}`}
-                    className='border-b dark:border-gray-600 dark:text-gray-300'
-                  >
-                    <td className='py-2 px-4'>
+                  <tr key={customer.id || `customer-${index}`} className='border-b'>
+                    <td className='py-2 px-4 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                       {customer.firstName} {customer.lastName}
                     </td>
                     {customer.role === 'admin' ? (
                       <>
-                        <td className='py-2 px-4 text-center' colSpan={4}>
+                        <td
+                          className='py-2 px-4 text-center border-[1px] dark:border-gray-600 dark:text-gray-300'
+                          colSpan={4}
+                        >
                           {t('Admin')}
                         </td>
                       </>
                     ) : (
                       <>
-                        <td className='py-2 px-4 text-[green]'>
+                        <td className='py-2 px-4 text-[green] border-[1px] dark:border-gray-600 dark:text-gray-300'>
                           {customer.totalPurchase.toLocaleString() || 0}
                         </td>
-                        <td className='py-2 px-4 text-[red]'>
+                        <td className='py-2 px-4 text-[red] border-[1px] dark:border-gray-600 dark:text-gray-300'>
                           {customer.totalPayment > 0 && '-'}
                           {customer.totalPayment.toLocaleString() || 0}
-                        </td>
-                        <td className='py-2 px-4 text-[red]'>
-                          {customer.totalReturn > 0 && '-'}
-                          {customer.totalReturn.toLocaleString() || 0}
                         </td>
                         <td
                           className={`py-2 px-4 ${
                             customer.totalBalance >= 0 ? 'text-[green]' : 'text-[red]'
-                          }`}
+                          } border-[1px] dark:border-gray-600 dark:text-gray-300`}
                         >
                           {customer.totalBalance.toLocaleString() || 0}
                         </td>
                       </>
                     )}
-                    <td className='py-2 px-4 flex gap-[25px]'>
+                    <td className='py-2 px-4 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                       <button
-                        className='text-gray-800 py-1 rounded mr-1 dark:text-white'
+                        className='text-gray-800 py-1 rounded dark:text-white mr-[15px]'
                         onClick={() => {
                           setType('Edit');
                           setShowCustomerForm(true);
@@ -286,6 +287,37 @@ export const Customers = () => {
                     </td>
                   </tr>
                 ))}
+
+                <tr>
+                  <td
+                    className='py-2 px-4 text-center text-[red]  border-[1px] dark:border-gray-600'
+                    colSpan={1}
+                  >
+                    {t('Total')}
+                  </td>
+                  <td
+                    className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600'
+                    colSpan={1}
+                  >
+                    {t('Invoice')}: {incomes.toLocaleString()}
+                  </td>
+                  <td
+                    className='py-2 px-4 text-center text-[red] border-[1px] dark:border-gray-600'
+                    colSpan={1}
+                  >
+                    {t('Payment')}: {expenses > 0 && '-'}
+                    {expenses.toLocaleString()}
+                  </td>
+                  <td
+                    className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600'
+                    colSpan={2}
+                  >
+                    {t('Balance')}:{' '}
+                    <span className={incomes - expenses >= 0 ? `text-[green]` : `text-[red]`}>
+                      {(incomes - expenses).toLocaleString()}
+                    </span>
+                  </td>
+                </tr>
               </tbody>
             </table>
           )}

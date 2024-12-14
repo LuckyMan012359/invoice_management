@@ -207,7 +207,6 @@ const TransactionForm = ({
     { value: null, label: t('Select a transaction type'), isDisabled: true },
     { value: 'invoice', label: t('invoice'), isDisabled: false },
     { value: 'payment', label: t('payment'), isDisabled: false },
-    { value: 'return', label: t('return'), isDisabled: false },
   ];
 
   const selectStyles = {

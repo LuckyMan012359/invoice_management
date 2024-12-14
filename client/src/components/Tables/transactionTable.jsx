@@ -347,6 +347,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                     <th className='p-3'>{t('Transaction')}</th>
                     <th className='p-3'>{t('Note')}</th>
                     <th className='p-3'>{t('Amount')}</th>
+                    <th className='p-3'>{t('Payment')}</th>
                     {role === 'customer' && <th className='p-3'>{t('Balance')}</th>}
                     <th className='p-3'>{t('Attachments')}</th>
                     <th className='p-3'>{t('Action')}</th>
@@ -387,8 +388,15 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                           item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
                         } border-[1px] dark:border-gray-600 dark:text-gray-300`}
                       >
+                        {item.transaction_type == 'invoice' && item.amount.toLocaleString()}
+                      </td>
+                      <td
+                        className={`p-3 ${
+                          item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
+                        } border-[1px] dark:border-gray-600 dark:text-gray-300`}
+                      >
                         {item.transaction_type !== 'invoice' && '-'}
-                        {item.amount.toLocaleString()}
+                        {item.transaction_type !== 'invoice' && item.amount.toLocaleString()}
                       </td>
                       {role === 'customer' && (
                         <td
@@ -470,9 +478,9 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                     </td>
                     <td
                       className='py-2 px-4 text-center text-[red] border-[1px] dark:border-gray-600'
-                      colSpan={role === 'admin' ? 3 : 4}
+                      colSpan={role === 'admin' ? 4 : 5}
                     >
-                      {t('Payment')} / {t('Return')}: {expenses > 0 && '-'}
+                      {t('Payment')}: {expenses > 0 && '-'}
                       {expenses.toLocaleString()}
                     </td>
                     <td
