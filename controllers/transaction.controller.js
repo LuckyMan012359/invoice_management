@@ -242,10 +242,23 @@ exports.readTransaction = async (req, res) => {
     const totalTransactions = await Transaction.aggregate(totalPipeline);
     const count = totalTransactions.length > 0 ? totalTransactions.length : 0;
 
+    let incomes = 0;
+    let expenses = 0;
+
+    totalTransactions.forEach((item) => {
+      if (item.transaction_type === 'invoice') {
+        incomes += item.amount;
+      } else {
+        expenses += item.amount;
+      }
+    });
+
     const result = {
       message: 'Transactions retrieved successfully',
       transactions,
       totalPage: Math.ceil(count / parseInt(pageSize, 10)),
+      incomes,
+      expenses,
       totalCount: count,
       totalTransactions,
     };

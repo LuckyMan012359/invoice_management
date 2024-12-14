@@ -1,6 +1,6 @@
 const { deleteCache, getCache, setCache } = require('../config/cacheController');
 const Supplier = require('../models/supplier.model');
-const Trasnaction = require('../models/transaction.model');
+const Transaction = require('../models/transaction.model');
 
 exports.createSupplier = async (req, res) => {
   const { name, email, phoneNumber, homeAddress } = req.body;
@@ -69,7 +69,7 @@ exports.readSupplier = async (req, res) => {
 
     const resultSuppliers = await Promise.all(
       suppliers.map(async (supplier) => {
-        const transactions = await Trasnaction.find({ supplier_id: supplier._id });
+        const transactions = await Transaction.find({ supplier_id: supplier._id });
 
         if (transactions && transactions.length > 0) {
           const { invoiceTotal, paymentTotal, returnTotal } = transactions.reduce(
@@ -103,8 +103,68 @@ exports.readSupplier = async (req, res) => {
       }),
     );
 
+    const totalPipeline = [
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'customer_id',
+          foreignField: '_id',
+          as: 'customer',
+        },
+      },
+      {
+        $lookup: {
+          from: 'suppliers',
+          localField: 'supplier_id',
+          foreignField: '_id',
+          as: 'supplier',
+        },
+      },
+      {
+        $unwind: { path: '$customer', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $unwind: { path: '$supplier', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $sort: { created: -1 },
+      },
+      {
+        $project: {
+          _id: 1,
+          transaction_type: 1,
+          amount: 1,
+          balance: 1,
+          notes: 1,
+          transaction_date: 1,
+          'customer._id': 1,
+          'customer.email': 1,
+          'customer.firstName': 1,
+          'customer.lastName': 1,
+          'supplier._id': 1,
+          'supplier.email': 1,
+          'supplier.name': 1,
+        },
+      },
+    ];
+
+    const totalTransactions = await Transaction.aggregate(totalPipeline);
+
+    let incomes = 0;
+    let expenses = 0;
+
+    totalTransactions.forEach((item) => {
+      if (item.transaction_type === 'invoice') {
+        incomes += item.amount;
+      } else {
+        expenses += item.amount;
+      }
+    });
+
     const result = {
       data: resultSuppliers,
+      incomes,
+      expenses,
       meta: {
         totalRecords: totalCount,
         currentPage: parseInt(pageNum),

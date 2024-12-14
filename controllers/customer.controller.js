@@ -128,8 +128,68 @@ exports.readCustomer = async (req, res) => {
       }),
     );
 
+    const totalPipeline = [
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'customer_id',
+          foreignField: '_id',
+          as: 'customer',
+        },
+      },
+      {
+        $lookup: {
+          from: 'suppliers',
+          localField: 'supplier_id',
+          foreignField: '_id',
+          as: 'supplier',
+        },
+      },
+      {
+        $unwind: { path: '$customer', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $unwind: { path: '$supplier', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $sort: { created: -1 },
+      },
+      {
+        $project: {
+          _id: 1,
+          transaction_type: 1,
+          amount: 1,
+          balance: 1,
+          notes: 1,
+          transaction_date: 1,
+          'customer._id': 1,
+          'customer.email': 1,
+          'customer.firstName': 1,
+          'customer.lastName': 1,
+          'supplier._id': 1,
+          'supplier.email': 1,
+          'supplier.name': 1,
+        },
+      },
+    ];
+
+    const totalTransactions = await Transaction.aggregate(totalPipeline);
+
+    let incomes = 0;
+    let expenses = 0;
+
+    totalTransactions.forEach((item) => {
+      if (item.transaction_type === 'invoice') {
+        incomes += item.amount;
+      } else {
+        expenses += item.amount;
+      }
+    });
+
     const result = {
       data: resultCustomer,
+      incomes,
+      expenses,
       meta: {
         totalRecords: totalCount,
         currentPage: parseInt(pageNum),

@@ -104,21 +104,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
         pageSize: transactionsPerPage,
       });
 
-      const data = response.data.transactions;
-
-      let totalIncome = 0;
-      let totalExpenses = 0;
-
-      data.forEach((item) => {
-        if (item.transaction_type === 'invoice') {
-          totalIncome += item.amount;
-        } else {
-          totalExpenses += item.amount;
-        }
-      });
-
-      setIncomes(totalIncome);
-      setExpenses(totalExpenses);
+      setIncomes(response.data.incomes);
+      setExpenses(response.data.expenses);
 
       setTotalPages(response.data.totalPage);
       setTransactionData(response.data.transactions);

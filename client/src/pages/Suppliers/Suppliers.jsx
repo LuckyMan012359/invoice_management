@@ -26,6 +26,9 @@ export const Suppliers = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const [incomes, setIncomes] = useState(0);
+  const [expenses, setExpenses] = useState(0);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -39,6 +42,9 @@ export const Suppliers = () => {
       setFilteredSuppliers(response.data.data);
 
       setTotalPages(response.data.meta.totalPages);
+
+      setIncomes(response.data.incomes || 0);
+      setExpenses(response.data.expenses || 0);
 
       setLoading(false);
     };
@@ -217,6 +223,37 @@ export const Suppliers = () => {
                     </td>
                   </tr>
                 ))}
+
+                <tr>
+                  <td
+                    className='py-2 px-4 text-center text-[red]  border-[1px] dark:border-gray-600'
+                    colSpan={1}
+                  >
+                    {t('Total')}
+                  </td>
+                  <td
+                    className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600'
+                    colSpan={1}
+                  >
+                    {t('Invoice')}: {incomes.toLocaleString()}
+                  </td>
+                  <td
+                    className='py-2 px-4 text-center text-[red] border-[1px] dark:border-gray-600'
+                    colSpan={1}
+                  >
+                    {t('Payment')}: {expenses > 0 && '-'}
+                    {expenses.toLocaleString()}
+                  </td>
+                  <td
+                    className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600'
+                    colSpan={2}
+                  >
+                    {t('Balance')}:{' '}
+                    <span className={incomes - expenses >= 0 ? `text-[green]` : `text-[red]`}>
+                      {(incomes - expenses).toLocaleString()}
+                    </span>
+                  </td>
+                </tr>
               </tbody>
             </table>
           )}
