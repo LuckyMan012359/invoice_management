@@ -77,10 +77,10 @@ exports.readTransaction = async (req, res) => {
 
     const cacheKey = `transactions:${req.user.email}:${req.user.role}:${customer}:${supplier}:${keyword}:${date}:${pageNum}:${pageSize}`;
 
-    const cachedData = getCache('transaction', cacheKey);
-    if (cachedData) {
-      return res.status(200).send(cachedData);
-    }
+    // const cachedData = getCache('transaction', cacheKey);
+    // if (cachedData) {
+    //   return res.status(200).send(cachedData);
+    // }
 
     const match = {};
     const user = await User.findOne({ email: req.user.email }).exec();
@@ -90,10 +90,21 @@ exports.readTransaction = async (req, res) => {
     }
 
     if (customer) {
-      match['$or'] = [
-        { 'customer.firstName': { $regex: customer, $options: 'i' } },
-        { 'customer.lastName': { $regex: customer, $options: 'i' } },
-      ];
+      const nameParts = customer.trim().split(/\s+/);
+      if (nameParts.length > 1) {
+        const firstName = nameParts.slice(0, -1).join(' '); // Everything except the last part
+        const lastName = nameParts[nameParts.length - 1]; // Last part
+
+        match['$and'] = [
+          { 'customer.firstName': { $regex: firstName, $options: 'i' } },
+          { 'customer.lastName': { $regex: lastName, $options: 'i' } },
+        ];
+      } else {
+        match['$or'] = [
+          { 'customer.firstName': { $regex: customer, $options: 'i' } },
+          { 'customer.lastName': { $regex: customer, $options: 'i' } },
+        ];
+      }
     }
 
     if (supplier) {

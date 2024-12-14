@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Datepicker from 'react-tailwindcss-datepicker';
 import axiosInstance from '../../utils/axiosInstance';
 import { LoadingOutlined } from '@ant-design/icons';
+import Select from 'react-select';
 import * as XLSX from 'xlsx';
 
 import { toast } from 'react-toastify';
@@ -14,11 +15,13 @@ import { Modal } from 'antd';
 
 import { Button } from 'antd';
 import getUserRole from '../../utils/getUserRole';
+import { useSelector } from 'react-redux';
 
 const imageUrl = process.env.REACT_APP_IMAGE_URL;
 
 export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
   const { t, i18n } = useTranslation();
+  const isDarkMode = useSelector((state) => state.darkMode.isDarkMode);
   const [date, setDate] = useState({
     startDate: '',
     endDate: '',
@@ -26,6 +29,8 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [transactionsPerPage, setTransactionsPerPage] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
+  const [suppliers, setSuppliers] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [customer, setCustomer] = useState('');
   const [supplier, setSupplier] = useState('');
   const [keyword, setKeyword] = useState('');
@@ -60,6 +65,20 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
 
     return `${year}-${month}-${day}`;
   };
+
+  useEffect(() => {
+    const fetchSuppliersData = async () => {
+      const response = await axiosInstance('/supplier/get_suppliers', 'get');
+      setSuppliers(response.data.data);
+    };
+    const fetchCustomersData = async () => {
+      const response = await axiosInstance('/customer/get_only_customers', 'get');
+      setCustomers(response.data.data);
+    };
+
+    fetchCustomersData();
+    fetchSuppliersData();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -179,6 +198,66 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
     XLSX.writeFile(workbook, 'Transactions.xlsx');
   };
 
+  const selectStyles = {
+    control: (styles, { isFocused }) => ({
+      ...styles,
+      backgroundColor: 'var(--bg-color)',
+      borderColor: isFocused ? 'var(--focus-border-color)' : isDarkMode ? '#fff' : '#e7e9ed',
+      boxShadow: isFocused ? '0 0 0 1px var(--focus-border-color)' : 'none',
+      '&:hover': {
+        borderColor: isDarkMode ? '#fff' : '#e7e9ed',
+      },
+      color: isDarkMode ? '#fff' : '#000',
+    }),
+    menu: (styles) => ({
+      ...styles,
+      backgroundColor: isDarkMode ? '#1f2937' : '#fff',
+      color: isDarkMode ? '#fff' : '#000',
+    }),
+    option: (styles, { isSelected, isFocused }) => ({
+      ...styles,
+      backgroundColor: isSelected
+        ? isDarkMode
+          ? '#4B5563'
+          : '#E5E7EB'
+        : isFocused
+        ? isDarkMode
+          ? '#374151'
+          : '#F3F4F6'
+        : 'transparent',
+      color: isDarkMode ? '#fff' : '#000',
+      '&:hover': {
+        backgroundColor: isFocused ? (isDarkMode ? '#374151' : '#F3F4F6') : undefined,
+      },
+    }),
+    singleValue: (styles) => ({
+      ...styles,
+      color: isDarkMode ? '#fff' : '#000',
+    }),
+    placeholder: (styles) => ({
+      ...styles,
+      color: isDarkMode ? '#fff' : '#e5e7eb',
+    }),
+  };
+
+  const customerOptions = [
+    { value: '', label: t('Select a customer'), isDisabled: true },
+    ...customers.map((customer) => ({
+      value: customer._id,
+      label: `${customer.firstName} ${customer.lastName}`,
+      isDisabled: false,
+    })),
+  ];
+
+  const supplierOptions = [
+    { value: '', label: t('Select a supplier'), isDisabled: true },
+    ...suppliers.map((supplier) => ({
+      value: supplier._id,
+      label: supplier.name,
+      isDisabled: false,
+    })),
+  ];
+
   return (
     <div className='w-full h-full'>
       <div className='mx-auto bg-white p-6 space-y-6 dark:bg-gray-800'>
@@ -201,22 +280,22 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
           </div>
           <div>
             <label className='block text-gray-700 dark:text-gray-300'>{t('Customer')}</label>
-            <input
-              type='text'
-              className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
-              placeholder={t('Filter by customer')}
-              value={customer}
-              onChange={(e) => setCustomer(e.target.value)}
+            <Select
+              options={customerOptions}
+              value={customerOptions.find((option) => option.value === customer)}
+              onChange={(option) => setCustomer(option.label)}
+              styles={selectStyles}
+              placeholder={t('Select a customer')}
             />
           </div>
           <div>
             <label className='block text-gray-700 dark:text-gray-300'>{t('Supplier')}</label>
-            <input
-              type='text'
-              className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
-              placeholder={t('Filter by supplier')}
-              value={supplier}
-              onChange={(e) => setSupplier(e.target.value)}
+            <Select
+              options={supplierOptions}
+              value={supplierOptions.find((option) => option.value === supplier)}
+              onChange={(option) => setSupplier(option.label)}
+              styles={selectStyles}
+              placeholder={t('Select a supplier')}
             />
           </div>
           <div>

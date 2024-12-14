@@ -6,6 +6,7 @@ import TransactionForm from '../../components/Form/TransactionForm';
 import axiosInstance from '../../utils/axiosInstance';
 import * as XLSX from 'xlsx';
 import { LoadingOutlined } from '@ant-design/icons';
+import Select from 'react-select';
 
 import { Modal } from 'antd';
 
@@ -13,11 +14,13 @@ import { FaRegEdit } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import getUserRole from '../../utils/getUserRole';
+import { useSelector } from 'react-redux';
 
 const imageUrl = process.env.REACT_APP_IMAGE_URL;
 
 export const TransactionTable = ({ isChanged, setIsChanged }) => {
   const { t, i18n } = useTranslation();
+  const isDarkMode = useSelector((state) => state.darkMode.isDarkMode);
   const [suppliers, setSuppliers] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [type, setType] = useState('Add');
@@ -210,6 +213,66 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     XLSX.writeFile(workbook, 'Transactions.xlsx');
   };
 
+  const selectStyles = {
+    control: (styles, { isFocused }) => ({
+      ...styles,
+      backgroundColor: 'var(--bg-color)',
+      borderColor: isFocused ? 'var(--focus-border-color)' : isDarkMode ? '#fff' : '#e7e9ed',
+      boxShadow: isFocused ? '0 0 0 1px var(--focus-border-color)' : 'none',
+      '&:hover': {
+        borderColor: isDarkMode ? '#fff' : '#e7e9ed',
+      },
+      color: isDarkMode ? '#fff' : '#000',
+    }),
+    menu: (styles) => ({
+      ...styles,
+      backgroundColor: isDarkMode ? '#1f2937' : '#fff',
+      color: isDarkMode ? '#fff' : '#000',
+    }),
+    option: (styles, { isSelected, isFocused }) => ({
+      ...styles,
+      backgroundColor: isSelected
+        ? isDarkMode
+          ? '#4B5563'
+          : '#E5E7EB'
+        : isFocused
+        ? isDarkMode
+          ? '#374151'
+          : '#F3F4F6'
+        : 'transparent',
+      color: isDarkMode ? '#fff' : '#000',
+      '&:hover': {
+        backgroundColor: isFocused ? (isDarkMode ? '#374151' : '#F3F4F6') : undefined,
+      },
+    }),
+    singleValue: (styles) => ({
+      ...styles,
+      color: isDarkMode ? '#fff' : '#000',
+    }),
+    placeholder: (styles) => ({
+      ...styles,
+      color: isDarkMode ? '#fff' : '#e5e7eb',
+    }),
+  };
+
+  const customerOptions = [
+    { value: '', label: t('Select a customer'), isDisabled: true },
+    ...customers.map((customer) => ({
+      value: customer._id,
+      label: `${customer.firstName} ${customer.lastName}`,
+      isDisabled: false,
+    })),
+  ];
+
+  const supplierOptions = [
+    { value: '', label: t('Select a supplier'), isDisabled: true },
+    ...suppliers.map((supplier) => ({
+      value: supplier._id,
+      label: supplier.name,
+      isDisabled: false,
+    })),
+  ];
+
   return (
     <>
       <div className='w-full h-full'>
@@ -233,22 +296,36 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
             </div>
             <div>
               <label className='block text-gray-700 dark:text-gray-300'>{t('Customer')}</label>
-              <input
+              {/* <input
                 type='text'
                 className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
                 placeholder={t('Filter by customer')}
                 value={customer}
                 onChange={(e) => setCustomer(e.target.value)}
+              /> */}
+              <Select
+                options={customerOptions}
+                value={customerOptions.find((option) => option.value === customer)}
+                onChange={(option) => setCustomer(option.label)}
+                styles={selectStyles}
+                placeholder={t('Select a customer')}
               />
             </div>
             <div>
               <label className='block text-gray-700 dark:text-gray-300'>{t('Supplier')}</label>
-              <input
+              {/* <input
                 type='text'
                 className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
                 placeholder={t('Filter by supplier')}
                 value={supplier}
                 onChange={(e) => setSupplier(e.target.value)}
+              /> */}
+              <Select
+                options={supplierOptions}
+                value={supplierOptions.find((option) => option.value === supplier)}
+                onChange={(option) => setSupplier(option.label)}
+                styles={selectStyles}
+                placeholder={t('Select a supplier')}
               />
             </div>
             <div>
@@ -375,7 +452,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                           item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
                         } border-[1px] dark:border-gray-600 dark:text-gray-300`}
                       >
-                        {item.transaction_type == 'invoice' && item.amount.toLocaleString()}
+                        {item.transaction_type === 'invoice' && item.amount.toLocaleString()}
                       </td>
                       <td
                         className={`p-3 ${
