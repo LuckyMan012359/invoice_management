@@ -6,6 +6,7 @@ import { MdDelete } from 'react-icons/md';
 import axiosInstance from '../../utils/axiosInstance';
 import { toast } from 'react-toastify';
 import { LoadingOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 
 export const Customers = () => {
   const { t } = useTranslation();
@@ -238,7 +239,15 @@ export const Customers = () => {
                 {filteredCustomers.map((customer, index) => (
                   <tr key={customer.id || `customer-${index}`} className='border-b'>
                     <td className='py-2 px-4 border-[1px] dark:border-gray-600 dark:text-gray-300'>
-                      {customer.firstName} {customer.lastName}
+                      {customer.role !== 'admin' ? (
+                        <Link to={`/transactions?customer_id=${customer._id}&&supplier_id=`}>
+                          {customer.firstName} {customer.lastName}
+                        </Link>
+                      ) : (
+                        <>
+                          {customer.firstName} {customer.lastName}
+                        </>
+                      )}
                     </td>
                     {customer.role === 'admin' ? (
                       <>

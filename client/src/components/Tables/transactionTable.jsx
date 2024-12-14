@@ -15,6 +15,7 @@ import { MdDelete } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import getUserRole from '../../utils/getUserRole';
 import { useSelector } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
 
 const imageUrl = process.env.REACT_APP_IMAGE_URL;
 
@@ -43,6 +44,13 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
   const [expenses, setExpenses] = useState(0);
 
   const [loading, setLoading] = useState(false);
+
+  const [isClient, setIsClient] = useState(true);
+
+  const [searchParams] = useSearchParams();
+
+  const customer_id = searchParams.get('customer_id');
+  const supplier_id = searchParams.get('supplier_id');
 
   const [transaction, setTransaction] = useState({
     date: '',
@@ -81,20 +89,6 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
   };
 
   useEffect(() => {
-    const fetchSuppliersData = async () => {
-      const response = await axiosInstance('/supplier/get_suppliers', 'get');
-      setSuppliers(response.data.data);
-    };
-    const fetchCustomersData = async () => {
-      const response = await axiosInstance('/customer/get_only_customers', 'get');
-      setCustomers(response.data.data);
-    };
-
-    fetchCustomersData();
-    fetchSuppliersData();
-  }, []);
-
-  useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
 
@@ -115,8 +109,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
       setTotalTransactionsData(response.data.totalTransactions);
       setLoading(false);
     };
-    fetchData();
-  }, [isChanged, currentPage, transactionsPerPage, role]);
+    if (isClient) fetchData();
+  }, [isChanged, currentPage, transactionsPerPage, role, isClient]);
 
   const filterData = async () => {
     setLoading(true);
@@ -154,6 +148,90 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     setLoading(false);
   };
 
+  useEffect(() => {
+    setIsClient(false);
+
+    setLoading(true);
+
+    setSupplier(supplier_id);
+    setCustomer(customer_id);
+
+    const fetchSuppliersData = async () => {
+      const supplier_data = await axiosInstance('/supplier/get_suppliers', 'get');
+      const customer_data = await axiosInstance('/customer/get_only_customers', 'get');
+
+      let supplier_name = '';
+      let customer_name = '';
+
+      if (supplier_data !== undefined) {
+        const data = supplier_data.data.data.find((item) => item._id === supplier_id);
+
+        if (data) {
+          supplier_name = data.name;
+        }
+      }
+
+      if (customer_data !== undefined) {
+        const data = customer_data.data.data.find((item) => item._id === customer_id);
+
+        if (data) {
+          customer_name = `${data.firstName} ${data.lastName}`;
+        }
+      }
+
+      const response = await axiosInstance('/transaction/get_transactions', 'get', {
+        customer: customer_name,
+        supplier: supplier_name,
+        keyword: '',
+        date: '',
+        pageNum: currentPage,
+        pageSize: transactionsPerPage,
+      });
+
+      const data = response.data.transactions;
+
+      let totalIncome = 0;
+      let totalExpenses = 0;
+
+      data.forEach((item) => {
+        if (item.transaction_type === 'invoice') {
+          totalIncome += item.amount;
+        } else {
+          totalExpenses += item.amount;
+        }
+      });
+
+      setIncomes(totalIncome);
+      setExpenses(totalExpenses);
+
+      setTotalPages(response.data.totalPage);
+      setTransactionData(response.data.transactions);
+      setTotalTransactionsData(response.data.totalTransactions);
+
+      setIsClient(false);
+    };
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 5000);
+
+    fetchSuppliersData();
+  }, [supplier_id, customer_id, currentPage, transactionsPerPage, isClient]);
+
+  useEffect(() => {
+    const fetchSuppliersData = async () => {
+      const response = await axiosInstance('/supplier/get_suppliers', 'get');
+      setSuppliers(response.data.data);
+    };
+    const fetchCustomersData = async () => {
+      const response = await axiosInstance('/customer/get_only_customers', 'get');
+      setCustomers(response.data.data);
+    };
+
+    fetchCustomersData();
+    fetchSuppliersData();
+  }, []);
+
   const deleteTransaction = async (id) => {
     const response = await axiosInstance('/transaction/delete_transaction', 'delete', {
       transaction_id: id,
@@ -172,6 +250,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     setCustomer('');
     setSupplier('');
     setKeyword('');
+    setIsClient(true);
     setDate({
       startDate: null,
       endDate: null,

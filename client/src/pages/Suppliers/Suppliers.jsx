@@ -6,6 +6,7 @@ import axiosInstance from '../../utils/axiosInstance';
 import { toast } from 'react-toastify';
 import SupplierForm from '../../components/Form/SupplierForm';
 import { LoadingOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 
 export const Suppliers = () => {
   const { t } = useTranslation();
@@ -187,8 +188,10 @@ export const Suppliers = () => {
               <tbody>
                 {filteredSuppliers.map((supplier) => (
                   <tr key={supplier.id}>
-                    <td className='py-2 px-4 border-[1px] dark:border-gray-600 dark:text-gray-300'>
-                      {supplier.name}
+                    <td className='py-2 px-4 border-[1px] dark:border-gray-600 dark:text-gray-300 cursor-pointer'>
+                      <Link to={`/transactions?customer_id=&&supplier_id=${supplier._id}`}>
+                        {supplier.name}
+                      </Link>
                     </td>
                     <td className='py-2 px-4 text-[green] border-[1px] dark:border-gray-600'>
                       {supplier.totalPurchase.toLocaleString()}

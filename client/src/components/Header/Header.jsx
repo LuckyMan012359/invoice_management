@@ -74,7 +74,10 @@ function Header() {
         <Link to='/dashboard' className='text-gray-800 dark:text-gray-200 hover:text-gray-500'>
           {t('Dashboard')}
         </Link>
-        <Link to='/transactions' className='text-gray-800 dark:text-gray-200 hover:text-gray-500'>
+        <Link
+          to='/transactions?customer_id=&&supplier_id='
+          className='text-gray-800 dark:text-gray-200 hover:text-gray-500'
+        >
           {t('Transactions')}
         </Link>
         {userRole !== 'customer' && (
