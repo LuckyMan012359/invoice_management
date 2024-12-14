@@ -90,11 +90,35 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setCustomer(customer_id);
+      setSupplier(supplier_id);
       setLoading(true);
 
+      const supplier_data = await axiosInstance('/supplier/get_suppliers', 'get');
+      const customer_data = await axiosInstance('/customer/get_only_customers', 'get');
+
+      let supplier_name = '';
+      let customer_name = '';
+
+      if (supplier_data !== undefined) {
+        const data = supplier_data.data.data.find((item) => item._id === supplier_id);
+
+        if (data) {
+          supplier_name = data.name;
+        }
+      }
+
+      if (customer_data !== undefined) {
+        const data = customer_data.data.data.find((item) => item._id === customer_id);
+
+        if (data) {
+          customer_name = `${data.firstName} ${data.lastName}`;
+        }
+      }
+
       const response = await axiosInstance('/transaction/get_transactions', 'get', {
-        customer: '',
-        supplier: '',
+        customer: customer_name,
+        supplier: supplier_name,
         keyword: '',
         date: '',
         pageNum: currentPage,
@@ -147,76 +171,6 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     setTotalTransactionsData(response.data.totalTransactions);
     setLoading(false);
   };
-
-  useEffect(() => {
-    setIsClient(false);
-
-    setLoading(true);
-
-    setSupplier(supplier_id);
-    setCustomer(customer_id);
-
-    const fetchSuppliersData = async () => {
-      const supplier_data = await axiosInstance('/supplier/get_suppliers', 'get');
-      const customer_data = await axiosInstance('/customer/get_only_customers', 'get');
-
-      let supplier_name = '';
-      let customer_name = '';
-
-      if (supplier_data !== undefined) {
-        const data = supplier_data.data.data.find((item) => item._id === supplier_id);
-
-        if (data) {
-          supplier_name = data.name;
-        }
-      }
-
-      if (customer_data !== undefined) {
-        const data = customer_data.data.data.find((item) => item._id === customer_id);
-
-        if (data) {
-          customer_name = `${data.firstName} ${data.lastName}`;
-        }
-      }
-
-      const response = await axiosInstance('/transaction/get_transactions', 'get', {
-        customer: customer_name,
-        supplier: supplier_name,
-        keyword: '',
-        date: '',
-        pageNum: currentPage,
-        pageSize: transactionsPerPage,
-      });
-
-      const data = response.data.transactions;
-
-      let totalIncome = 0;
-      let totalExpenses = 0;
-
-      data.forEach((item) => {
-        if (item.transaction_type === 'invoice') {
-          totalIncome += item.amount;
-        } else {
-          totalExpenses += item.amount;
-        }
-      });
-
-      setIncomes(totalIncome);
-      setExpenses(totalExpenses);
-
-      setTotalPages(response.data.totalPage);
-      setTransactionData(response.data.transactions);
-      setTotalTransactionsData(response.data.totalTransactions);
-
-      setIsClient(false);
-    };
-
-    setTimeout(() => {
-      setLoading(false);
-    }, 5000);
-
-    fetchSuppliersData();
-  }, [supplier_id, customer_id, currentPage, transactionsPerPage, isClient]);
 
   useEffect(() => {
     const fetchSuppliersData = async () => {
