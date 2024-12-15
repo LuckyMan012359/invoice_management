@@ -33,8 +33,6 @@ const TransactionForm = ({
   const [locale, setLocale] = useState();
 
   useEffect(() => {
-    console.log(i18n.language);
-
     setLocale(i18n.language === 'en' ? enUS : esES);
   }, [i18n.language]);
 
@@ -104,10 +102,6 @@ const TransactionForm = ({
       date: newValue,
     }));
   };
-
-  useEffect(() => {
-    console.log(formData.date);
-  }, [formData.date]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

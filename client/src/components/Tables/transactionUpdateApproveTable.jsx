@@ -108,8 +108,6 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
         approve_status: 3,
       });
 
-      console.log(response.data.transactions);
-
       setTotalPages(response.data.totalPage);
       setTransactionData(response.data.transactions || []);
       setTotalTransactionsData(response.data.totalTransactions);

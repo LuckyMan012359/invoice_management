@@ -723,8 +723,6 @@ exports.approveCreatingTransaction = async (req, res) => {
   try {
     const { transaction_id } = req.body;
 
-    console.log(transaction_id);
-
     const transaction = await Transaction.findByIdAndUpdate(
       { _id: transaction_id },
       {
@@ -754,8 +752,6 @@ exports.deleteApproveUpdatingTransaction = async (req, res) => {
   try {
     const { transaction_id } = req.body;
 
-    console.log(transaction_id);
-
     const transaction = await Transaction.findByIdAndUpdate(transaction_id, {
       approve_status: 1,
       updated_customer_id: null,
@@ -767,8 +763,6 @@ exports.deleteApproveUpdatingTransaction = async (req, res) => {
       updated_notes: '',
       updated_attachments: [],
     });
-
-    console.log(transaction);
 
     res.status(200).send({
       message: 'Transaction approve successfully!',

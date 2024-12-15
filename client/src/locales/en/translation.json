@@ -109,5 +109,7 @@
   "Payment": "Payment",
   "Return": "Return",
   "and": "and",
-  "Invoice": "Invoice"
+  "Invoice": "Invoice",
+  "Approve Create Transaction": "Approve Create Transaction",
+  "Approve Update Transaction": "Approve Update Transaction"
 }

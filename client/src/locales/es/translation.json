@@ -110,5 +110,7 @@
   "Payment": "Pago",
   "Return": "Devolucion",
   "and": "y",
-  "Invoice": "Factura"
+  "Invoice": "Factura",
+  "Approve Create Transaction": "Aprobar Crear Transacción",
+  "Approve Update Transaction": "Aprobar Actualizar Transacción"
 }
