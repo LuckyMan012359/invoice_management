@@ -2,15 +2,13 @@ import { useTranslation } from 'react-i18next';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useEffect, useState } from 'react';
 import Datepicker from 'react-tailwindcss-datepicker';
-import TransactionForm from '../../components/Form/TransactionForm';
 import axiosInstance from '../../utils/axiosInstance';
 import * as XLSX from 'xlsx';
 import { LoadingOutlined } from '@ant-design/icons';
 import Select from 'react-select';
 
-import { Modal } from 'antd';
+import { Button, Modal } from 'antd';
 
-import { FaRegEdit } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import getUserRole from '../../utils/getUserRole';
@@ -19,13 +17,11 @@ import { useSearchParams } from 'react-router-dom';
 
 const imageUrl = process.env.REACT_APP_IMAGE_URL;
 
-export const TransactionTable = ({ isChanged, setIsChanged }) => {
+export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
   const { t, i18n } = useTranslation();
   const isDarkMode = useSelector((state) => state.darkMode.isDarkMode);
   const [suppliers, setSuppliers] = useState([]);
   const [customers, setCustomers] = useState([]);
-  const [type, setType] = useState('Add');
-  const [showTransactionForm, setShowTransactionForm] = useState(false);
   const [date, setDate] = useState({
     startDate: '',
     endDate: '',
@@ -38,10 +34,6 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
   const [keyword, setKeyword] = useState('');
   const [transactionData, setTransactionData] = useState([]);
   const [totalTransactionsData, setTotalTransactionsData] = useState([]);
-  const [transactionId, setTransactionId] = useState('');
-
-  const [incomes, setIncomes] = useState(0);
-  const [expenses, setExpenses] = useState(0);
 
   const [loading, setLoading] = useState(false);
 
@@ -51,16 +43,6 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
   const customer_id = searchParams.get('customer_id');
   const supplier_id = searchParams.get('supplier_id');
-
-  const [transaction, setTransaction] = useState({
-    date: '',
-    customer: '',
-    supplier: '',
-    transaction: '',
-    amount: '',
-    balance: '',
-    note: '',
-  });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAttachment, setSelectedAttachment] = useState(null);
@@ -119,15 +101,14 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
       const response = await axiosInstance('/transaction/get_transactions', 'get', {
         customer: customer_name,
         supplier: supplier_name,
-        approve_status: 1,
         keyword: '',
         date: '',
         pageNum: currentPage,
         pageSize: transactionsPerPage,
+        approve_status: 3,
       });
 
-      setIncomes(response.data.incomes);
-      setExpenses(response.data.expenses);
+      console.log(response.data.transactions);
 
       setTotalPages(response.data.totalPage);
       setTransactionData(response.data.transactions || []);
@@ -147,15 +128,10 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
       supplier: supplier,
       keyword: keyword,
       date: filterDate,
-      approve_status: 1,
       pageNum: currentPage,
       pageSize: transactionsPerPage,
+      approve_status: 3,
     });
-
-    console.log(response.data.transactions);
-
-    setIncomes(response.data.incomes);
-    setExpenses(response.data.expenses);
 
     setTotalPages(response.data.totalPage);
     setTransactionData(response.data.transactions || []);
@@ -177,8 +153,40 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     fetchSuppliersData();
   }, []);
 
+  const approveUpdatingTransaction = async (
+    transaction_id,
+    customer_id,
+    supplier_id,
+    transaction_type,
+    amount,
+    notes,
+    transaction_date,
+    isRemove,
+    updated_attachments,
+  ) => {
+    const response = await axiosInstance('/transaction/approve_update_transaction', 'put', {
+      transaction_id,
+      customer_id,
+      supplier_id,
+      transaction_type,
+      amount,
+      notes,
+      transaction_date,
+      isRemove,
+      updated_attachments,
+    });
+
+    if (response.status === 200) {
+      toast.success(t('Transaction updated successfully'));
+    } else {
+      toast.warning(response.data.message);
+    }
+
+    setIsChanged(!isChanged);
+  };
+
   const deleteTransaction = async (id) => {
-    const response = await axiosInstance('/transaction/delete_transaction', 'delete', {
+    const response = await axiosInstance('/transaction/delete_approve_update_transaction', 'put', {
       transaction_id: id,
     });
 
@@ -399,17 +407,6 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
               </button>
             </div>
             <div className='flex justify-end gap-4 max-md:justify-between'>
-              {role !== 'customer' && (
-                <button
-                  className='px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none max-md:w-full'
-                  onClick={() => {
-                    setShowTransactionForm(true);
-                    setType('Add');
-                  }}
-                >
-                  {t('Add New Record')}
-                </button>
-              )}
               <button
                 className='px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 focus:outline-none max-md:w-full'
                 onClick={exportToExcel}
@@ -450,54 +447,60 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                         {(() => {
-                          const date = new Date(item.transaction_date);
+                          const date = new Date(item.updated_transaction_date);
                           const formattedDate = date.toISOString().split('T')[0];
                           return formattedDate;
                         })()}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
-                        {item.customer.firstName} {item.customer.lastName}
+                        {item.updated_customer.firstName} {item.updated_customer.lastName}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
-                        {item.supplier.name}
+                        {item.updated_supplier.name}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
-                        {item.transaction_type === 'invoice'
+                        {item.updated_transaction_type === 'invoice'
                           ? t('invoice')
-                          : item.transaction_type === 'payment'
+                          : item.updated_transaction_type === 'payment'
                           ? t('payment')
                           : t('return')}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
-                        {item.notes}
+                        {item.updated_notes}
                       </td>
                       <td
                         className={`p-3 ${
-                          item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
+                          item.updated_transaction_type === 'invoice'
+                            ? 'text-[green]'
+                            : 'text-[red]'
                         } border-[1px] dark:border-gray-600 dark:text-gray-300`}
                       >
-                        {item.transaction_type === 'invoice' && item.amount.toLocaleString()}
+                        {item.updated_transaction_type === 'invoice' &&
+                          item.updated_amount.toLocaleString()}
                       </td>
                       <td
                         className={`p-3 ${
-                          item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
+                          item.updated_transaction_type === 'invoice'
+                            ? 'text-[green]'
+                            : 'text-[red]'
                         } border-[1px] dark:border-gray-600 dark:text-gray-300`}
                       >
-                        {item.transaction_type !== 'invoice' && '-'}
-                        {item.transaction_type !== 'invoice' && item.amount.toLocaleString()}
+                        {item.updated_transaction_type !== 'invoice' && '-'}
+                        {item.updated_transaction_type !== 'invoice' &&
+                          item.updated_amount.toLocaleString()}
                       </td>
                       {role === 'customer' && (
                         <td
                           className={`p-3 border-[1px] dark:border-gray-600 dark:text-gray-300 ${
-                            item.balance >= 0 ? 'text-[green]' : 'text-[red]'
+                            item.updated_balance >= 0 ? 'text-[green]' : 'text-[red]'
                           }`}
                         >
-                          {item.balance.toLocaleString()}
+                          {item.updated_balance.toLocaleString()}
                         </td>
                       )}
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
-                        {item.attachments.length > 0
-                          ? item.attachments.map((attachment, index) => {
+                        {item.updated_attachments.length > 0
+                          ? item.updated_attachments.map((attachment, index) => {
                               const fileName = attachment.split('/').pop();
                               const fileType = fileName.split('.').pop();
 
@@ -516,29 +519,29 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                           : t('No attachments')}
                       </td>
                       <td className='py-2 px-4 border-[1px] dark:border-gray-600 dark:text-gray-300'>
-                        <button
-                          className='text-gray-800 py-1 rounded mr-1 dark:text-white'
-                          onClick={() => {
-                            setType('Edit');
-                            console.log(item.transaction_date);
-
-                            setTransaction({
-                              date: item.transaction_date,
-                              customer: item.customer._id,
-                              supplier: item.supplier._id,
-                              transaction: item.transaction_type,
-                              amount: item.amount,
-                              balance: item.balance,
-                              note: item.notes,
-                            });
-                            setTransactionId(item._id);
-                            setShowTransactionForm(true);
-                          }}
-                        >
-                          <FaRegEdit />
-                        </button>
-
-                        {role !== 'customer' && (
+                        {role !== 'admin' ? (
+                          <>
+                            <Button
+                              color='primary'
+                              variant='solid'
+                              onClick={() => {
+                                approveUpdatingTransaction(
+                                  item._id,
+                                  item.updated_customer._id,
+                                  item.updated_supplier._id,
+                                  item.updated_transaction_type,
+                                  item.updated_amount,
+                                  item.updated_notes,
+                                  item.updated_transaction_date,
+                                  item.isRemoved[0],
+                                  item.updated_attachments,
+                                );
+                              }}
+                            >
+                              {t('Allow')}
+                            </Button>
+                          </>
+                        ) : (
                           <button
                             className='text-gray-800 py-1 rounded mr-1 dark:text-white ml-[20px]'
                             onClick={() => {
@@ -551,36 +554,6 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                       </td>
                     </tr>
                   ))}
-                  <tr>
-                    <td
-                      className='py-2 px-4 text-center text-[red]  border-[1px] dark:border-gray-600'
-                      colSpan={2}
-                    >
-                      {t('Total')}
-                    </td>
-                    <td
-                      className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600'
-                      colSpan={2}
-                    >
-                      {t('Invoice')}: {incomes.toLocaleString()}
-                    </td>
-                    <td
-                      className='py-2 px-4 text-center text-[red] border-[1px] dark:border-gray-600'
-                      colSpan={role === 'admin' ? 4 : 5}
-                    >
-                      {t('Payment')}: {expenses > 0 && '-'}
-                      {expenses.toLocaleString()}
-                    </td>
-                    <td
-                      className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600'
-                      colSpan={2}
-                    >
-                      {t('Balance')}:{' '}
-                      <span className={incomes - expenses >= 0 ? `text-[green]` : `text-[red]`}>
-                        {(incomes - expenses).toLocaleString()}
-                      </span>
-                    </td>
-                  </tr>
                 </tbody>
               </table>
             )}
@@ -608,19 +581,6 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
           </div>
         </div>
       </div>
-      <TransactionForm
-        customers={customers}
-        suppliers={suppliers}
-        showTransactionForm={showTransactionForm}
-        setShowTransactionForm={setShowTransactionForm}
-        transaction={transaction}
-        type={type}
-        onClose={() => setShowTransactionForm(false)}
-        setIsChanged={setIsChanged}
-        isChanged={isChanged}
-        transactionId={transactionId}
-        setLoading={setLoading}
-      />
 
       <Modal
         title={t('Attachment Preview')}

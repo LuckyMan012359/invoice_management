@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Tabs } from 'antd';
 import { TransactionTable } from '../../components/Tables/transactionTable';
 import { TransactionPendingTable } from '../../components/Tables/transactionPendingTable';
+import { TransactionCreateApproveTable } from '../../components/Tables/transactionCreateApproveTable';
+import { TransactionUpdateApproveTable } from '../../components/Tables/transactionUpdateApproveTable';
 
 const { TabPane } = Tabs;
 
@@ -30,6 +32,20 @@ export const Transactions = () => {
             className='!text-[#000] dark:!text-[#fff]'
           >
             <TransactionPendingTable isChanged={isChanged} setIsChanged={setIsChanged} />
+          </TabPane>
+          <TabPane
+            tab={t('Approve Create Transaction')}
+            key='3'
+            className='!text-[#000] dark:!text-[#fff]'
+          >
+            <TransactionCreateApproveTable isChanged={isChanged} setIsChanged={setIsChanged} />
+          </TabPane>
+          <TabPane
+            tab={t('Approve Update Transaction')}
+            key='4'
+            className='!text-[#000] dark:!text-[#fff]'
+          >
+            <TransactionUpdateApproveTable isChanged={isChanged} setIsChanged={setIsChanged} />
           </TabPane>
         </Tabs>
       </div>

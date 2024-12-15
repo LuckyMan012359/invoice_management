@@ -11,6 +11,9 @@ const {
   updateTransaction,
   deleteTransaction,
   getTransactionData,
+  approveUpdateTransaction,
+  approveCreatingTransaction,
+  deleteApproveUpdatingTransaction,
 } = require('../controllers/transaction.controller.js');
 const verifyToken = require('../middlewares/authJWT.js');
 
@@ -108,8 +111,20 @@ router.put(
   updateTransaction,
 );
 
+router.put(
+  '/approve_update_transaction',
+  upload.array('attachments'),
+  verifyToken,
+  validateAndOptimizeFiles,
+  approveUpdateTransaction,
+);
+
 router.delete('/delete_transaction', verifyToken, deleteTransaction);
 
 router.get('/total_transaction_value', verifyToken, getTransactionData);
+
+router.put('/approve_create_transaction', verifyToken, approveCreatingTransaction);
+
+router.put('/delete_approve_update_transaction', verifyToken, deleteApproveUpdatingTransaction);
 
 module.exports = router;

@@ -49,6 +49,7 @@ exports.createTransaction = async (req, res) => {
       notes,
       transaction_date,
       attachments: attachments.map((file) => `uploads/attachments/${file.hashedName}`),
+      approve_status: 2,
     });
 
     await transaction.save();
@@ -73,14 +74,14 @@ exports.createTransaction = async (req, res) => {
 
 exports.readTransaction = async (req, res) => {
   try {
-    const { customer, supplier, keyword, date, pageNum, pageSize } = req.query;
+    const { customer, supplier, keyword, date, pageNum, pageSize, approve_status } = req.query;
 
-    const cacheKey = `transactions:${req.user.email}:${req.user.role}:${customer}:${supplier}:${keyword}:${date}:${pageNum}:${pageSize}`;
+    const cacheKey = `transactions:${req.user.email}:${req.user.role}:${customer}:${supplier}:${keyword}:${date}:${pageNum}:${pageSize}:${approve_status}`;
 
-    // const cachedData = getCache('transaction', cacheKey);
-    // if (cachedData) {
-    //   return res.status(200).send(cachedData);
-    // }
+    const cachedData = getCache('transaction', cacheKey);
+    if (cachedData) {
+      return res.status(200).send(cachedData);
+    }
 
     const match = {};
     const user = await User.findOne({ email: req.user.email }).exec();
@@ -109,6 +110,14 @@ exports.readTransaction = async (req, res) => {
 
     if (supplier) {
       match['supplier.name'] = { $regex: supplier, $options: 'i' };
+    }
+
+    if (approve_status && Number(approve_status) === 1) {
+      match['$or'] = [{ approve_status: 1 }, { approve_status: 3 }];
+    } else if (approve_status && Number(approve_status) === 2) {
+      match['approve_status'] = 2;
+    } else if (approve_status && Number(approve_status) === 3) {
+      match['approve_status'] = 3;
     }
 
     if (req.user.role === 'admin') {
@@ -161,10 +170,32 @@ exports.readTransaction = async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: 'users',
+          localField: 'updated_customer_id',
+          foreignField: '_id',
+          as: 'updated_customer',
+        },
+      },
+      {
+        $lookup: {
+          from: 'suppliers',
+          localField: 'updated_supplier_id',
+          foreignField: '_id',
+          as: 'updated_supplier',
+        },
+      },
+      {
         $unwind: { path: '$customer', preserveNullAndEmptyArrays: true },
       },
       {
         $unwind: { path: '$supplier', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $unwind: { path: '$updated_customer', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $unwind: { path: '$updated_supplier', preserveNullAndEmptyArrays: true },
       },
       {
         $match: match,
@@ -181,7 +212,16 @@ exports.readTransaction = async (req, res) => {
           balance: 1,
           notes: 1,
           transaction_date: 1,
+          approve_status: 1,
           attachments: 1,
+          updated_transaction_type: 1,
+          updated_translate_transaction_type: 1,
+          updated_amount: 1,
+          updated_balance: 1,
+          updated_notes: 1,
+          updated_transaction_date: 1,
+          updated_attachments: 1,
+          isRemoved: 1,
           created: 1,
           'customer._id': 1,
           'customer.email': 1,
@@ -190,6 +230,13 @@ exports.readTransaction = async (req, res) => {
           'supplier._id': 1,
           'supplier.email': 1,
           'supplier.name': 1,
+          'updated_customer._id': 1,
+          'updated_customer.email': 1,
+          'updated_customer.firstName': 1,
+          'updated_customer.lastName': 1,
+          'updated_supplier._id': 1,
+          'updated_supplier.email': 1,
+          'updated_supplier.name': 1,
         },
       },
     ];
@@ -238,6 +285,7 @@ exports.readTransaction = async (req, res) => {
           balance: 1,
           notes: 1,
           transaction_date: 1,
+          approve_status: 1,
           'customer._id': 1,
           'customer.email': 1,
           'customer.firstName': 1,
@@ -315,6 +363,93 @@ exports.updateTransaction = async (req, res) => {
       return res.status(404).send({ message: 'Transaction not found.' });
     }
 
+    let balance = transaction_type === 'invoice' ? Number(amount) : -Number(amount);
+
+    let attachments = [];
+
+    if (req.files && req.files.length > 0) {
+      existingTransaction.attachments.forEach((filePath) => {
+        const fullPath = path.join(__dirname, '..', filePath);
+        fs.unlink(fullPath, (err) => {
+          if (err) {
+            console.error(`Error deleting file: ${fullPath}`, err);
+          } else {
+            console.log(`File deleted successfully: ${fullPath}`);
+          }
+        });
+      });
+      attachments = req.files.map((file) => `uploads/attachments/${file.filename}`);
+    }
+
+    const translate_transaction_type =
+      transaction_type === 'invoice'
+        ? 'factura'
+        : transaction_type === 'payment'
+        ? 'pago'
+        : 'devolucion';
+
+    existingTransaction.updated_customer_id = customer_id;
+    existingTransaction.updated_supplier_id = supplier_id;
+    existingTransaction.updated_transaction_type = transaction_type;
+    existingTransaction.updated_translate_transaction_type = translate_transaction_type;
+    existingTransaction.updated_amount = amount;
+    existingTransaction.updated_balance = balance;
+    existingTransaction.updated_notes = notes;
+    existingTransaction.updated_transaction_date = transaction_date;
+    existingTransaction.updated_attachments = attachments;
+    existingTransaction.isRemoved = isRemove;
+    existingTransaction.approve_status = 3;
+
+    await existingTransaction.save();
+
+    deleteCache('customer');
+    deleteCache('transaction');
+    deleteCache('pending_transaction');
+    deleteCache('supplier');
+
+    res.status(200).send({
+      message: 'Transaction updated successfully!',
+      transaction: existingTransaction,
+    });
+  } catch (error) {
+    console.error('Error updating transaction:', error);
+    res.status(500).send({
+      message: 'An error occurred while updating the transaction.',
+      error: error.message,
+    });
+  }
+};
+
+exports.approveUpdateTransaction = async (req, res) => {
+  try {
+    const {
+      transaction_id,
+      customer_id,
+      supplier_id,
+      transaction_type,
+      amount,
+      notes,
+      transaction_date,
+      isRemove,
+      updated_attachments,
+    } = req.body;
+
+    if (
+      !transaction_id ||
+      !customer_id ||
+      !supplier_id ||
+      !transaction_type ||
+      !amount ||
+      !transaction_date
+    ) {
+      return res.status(400).send({ message: 'All fields are required.' });
+    }
+
+    const existingTransaction = await Transaction.findById(transaction_id);
+    if (!existingTransaction) {
+      return res.status(404).send({ message: 'Transaction not found.' });
+    }
+
     const latestTransaction = await Transaction.findOne({
       $and: [{ customer_id }, { created: { $lt: existingTransaction.created } }],
     })
@@ -361,6 +496,20 @@ exports.updateTransaction = async (req, res) => {
       attachments = req.files.map((file) => `uploads/attachments/${file.filename}`);
     }
 
+    if (updated_attachments && updated_attachments.length > 0) {
+      existingTransaction.attachments.forEach((filePath) => {
+        const fullPath = path.join(__dirname, '..', filePath);
+        fs.unlink(fullPath, (err) => {
+          if (err) {
+            console.error(`Error deleting file: ${fullPath}`, err);
+          } else {
+            console.log(`File deleted successfully: ${fullPath}`);
+          }
+        });
+      });
+      attachments = updated_attachments.map((file) => file);
+    }
+
     const translate_transaction_type =
       transaction_type === 'invoice'
         ? 'factura'
@@ -377,8 +526,13 @@ exports.updateTransaction = async (req, res) => {
     existingTransaction.notes = notes;
     existingTransaction.transaction_date = transaction_date;
     existingTransaction.attachments = attachments;
-
-    await existingTransaction.save();
+    existingTransaction.approve_status = 1;
+    existingTransaction.updated_customer_id = null;
+    existingTransaction.updated_supplier_id = null;
+    existingTransaction.updated_amount = 0;
+    existingTransaction.updated_balance = 0;
+    existingTransaction.updated_notes = '';
+    (existingTransaction.updated_attachments = []), await existingTransaction.save();
 
     deleteCache('customer');
     deleteCache('transaction');
@@ -560,6 +714,70 @@ exports.getTransactionData = async (req, res) => {
     console.error('Error getting transactions data', error);
     return res.status(500).send({
       message: 'An error occurred while getting all transactions.',
+      error: error.message,
+    });
+  }
+};
+
+exports.approveCreatingTransaction = async (req, res) => {
+  try {
+    const { transaction_id } = req.body;
+
+    console.log(transaction_id);
+
+    const transaction = await Transaction.findByIdAndUpdate(
+      { _id: transaction_id },
+      {
+        approve_status: 1,
+      },
+    );
+
+    deleteCache('customer');
+    deleteCache('transaction');
+    deleteCache('pending_transaction');
+    deleteCache('supplier');
+
+    res.status(200).send({
+      message: 'Transaction approve successfully!',
+      transaction: transaction,
+    });
+  } catch (error) {
+    console.error('Error updating transaction:', error);
+    res.status(500).send({
+      message: 'An error occurred while updating the transaction.',
+      error: error.message,
+    });
+  }
+};
+
+exports.deleteApproveUpdatingTransaction = async (req, res) => {
+  try {
+    const { transaction_id } = req.body;
+
+    console.log(transaction_id);
+
+    const transaction = await Transaction.findByIdAndUpdate(transaction_id, {
+      approve_status: 1,
+      updated_customer_id: null,
+      updated_supplier_id: null,
+      updated_transaction_type: '',
+      updated_translate_transaction_type: '',
+      updated_amount: 0,
+      updated_balance: 0,
+      updated_notes: '',
+      updated_attachments: [],
+    });
+
+    console.log(transaction);
+
+    res.status(200).send({
+      message: 'Transaction approve successfully!',
+      transaction: transaction,
+    });
+  } catch (error) {
+    console.error('Error deleting transaction:', error);
+    res.status(500).send({
+      message: 'An error occurred while deleting the transaction.',
       error: error.message,
     });
   }
