@@ -11,7 +11,7 @@ import { TransactionUpdateApproveTable } from '../../components/Tables/transacti
 const { TabPane } = Tabs;
 
 export const Transactions = () => {
-  const backendDomain = 'wss://negociationalex.lat/api';
+  const backendDomain = 'ws://localhost:5000';
 
   const [approveCreateTransactionAmount, setApproveCreateTransactionAmount] = useState(0);
   const [approveUpdateTransactionAmount, setApproveUpdateTransactionAmount] = useState(0);
