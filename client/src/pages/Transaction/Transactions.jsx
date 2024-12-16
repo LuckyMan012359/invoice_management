@@ -13,6 +13,8 @@ const { TabPane } = Tabs;
 export const Transactions = () => {
   const backendDomain = process.env.REACT_APP_SOCKET_URL || 'wss://negociationalex.lat/api';
 
+  console.log(backendDomain);
+
   const socket = io(backendDomain, () => {
     console.log('Websocket connected');
   });
