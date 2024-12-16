@@ -17,6 +17,8 @@ export const Transactions = () => {
   const [approveUpdateTransactionAmount, setApproveUpdateTransactionAmount] = useState(0);
   const [pendingTransactionAmount, setPendingTransactionAmount] = useState(0);
 
+  console.log(backendDomain);
+
   const socket = io(backendDomain, () => {
     console.log('Websocket connected');
   });
