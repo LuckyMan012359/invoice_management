@@ -24,6 +24,8 @@ export const Transactions = () => {
   });
 
   socket.on('transactionDataUpdated', (data) => {
+    console.log(data);
+
     if (data && data.transactions && data.transactions.length >= 0) {
       const approveCreateTransaction = data.transactions.filter(
         (item) => Number(item.approve_status) === 2,
