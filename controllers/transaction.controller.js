@@ -776,3 +776,18 @@ exports.deleteApproveUpdatingTransaction = async (req, res) => {
     });
   }
 };
+
+exports.getTransactionDataAmount = async (req, res) => {
+  try {
+    // Example: Fetch transaction data (this would be replaced with actual DB logic)
+    const transactionData = {
+      totalTransactions: 150,
+      totalAmount: 5000,
+    };
+
+    return transactionData; // Return data for API and Socket.IO
+  } catch (error) {
+    console.error('Error fetching transaction data:', error);
+    throw new Error('Failed to fetch transaction data.');
+  }
+};

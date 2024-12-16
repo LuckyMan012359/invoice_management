@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useState } from 'react';
+import { io } from 'socket.io-client';
 import { Badge, Tabs } from 'antd';
 import { TransactionTable } from '../../components/Tables/transactionTable';
 import { TransactionPendingTable } from '../../components/Tables/transactionPendingTable';
@@ -10,11 +11,20 @@ import { TransactionUpdateApproveTable } from '../../components/Tables/transacti
 const { TabPane } = Tabs;
 
 export const Transactions = () => {
+  const backendDomain = process.env.REACT_APP_SOCKET_URL || 'wss://negociationalex.lat/api';
+
+  const socket = io(backendDomain, () => {
+    console.log('Websocket connected');
+  });
+
+  socket.on('transactionDataUpdated', (data) => {
+    console.log('Updated Transaction Data:', data);
+  });
+
   const { t } = useTranslation();
 
   const [isChanged, setIsChanged] = useState(false);
-  const [tabNum, setTabNum] = useState('1'); // Tracks the selected tab
-
+  const [tabNum, setTabNum] = useState('1');
   return (
     <div className='min-h-screen px-[100px] pb-[50px] pt-[200px] max-xl:px-[50px] max-sm:px-[15px] bg-gray-100 dark:bg-gray-900'>
       <div className='mx-auto bg-white shadow-md rounded-lg p-6 space-y-6 dark:bg-gray-800'>

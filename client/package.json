@@ -19,6 +19,7 @@
     "react-redux": "^9.1.2",
     "react-scripts": "5.0.1",
     "react-select": "^5.8.3",
+    "socket.io-client": "^4.8.1",
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5"
   },

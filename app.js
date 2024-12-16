@@ -1,20 +1,35 @@
+// File: app.js
 const express = require('express');
-const app = express();
+const http = require('http');
+const { Server } = require('socket.io');
+const cors = require('cors');
+const path = require('path');
+require('dotenv').config();
+
 const userRoute = require('./routes/user.route');
 const transactionRouter = require('./routes/transaction.route');
 const customerRouter = require('./routes/customer.route');
 const supplierRouter = require('./routes/supplier.route');
 const pendingTransactionRouter = require('./routes/pending_transaction.route');
-const { connectDB } = require('./config/connect');
-const path = require('path');
-const cors = require('cors');
 const createInitialUserData = require('./middlewares/createInitialData');
-require('dotenv').config();
-const PORT = process.env.PORT || 8080;
+const { connectDB } = require('./config/connect');
+const app = express();
+const server = http.createServer(app);
+
+const getTransactionDataAmount = require('./getData');
+
+const io = new Server(server, {
+  cors: {
+    origin: ['https://negociacionalex.lat', 'http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  },
+});
 
 connectDB();
 
 app.set('trust proxy', true);
+app.set('io', io);
 
 app.use(
   cors({
@@ -24,13 +39,8 @@ app.use(
   }),
 );
 
-// app.use(cors({}));
 app.use(express.json());
-app.use(
-  express.urlencoded({
-    extended: true,
-  }),
-);
+app.use(express.urlencoded({ extended: true }));
 
 createInitialUserData();
 
@@ -42,14 +52,30 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/user', userRoute);
-app.use('/api/transaction', transactionRouter);
+app.use('/api/transaction', transactionRouter());
 app.use('/api/customer', customerRouter);
 app.use('/api/supplier', supplierRouter);
 app.use('/api/pending', pendingTransactionRouter);
+
+// Real-time Socket.IO logic
+io.on('connection', (socket) => {
+  console.log(`User connected: ${socket.id}`);
+
+  socket.emit('message', 'Welcome to the Transactions App'); // Welcome message
+
+  socket.on('disconnect', () => {
+    console.log(`User disconnected: ${socket.id}`);
+  });
+});
+
 app.get('*', (req, res) => {
   res.status(404).send('404! This is an invalid URL.');
 });
 
-app.listen(PORT, () => {
+getTransactionDataAmount(io);
+
+// Start the server
+const PORT = process.env.PORT || 8080;
+server.listen(PORT, () => {
   console.log(`Server is live on port ${PORT}`);
 });
