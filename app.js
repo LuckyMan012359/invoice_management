@@ -59,8 +59,6 @@ app.use('/api/pending', pendingTransactionRouter);
 
 // Real-time Socket.IO logic
 io.on('connection', (socket) => {
-  console.log(`User connected: ${socket.id}`);
-
   socket.emit('message', 'Welcome to the Transactions App'); // Welcome message
 
   socket.on('disconnect', () => {
