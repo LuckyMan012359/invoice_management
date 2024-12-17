@@ -253,7 +253,7 @@ export const Customers = () => {
                       <>
                         <td
                           className='py-2 px-4 text-center border-[1px] dark:border-gray-600 dark:text-gray-300'
-                          colSpan={4}
+                          colSpan={3}
                         >
                           {t('Admin')}
                         </td>
