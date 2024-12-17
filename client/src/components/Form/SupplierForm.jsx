@@ -1,13 +1,25 @@
+import { Modal } from 'antd';
+import { ThemeProvider } from 'antd-style';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 
 const SupplierForm = ({ showSupplierForm, onClose, onSubmit, supplier, setSupplier, type }) => {
   const { t } = useTranslation();
 
+  const isDarkMode = useSelector((state) => state.darkMode.isDarkMode);
+
   if (!showSupplierForm) return null;
 
   return (
-    <div className='fixed top-0 left-0 w-screen h-screen flex justify-center py-[50px] z-[101] bg-black overflow-y-scroll bg-opacity-50'>
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-lg h-[480px]'>
+    <ThemeProvider appearance={isDarkMode ? 'dark' : 'light'}>
+      <Modal
+        open={showSupplierForm}
+        onOk={onSubmit}
+        onCancel={() => {
+          onClose();
+        }}
+        footer={[]}
+      >
         <h2 className='text-2xl font-bold mb-4 dark:text-white'>
           {type === 'Add' ? t('Add New Supplier') : t('Edit supplier')}
         </h2>
@@ -69,8 +81,8 @@ const SupplierForm = ({ showSupplierForm, onClose, onSubmit, supplier, setSuppli
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </Modal>
+    </ThemeProvider>
   );
 };
 

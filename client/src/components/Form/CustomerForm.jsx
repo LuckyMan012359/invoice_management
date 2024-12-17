@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { Switch, Tooltip } from 'antd';
+import { Modal, Switch, Tooltip } from 'antd';
 import { useTranslation } from 'react-i18next';
 import Select from 'react-select';
 import { useSelector } from 'react-redux';
+import { ThemeProvider } from 'antd-style';
 
 const CustomerForm = ({
   showCustomerForm,
@@ -75,8 +76,15 @@ const CustomerForm = ({
   };
 
   return (
-    <div className='fixed top-0 left-0 w-screen h-screen flex justify-center py-[50px] z-[101] bg-black overflow-y-scroll bg-opacity-50'>
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-lg h-[750px]'>
+    <ThemeProvider appearance={isDarkMode ? 'dark' : 'light'}>
+      <Modal
+        open={showCustomerForm}
+        onOk={onSubmit}
+        onCancel={() => {
+          onClose();
+        }}
+        footer={[]}
+      >
         <h2 className='text-2xl font-bold mb-4 dark:text-white'>
           {type === 'Add' ? t('Add New Customer') : t('Edit customer information')}
         </h2>
@@ -259,8 +267,8 @@ const CustomerForm = ({
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </Modal>
+    </ThemeProvider>
   );
 };
 
