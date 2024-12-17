@@ -1,5 +1,6 @@
 const { deleteCache, getCache, setCache } = require('../config/cacheController');
 const Transaction = require('../models/transaction.model');
+const PendingTransaction = require('../models/pending_transaction.model');
 const User = require('../models/user.model');
 const fs = require('fs');
 const path = require('path');
@@ -752,21 +753,30 @@ exports.deleteApproveUpdatingTransaction = async (req, res) => {
   try {
     const { transaction_id } = req.body;
 
-    const transaction = await Transaction.findByIdAndUpdate(transaction_id, {
-      approve_status: 1,
-      updated_customer_id: null,
-      updated_supplier_id: null,
-      updated_transaction_type: '',
-      updated_translate_transaction_type: '',
-      updated_amount: 0,
-      updated_balance: 0,
-      updated_notes: '',
-      updated_attachments: [],
-    });
+    console.log(transaction_id);
+
+    const transaction = await Transaction.findByIdAndUpdate({ _id: transaction_id });
+
+    transaction.approve_status = 1;
+    transaction.updated_customer_id = null;
+    transaction.updated_supplier_id = null;
+    transaction.updated_transaction_type = null;
+    transaction.updated_translate_transaction_type = null;
+    transaction.updated_amount = 0;
+    transaction.updated_balance = 0;
+    transaction.updated_notes = '';
+
+    console.log(transaction);
+
+    await transaction.save();
+
+    deleteCache('customer');
+    deleteCache('transaction');
+    deleteCache('pending_transaction');
+    deleteCache('supplier');
 
     res.status(200).send({
       message: 'Transaction approve successfully!',
-      transaction: transaction,
     });
   } catch (error) {
     console.error('Error deleting transaction:', error);
@@ -779,13 +789,23 @@ exports.deleteApproveUpdatingTransaction = async (req, res) => {
 
 exports.getTransactionDataAmount = async (req, res) => {
   try {
-    // Example: Fetch transaction data (this would be replaced with actual DB logic)
-    const transactionData = {
-      totalTransactions: 150,
-      totalAmount: 5000,
-    };
+    const cacheKey = 'transactionAmounts';
 
-    return transactionData; // Return data for API and Socket.IO
+    const cachedData = getCache('transaction', cacheKey);
+
+    if (cachedData) {
+      return res.status(200).send(cachedData);
+    }
+
+    const transactions = await Transaction.find({ approve_status: { $in: [2, 3] } });
+
+    const pendingTransaction = await PendingTransaction.find();
+
+    const result = { transactions, pendingTransaction };
+
+    setCache('transaction', cacheKey, result);
+
+    res.status(200).send(result);
   } catch (error) {
     console.error('Error fetching transaction data:', error);
     throw new Error('Failed to fetch transaction data.');

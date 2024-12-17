@@ -1,53 +1,45 @@
 import { useTranslation } from 'react-i18next';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useState } from 'react';
-import { io } from 'socket.io-client';
+import { useEffect, useState } from 'react';
 import { Badge, Tabs } from 'antd';
 import { TransactionTable } from '../../components/Tables/transactionTable';
 import { TransactionPendingTable } from '../../components/Tables/transactionPendingTable';
 import { TransactionCreateApproveTable } from '../../components/Tables/transactionCreateApproveTable';
 import { TransactionUpdateApproveTable } from '../../components/Tables/transactionUpdateApproveTable';
+import axiosInstance from '../../utils/axiosInstance';
 
 const { TabPane } = Tabs;
 
 export const Transactions = () => {
-  const backendDomain = process.env.REACT_APP_SOCKET_URL || 'wss://negociationalex.lat';
-
-  const [approveCreateTransactionAmount, setApproveCreateTransactionAmount] = useState(0);
-  const [approveUpdateTransactionAmount, setApproveUpdateTransactionAmount] = useState(0);
-  const [pendingTransactionAmount, setPendingTransactionAmount] = useState(0);
-
-  console.log(backendDomain);
-
-  const socket = io(backendDomain, () => {
-    console.log('Websocket connected');
-  });
-
-  socket.on('transactionDataUpdated', (data) => {
-    console.log(data);
-
-    if (data && data.transactions && data.transactions.length >= 0) {
-      const approveCreateTransaction = data.transactions.filter(
-        (item) => Number(item.approve_status) === 2,
-      );
-
-      const approveUpdateTransaction = data.transactions.filter(
-        (item) => Number(item.approve_status) === 3,
-      );
-
-      setApproveCreateTransactionAmount(approveCreateTransaction.length || 0);
-      setApproveUpdateTransactionAmount(approveUpdateTransaction.length || 0);
-    }
-
-    if (data && data.pendingTransactions && data.pendingTransactions.length >= 0) {
-      setPendingTransactionAmount(data.pendingTransactions.length || 0);
-    }
-  });
-
   const { t } = useTranslation();
 
   const [isChanged, setIsChanged] = useState(false);
-  const [tabNum, setTabNum] = useState('1');
+  const [tabNum, setTabNum] = useState('1'); // Tracks the selected tab
+
+  const [approveCreateTransactionsAmount, setApproveCreateTransactionsAmount] = useState(0);
+  const [approveUpdatingTransactionsAmount, setApproveUpdatingTransactionsAmount] = useState(0);
+  const [pendingTransactionsAmount, setPendingTransactionsAmount] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axiosInstance('/transaction/get_transaction_data_amount', 'get', {});
+
+      const approveCreateTransactions = response.data.transactions.filter(
+        (item) => item.approve_status === 2,
+      );
+
+      const approveUpdatingTransactions = response.data.transactions.filter(
+        (item) => item.approve_status === 3,
+      );
+
+      setApproveCreateTransactionsAmount(approveCreateTransactions.length);
+      setApproveUpdatingTransactionsAmount(approveUpdatingTransactions.length);
+      setPendingTransactionsAmount(response.data.pendingTransaction.length);
+    };
+
+    fetchData();
+  }, [isChanged]);
+
   return (
     <div className='min-h-screen px-[100px] pb-[50px] pt-[200px] max-xl:px-[50px] max-sm:px-[15px] bg-gray-100 dark:bg-gray-900'>
       <div className='tabs mx-auto bg-white shadow-md rounded-lg p-6 space-y-6 dark:bg-gray-800'>
@@ -76,7 +68,7 @@ export const Transactions = () => {
           <TabPane
             tab={
               <Badge
-                count={pendingTransactionAmount}
+                count={pendingTransactionsAmount}
                 showZero={false}
                 overflowCount={99}
                 className={`dark:!text-[#fff] ${
@@ -96,7 +88,7 @@ export const Transactions = () => {
           <TabPane
             tab={
               <Badge
-                count={approveCreateTransactionAmount}
+                count={approveCreateTransactionsAmount}
                 showZero={false}
                 overflowCount={99}
                 className={`dark:!text-[#fff] ${
@@ -116,7 +108,7 @@ export const Transactions = () => {
           <TabPane
             tab={
               <Badge
-                count={approveUpdateTransactionAmount}
+                count={approveUpdatingTransactionsAmount}
                 showZero={false}
                 overflowCount={99}
                 className={`dark:!text-[#fff] ${

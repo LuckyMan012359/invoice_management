@@ -14,6 +14,7 @@ const {
   approveUpdateTransaction,
   approveCreatingTransaction,
   deleteApproveUpdatingTransaction,
+  getTransactionDataAmount,
 } = require('../controllers/transaction.controller.js');
 const verifyToken = require('../middlewares/authJWT.js');
 
@@ -91,44 +92,42 @@ const validateAndOptimizeFiles = async (req, res, next) => {
   }
 };
 
-const transactionRouter = () => {
-  const router = express.Router();
+const router = express.Router();
 
-  router.post(
-    '/create_transaction',
-    upload.array('attachments'),
-    verifyToken,
-    validateAndOptimizeFiles,
-    createTransaction,
-  );
+router.post(
+  '/create_transaction',
+  upload.array('attachments'),
+  verifyToken,
+  validateAndOptimizeFiles,
+  createTransaction,
+);
 
-  router.get('/get_transactions', verifyToken, readTransaction);
+router.get('/get_transactions', verifyToken, readTransaction);
 
-  router.put(
-    '/update_transaction',
-    upload.array('attachments'),
-    verifyToken,
-    validateAndOptimizeFiles,
-    updateTransaction,
-  );
+router.put(
+  '/update_transaction',
+  upload.array('attachments'),
+  verifyToken,
+  validateAndOptimizeFiles,
+  updateTransaction,
+);
 
-  router.put(
-    '/approve_update_transaction',
-    upload.array('attachments'),
-    verifyToken,
-    validateAndOptimizeFiles,
-    approveUpdateTransaction,
-  );
+router.put(
+  '/approve_update_transaction',
+  upload.array('attachments'),
+  verifyToken,
+  validateAndOptimizeFiles,
+  approveUpdateTransaction,
+);
 
-  router.delete('/delete_transaction', verifyToken, deleteTransaction);
+router.delete('/delete_transaction', verifyToken, deleteTransaction);
 
-  router.get('/total_transaction_value', verifyToken, getTransactionData);
+router.get('/total_transaction_value', verifyToken, getTransactionData);
 
-  router.put('/approve_create_transaction', verifyToken, approveCreatingTransaction);
+router.put('/approve_create_transaction', verifyToken, approveCreatingTransaction);
 
-  router.put('/delete_approve_update_transaction', verifyToken, deleteApproveUpdatingTransaction);
+router.put('/delete_approve_update_transaction', verifyToken, deleteApproveUpdatingTransaction);
 
-  return router;
-};
+router.get('/get_transaction_data_amount', verifyToken, getTransactionDataAmount);
 
-module.exports = transactionRouter;
+module.exports = router;
