@@ -112,6 +112,7 @@ export const Customers = () => {
         _id: customer._id,
         firstName: customer.firstName,
         lastName: customer.lastName,
+        role: customer.role,
         email: customer.email,
         phoneNumber: customer.phoneNumber,
         homeAddress: customer.homeAddress,

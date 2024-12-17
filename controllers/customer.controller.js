@@ -208,7 +208,7 @@ exports.readCustomer = async (req, res) => {
 };
 
 exports.updateCustomer = async (req, res) => {
-  const { _id, firstName, lastName, email, phoneNumber, homeAddress, password } = req.body;
+  const { _id, firstName, lastName, email, phoneNumber, role, homeAddress, password } = req.body;
 
   try {
     const existingCustomer = await User.findOne({ _id }).exec();
@@ -220,6 +220,7 @@ exports.updateCustomer = async (req, res) => {
       firstName,
       lastName,
       email,
+      role,
       homeAddress,
       phoneNumber,
     };
