@@ -90,8 +90,6 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // setCustomer(customer_id);
-      // setSupplier(supplier_id);
       setLoading(true);
 
       const supplier_data = await axiosInstance('/supplier/get_suppliers', 'get');
@@ -116,8 +114,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
         }
       }
 
-      setCustomer(customer_name);
-      setSupplier(supplier_name);
+      setCustomer(customer_name !== '' ? customer_name : t('Select a customer'));
+      setSupplier(supplier_name !== '' ? supplier_name : t('Select a supplier'));
 
       const response = await axiosInstance('/transaction/get_transactions', 'get', {
         customer: customer_name,
@@ -210,6 +208,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     searchParams.set('supplier_id', '');
 
     setSearchParams(searchParams);
+
+    console.log(customer, supplier);
   };
 
   const showModal = (attachment) => {
