@@ -787,7 +787,7 @@ exports.deleteApproveUpdatingTransaction = async (req, res) => {
 
 exports.getTransactionDataAmount = async (req, res) => {
   try {
-    const cacheKey = 'transactionAmounts';
+    const cacheKey = `transactionAmounts:${req.user.role}:${req.user._id}`;
 
     const cachedData = getCache('transaction', cacheKey);
 
@@ -795,9 +795,15 @@ exports.getTransactionDataAmount = async (req, res) => {
       return res.status(200).send(cachedData);
     }
 
-    const transactions = await Transaction.find({ approve_status: { $in: [2, 3] } });
+    let filter = { approve_status: { $in: [2, 3] } };
 
-    const pendingTransaction = await PendingTransaction.find();
+    if (req.user.role !== 'admin') {
+      filter.customer_id = req.user._id;
+    }
+
+    const transactions = await Transaction.find(filter);
+
+    const pendingTransaction = await PendingTransaction.find({ customer_id: req.user._id });
 
     const result = { transactions, pendingTransaction };
 

@@ -90,8 +90,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setCustomer(customer_id);
-      setSupplier(supplier_id);
+      // setCustomer(customer_id);
+      // setSupplier(supplier_id);
       setLoading(true);
 
       const supplier_data = await axiosInstance('/supplier/get_suppliers', 'get');
@@ -115,6 +115,9 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
           customer_name = `${data.firstName} ${data.lastName}`;
         }
       }
+
+      setCustomer(customer_name);
+      setSupplier(supplier_name);
 
       const response = await axiosInstance('/transaction/get_transactions', 'get', {
         customer: customer_name,
@@ -141,6 +144,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     setLoading(true);
 
     const filterDate = date.endDate ? formatDate(date.endDate) : '';
+
+    console.log(customer, supplier);
 
     const response = await axiosInstance('/transaction/get_transactions', 'get', {
       customer: customer,
@@ -332,7 +337,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
               /> */}
               <Select
                 options={customerOptions}
-                value={customerOptions.find((option) => option.value === customer)}
+                value={customerOptions.find((option) => option.label === customer)}
                 onChange={(option) => setCustomer(option.label)}
                 styles={selectStyles}
                 placeholder={t('Select a customer')}
@@ -349,7 +354,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
               /> */}
               <Select
                 options={supplierOptions}
-                value={supplierOptions.find((option) => option.value === supplier)}
+                value={supplierOptions.find((option) => option.label === supplier)}
                 onChange={(option) => setSupplier(option.label)}
                 styles={selectStyles}
                 placeholder={t('Select a supplier')}
