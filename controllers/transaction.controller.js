@@ -678,12 +678,10 @@ exports.getTransactionData = async (req, res) => {
       return res.status(200).send(cachedData);
     }
 
-    let filter = {};
+    let filter = { approve_status: 1 };
 
     if (req.user.role !== 'admin') {
-      filter = {
-        customer_id: req.user._id,
-      };
+      filter.customer_id = req.user._id;
     }
 
     const transactions = await Transaction.find(filter);
