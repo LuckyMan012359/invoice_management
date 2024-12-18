@@ -141,7 +141,17 @@ router.put(
   upload.array('attachments'),
   verifyToken,
   validateAndOptimizeFiles,
-  approveUpdateTransaction,
+  async (req, res) => {
+    const { transaction_id } = req.body;
+
+    try {
+      await approveUpdateTransaction(req, res);
+      sendUpdateToClients({ type: 'DELETE', transactionId: transaction_id });
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+      res.status(500).json({ message: 'Failed to delete transaction' });
+    }
+  },
 );
 
 router.delete('/delete_transaction', verifyToken, async (req, res) => {
@@ -158,7 +168,17 @@ router.delete('/delete_transaction', verifyToken, async (req, res) => {
 
 router.get('/total_transaction_value', verifyToken, getTransactionData);
 
-router.put('/approve_create_transaction', verifyToken, approveCreatingTransaction);
+router.put('/approve_create_transaction', verifyToken, async (req, res) => {
+  const { transaction_id } = req.body;
+
+  try {
+    await approveCreatingTransaction(req, res);
+    sendUpdateToClients({ type: 'DELETE', transactionId: transaction_id });
+  } catch (error) {
+    console.error('Error deleting transaction:', error);
+    res.status(500).json({ message: 'Failed to delete transaction' });
+  }
+});
 
 router.put('/delete_approve_update_transaction', verifyToken, async (req, res) => {
   const { transaction_id } = req.body;

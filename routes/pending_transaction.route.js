@@ -124,7 +124,17 @@ router.put(
   upload.array('attachments'),
   verifyToken,
   validateAndOptimizeFiles,
-  updatePendingTransaction,
+  async (req, res) => {
+    const { pending_transaction_id } = req.body;
+
+    try {
+      await updatePendingTransaction(req, res);
+      sendUpdateToClients({ type: 'DELETE', transactionId: pending_transaction_id });
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+      res.status(500).json({ message: 'Failed to delete transaction' });
+    }
+  },
 );
 router.delete('/delete_pending_transaction', verifyToken, async (req, res) => {
   const { transaction_id } = req.query;
