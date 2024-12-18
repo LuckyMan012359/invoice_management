@@ -31,14 +31,20 @@ const axiosInstance = async (url, method, data, config = {}) => {
 
   try {
     const response = await instance.request(requestConfig);
-    return response; // Return data directly
-  } catch (error) {
-    console.error('Network Error:', error);
-    if (error.status === 404) {
+
+    if (response.status === 404) {
       cookies.remove('token');
 
       window.location.href = '/login';
+
+      return;
     }
+
+    return response;
+  } catch (error) {
+    console.error('Network Error:', error);
+
+    throw error;
   }
 };
 

@@ -129,6 +129,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
       setIncomes(response.data.incomes);
       setExpenses(response.data.expenses);
 
+      console.log(response.data.transactions);
+
       setTotalPages(response.data.totalPage);
       setTransactionData(response.data.transactions || []);
       setTotalTransactionsData(response.data.totalTransactions);
@@ -456,10 +458,10 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                         })()}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
-                        {item.customer.firstName} {item.customer.lastName}
+                        {item.customer?.firstName} {item.customer?.lastName}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
-                        {item.supplier.name}
+                        {item.supplier?.name}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                         {item.transaction_type === 'invoice'

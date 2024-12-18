@@ -416,9 +416,9 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
                       })()}
                     </td>
                     <td className='p-3'>
-                      {item.customer.firstName} {item.customer.lastName}
+                      {item.customer?.firstName} {item.customer?.lastName}
                     </td>
-                    <td className='p-3'>{item.supplier.name}</td>
+                    <td className='p-3'>{item.supplier?.name}</td>
                     <td className='p-3'>
                       {item.transaction_type === 'invoice'
                         ? t('invoice')

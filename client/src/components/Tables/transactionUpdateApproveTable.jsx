@@ -478,10 +478,10 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
                         })()}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
-                        {item.updated_customer.firstName} {item.updated_customer.lastName}
+                        {item.updated_customer?.firstName} {item.updated_customer?.lastName}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
-                        {item.updated_supplier.name}
+                        {item.updated_supplier?.name}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                         {item.updated_transaction_type === 'invoice'
