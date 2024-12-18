@@ -129,8 +129,6 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
       setIncomes(response.data.incomes);
       setExpenses(response.data.expenses);
 
-      console.log(response.data.transactions);
-
       setTotalPages(response.data.totalPage);
       setTransactionData(response.data.transactions || []);
       setTotalTransactionsData(response.data.totalTransactions);
@@ -153,8 +151,6 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
       pageNum: currentPage,
       pageSize: transactionsPerPage,
     });
-
-    console.log(response.data.transactions);
 
     setIncomes(response.data.incomes);
     setExpenses(response.data.expenses);

@@ -186,8 +186,8 @@ export const Suppliers = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredSuppliers.map((supplier) => (
-                  <tr key={supplier.id}>
+                {filteredSuppliers.map((supplier, index) => (
+                  <tr key={supplier._id || `customer-${index}`}>
                     <td className='py-2 px-4 border-[1px] dark:border-gray-600 dark:text-gray-300 cursor-pointer'>
                       <Link to={`/transactions?customer_id=&&supplier_id=${supplier._id}`}>
                         {supplier.name}

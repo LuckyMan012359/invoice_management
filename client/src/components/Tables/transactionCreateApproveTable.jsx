@@ -157,8 +157,6 @@ export const TransactionCreateApproveTable = ({ isChanged, setIsChanged }) => {
     eventSource.onmessage = (event) => {
       const { type, transactionId } = JSON.parse(event.data);
 
-      console.log(type, transactionId);
-
       if (type === 'DELETE') {
         setTransactionData((prevData) =>
           prevData.filter((transaction) => transaction._id !== transactionId),

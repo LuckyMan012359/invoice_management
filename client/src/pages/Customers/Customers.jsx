@@ -238,7 +238,7 @@ export const Customers = () => {
               </thead>
               <tbody>
                 {filteredCustomers.map((customer, index) => (
-                  <tr key={customer.id || `customer-${index}`} className='border-b'>
+                  <tr key={customer._id || `customer-${index}`} className='border-b'>
                     <td className='py-2 px-4 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                       {customer.role !== 'admin' ? (
                         <Link to={`/transactions?customer_id=${customer._id}&&supplier_id=`}>
