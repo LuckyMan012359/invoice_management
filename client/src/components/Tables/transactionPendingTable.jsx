@@ -387,7 +387,7 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
               <LoadingOutlined className='text-[40px]' />
             </div>
           ) : (
-            <table className='w-full text-left bg-white rounded-lg dark:bg-gray-800'>
+            <table className='w-full text-left bg-white rounded-lg max-2xl:min-w-[1200px] dark:bg-gray-800'>
               <thead>
                 <tr className='text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700'>
                   <th className='p-3'>#</th>
