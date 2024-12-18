@@ -522,8 +522,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
                             setTransaction({
                               date: item.transaction_date,
-                              customer: item.customer._id,
-                              supplier: item.supplier._id,
+                              customer: item.customer?._id || null,
+                              supplier: item.supplier?._id || null,
                               transaction: item.transaction_type,
                               amount: item.amount,
                               balance: item.balance,
