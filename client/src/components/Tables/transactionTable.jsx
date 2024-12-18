@@ -47,7 +47,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
   const [isClient, setIsClient] = useState(true);
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const customer_id = searchParams.get('customer_id');
   const supplier_id = searchParams.get('supplier_id');
@@ -200,6 +200,11 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     });
 
     setIsChanged(!isChanged);
+
+    searchParams.set('customer_id', '');
+    searchParams.set('supplier_id', '');
+
+    setSearchParams(searchParams);
   };
 
   const showModal = (attachment) => {
