@@ -111,6 +111,6 @@
   "Return": "Devolucion",
   "and": "y",
   "Invoice": "Factura",
-  "Approve Create Transaction": "Aprobar Crear Transacción",
-  "Approve Update Transaction": "Aprobar Actualizar Transacción"
+  "Invoice Approval": "Aprobación de facturas",
+  "Update Invoices": "Actualización de facturas"
 }

@@ -89,7 +89,7 @@ export const Transactions = () => {
           }`}
           size='small'
         >
-          {t('Approve Create Transaction')}
+          {t('Invoice Approval')}
         </Badge>
       ),
       children: <TransactionCreateApproveTable isChanged={isChanged} setIsChanged={setIsChanged} />,
@@ -108,7 +108,7 @@ export const Transactions = () => {
           }`}
           size='small'
         >
-          {t('Approve Update Transaction')}
+          {t('Update Invoices')}
         </Badge>
       ),
       children: <TransactionUpdateApproveTable isChanged={isChanged} setIsChanged={setIsChanged} />,
