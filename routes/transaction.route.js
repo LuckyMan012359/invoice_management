@@ -94,9 +94,8 @@ const validateAndOptimizeFiles = async (req, res, next) => {
 
 const router = express.Router();
 
-let clients = []; // Store connected SSE clients
+let clients = [];
 
-// SSE endpoint
 router.get('/updates', (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -119,7 +118,6 @@ const sendUpdateToClients = (data) => {
   });
 };
 
-// Routes
 router.post(
   '/create_transaction',
   upload.array('attachments'),

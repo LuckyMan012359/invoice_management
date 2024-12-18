@@ -87,6 +87,30 @@ const validateAndOptimizeFiles = async (req, res, next) => {
 
 const router = express.Router();
 
+let clients = [];
+
+router.get('/updates', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  res.write(`data: ${JSON.stringify({ message: 'Connected to SSE' })}\n\n`);
+
+  const client = { id: Date.now(), res };
+  clients.push(client);
+
+  req.on('close', () => {
+    clients = clients.filter((c) => c.id !== client.id);
+    res.end();
+  });
+});
+
+const sendUpdateToClients = (data) => {
+  clients.forEach((client) => {
+    client.res.write(`data: ${JSON.stringify(data)}\n\n`);
+  });
+};
+
 router.post(
   '/create_pending_transaction',
   upload.array('attachments'),
@@ -102,6 +126,19 @@ router.put(
   validateAndOptimizeFiles,
   updatePendingTransaction,
 );
-router.delete('/delete_pending_transaction', verifyToken, deletePendingTransaction);
+router.delete('/delete_pending_transaction', verifyToken, async (req, res) => {
+  const { transaction_id } = req.query;
+
+  try {
+    await deletePendingTransaction(req, res);
+
+    console.log(req.query);
+
+    sendUpdateToClients({ type: 'DELETE', transactionId: transaction_id });
+  } catch (error) {
+    console.error('Error deleting transaction:', error);
+    res.status(500).json({ message: 'Failed to delete transaction' });
+  }
+});
 
 module.exports = router;

@@ -456,6 +456,7 @@ exports.deletePendingTransaction = async (req, res) => {
 
     await PendingTransaction.findByIdAndDelete(transaction_id);
 
+    deleteCache('transaction');
     deleteCache('pending_transaction');
 
     res.status(200).send({
