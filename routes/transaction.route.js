@@ -94,6 +94,32 @@ const validateAndOptimizeFiles = async (req, res, next) => {
 
 const router = express.Router();
 
+let clients = []; // Store connected SSE clients
+
+// SSE endpoint
+router.get('/updates', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  res.write(`data: ${JSON.stringify({ message: 'Connected to SSE' })}\n\n`);
+
+  const client = { id: Date.now(), res };
+  clients.push(client);
+
+  req.on('close', () => {
+    clients = clients.filter((c) => c.id !== client.id);
+    res.end();
+  });
+});
+
+const sendUpdateToClients = (data) => {
+  clients.forEach((client) => {
+    client.res.write(`data: ${JSON.stringify(data)}\n\n`);
+  });
+};
+
+// Routes
 router.post(
   '/create_transaction',
   upload.array('attachments'),
@@ -120,14 +146,34 @@ router.put(
   approveUpdateTransaction,
 );
 
-router.delete('/delete_transaction', verifyToken, deleteTransaction);
+router.delete('/delete_transaction', verifyToken, async (req, res) => {
+  const { transaction_id } = req.query;
+
+  try {
+    await deleteTransaction(req, res);
+    sendUpdateToClients({ type: 'DELETE', transactionId: transaction_id });
+  } catch (error) {
+    console.error('Error deleting transaction:', error);
+    res.status(500).json({ message: 'Failed to delete transaction' });
+  }
+});
 
 router.get('/total_transaction_value', verifyToken, getTransactionData);
 
 router.put('/approve_create_transaction', verifyToken, approveCreatingTransaction);
 
-router.put('/delete_approve_update_transaction', verifyToken, deleteApproveUpdatingTransaction);
+router.put('/delete_approve_update_transaction', verifyToken, async (req, res) => {
+  const { transaction_id } = req.body;
+
+  try {
+    await deleteApproveUpdatingTransaction(req, res);
+    sendUpdateToClients({ type: 'DELETE', transactionId: transaction_id });
+  } catch (error) {
+    console.error('Error deleting transaction:', error);
+    res.status(500).json({ message: 'Failed to delete transaction' });
+  }
+});
 
 router.get('/get_transaction_data_amount', verifyToken, getTransactionDataAmount);
 
-module.exports = router;
+module.exports = router; // Only export the router

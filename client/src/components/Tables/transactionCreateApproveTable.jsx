@@ -151,6 +151,33 @@ export const TransactionCreateApproveTable = ({ isChanged, setIsChanged }) => {
     fetchSuppliersData();
   }, []);
 
+  useEffect(() => {
+    const eventSource = new EventSource(`${process.env.REACT_APP_API_URL}/transaction/updates`);
+
+    eventSource.onmessage = (event) => {
+      const { type, transactionId } = JSON.parse(event.data);
+
+      console.log(type, transactionId, '=>>>>>>>>>>>>>>>>>>>>>');
+
+      if (type === 'DELETE') {
+        setTransactionData((prevData) =>
+          prevData.filter((transaction) => transaction._id !== transactionId),
+        );
+
+        setIsChanged(!isChanged);
+      }
+    };
+
+    eventSource.onerror = () => {
+      console.error('Error connecting to SSE');
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close(); // Clean up connection on component unmount
+    };
+  }, [isChanged, setIsChanged]);
+
   const approveCreatingTransaction = async (transaction_id) => {
     const response = await axiosInstance('/transaction/approve_create_transaction', 'put', {
       transaction_id: transaction_id,

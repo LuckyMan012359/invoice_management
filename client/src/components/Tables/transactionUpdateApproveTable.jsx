@@ -151,6 +151,31 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
     fetchSuppliersData();
   }, []);
 
+  useEffect(() => {
+    const eventSource = new EventSource(`${process.env.REACT_APP_API_URL}/transaction/updates`);
+
+    eventSource.onmessage = (event) => {
+      const { type, transactionId } = JSON.parse(event.data);
+
+      if (type === 'DELETE') {
+        setTransactionData((prevData) =>
+          prevData.filter((transaction) => transaction._id !== transactionId),
+        );
+
+        setIsChanged(!isChanged);
+      }
+    };
+
+    eventSource.onerror = () => {
+      console.error('Error connecting to SSE');
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [isChanged, setIsChanged]);
+
   const approveUpdatingTransaction = async (
     transaction_id,
     customer_id,
