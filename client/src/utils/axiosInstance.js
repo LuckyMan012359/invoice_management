@@ -32,7 +32,7 @@ const axiosInstance = async (url, method, data, config = {}) => {
   try {
     const response = await instance.request(requestConfig);
 
-    if (response.status === 404) {
+    if (response.status === 404 && window.location.pathname !== '/login') {
       cookies.remove('token');
 
       window.location.href = '/login';
