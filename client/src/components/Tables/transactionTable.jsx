@@ -136,7 +136,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
       setLoading(false);
     };
     if (isClient) fetchData();
-  }, [isChanged, currentPage, transactionsPerPage, role, isClient, customer_id, supplier_id]);
+  }, [isChanged, currentPage, transactionsPerPage, role, isClient, customer_id, supplier_id, t]);
 
   const filterData = async () => {
     setLoading(true);
