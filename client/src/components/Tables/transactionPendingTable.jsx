@@ -387,7 +387,7 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
           ) : (
             <table className='w-full text-left bg-white rounded-lg max-2xl:min-w-[1200px] dark:bg-gray-800'>
               <thead>
-                <tr className='text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700'>
+                <tr className='text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700'>
                   <th className='p-3'>#</th>
                   <th className='p-3'>{t('Date')}</th>
                   <th className='p-3'>{t('Customer')}</th>
