@@ -6,7 +6,7 @@ import getUserRole from '../../utils/getUserRole';
 import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import { ThemeProvider } from 'antd-style';
-import { DatePicker, ConfigProvider, Modal } from 'antd';
+import { DatePicker, ConfigProvider, Modal, InputNumber } from 'antd';
 import enUS from 'antd/es/locale/en_US';
 import esES from 'antd/es/locale/es_ES';
 import dayjs from 'dayjs';
@@ -65,7 +65,7 @@ const TransactionForm = ({
       customerId: null,
       supplierId: null,
       transactionType: null,
-      amount: '',
+      amount: 0,
       document: '',
       notes: '',
       date: null,
@@ -92,11 +92,23 @@ const TransactionForm = ({
   }, [type, transaction]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    if (e.target) {
+      const { name, value } = e.target;
+      console.log(name, value);
+
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    } else {
+      const { name, value } = e;
+      console.log(name, value);
+
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
   const handleDateChange = (newValue) => {
@@ -321,13 +333,13 @@ const TransactionForm = ({
 
             <div className='mb-4'>
               <label className='block text-gray-700 dark:text-gray-300'>{t('Amount')}</label>
-              <input
-                type='number'
-                name='amount'
+              <InputNumber
+                className='w-full'
                 value={formData.amount}
-                onChange={handleChange}
-                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
-                required
+                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                onChange={(value) => handleChange({ name: 'amount', value })}
+                size='large'
               />
             </div>
 

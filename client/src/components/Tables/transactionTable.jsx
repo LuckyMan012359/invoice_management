@@ -612,6 +612,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
           </div>
         </div>
       </div>
+
       <TransactionForm
         customers={customers}
         suppliers={suppliers}
