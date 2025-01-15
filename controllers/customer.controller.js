@@ -99,12 +99,14 @@ exports.readCustomer = async (req, res) => {
         if (transactions && transactions.length > 0) {
           const { invoiceTotal, paymentTotal, returnTotal } = transactions.reduce(
             (totals, item) => {
-              if (item.transaction_type === 'invoice') {
-                totals.invoiceTotal += item.amount || 0;
-              } else if (item.transaction_type === 'payment') {
-                totals.paymentTotal += item.amount || 0;
-              } else {
-                totals.returnTotal += item.amount || 0;
+              if (item.approve_status === 1) {
+                if (item.transaction_type === 'invoice') {
+                  totals.invoiceTotal += item.amount || 0;
+                } else if (item.transaction_type === 'payment') {
+                  totals.paymentTotal += item.amount || 0;
+                } else {
+                  totals.returnTotal += item.amount || 0;
+                }
               }
               return totals;
             },
