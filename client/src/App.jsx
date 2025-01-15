@@ -9,7 +9,7 @@ import { Layout } from './components/Layout/Layout';
 import { router } from './router/router';
 
 function App() {
-  const [cookies] = useCookies(['token']);
+  const [cookies, , removeCookie] = useCookies(['token']);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -18,6 +18,37 @@ function App() {
       navigate('/login');
     }
   }, [location.pathname, navigate, cookies.token]);
+
+  useEffect(() => {
+    let timeoutId;
+    const INACTIVE_TIMEOUT = 10 * 60 * 1000;
+
+    const handleLogout = () => {
+      removeCookie('token');
+      navigate('/login');
+    };
+
+    const resetTimer = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleLogout, INACTIVE_TIMEOUT);
+    };
+
+    if (cookies.token) {
+      const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+      events.forEach((event) => {
+        document.addEventListener(event, resetTimer);
+      });
+
+      resetTimer();
+
+      return () => {
+        if (timeoutId) clearTimeout(timeoutId);
+        events.forEach((event) => {
+          document.removeEventListener(event, resetTimer);
+        });
+      };
+    }
+  }, [cookies.token, navigate, removeCookie]);
 
   return (
     <div className='App'>
