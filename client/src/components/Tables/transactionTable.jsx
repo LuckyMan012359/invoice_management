@@ -451,7 +451,12 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
                 <tbody>
                   {transactionData.map((item, index) => (
-                    <tr key={item._id || `transaction-${index}`}>
+                    <tr
+                      key={item._id || `transaction-${index}`}
+                      className={`${item.approve_status === 2 && 'text-[red]'} ${
+                        item.approve_status === 3 && 'text-[blue]'
+                      }`}
+                    >
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                         {index + 1 + transactionsPerPage * (currentPage - 1)}
                       </td>
@@ -478,20 +483,12 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                         {item.notes}
                       </td>
-                      <td
-                        className={`p-3 ${
-                          item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
-                        } border-[1px] dark:border-gray-600 dark:text-gray-300`}
-                      >
-                        {item.transaction_type === 'invoice' && item.amount.toLocaleString()}
+                      <td className={`p-3 border-[1px] dark:border-gray-600 dark:text-gray-300`}>
+                        {item.transaction_type === 'invoice' ? item.amount.toLocaleString() : 0}
                       </td>
-                      <td
-                        className={`p-3 ${
-                          item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
-                        } border-[1px] dark:border-gray-600 dark:text-gray-300`}
-                      >
+                      <td className={`p-3 border-[1px] dark:border-gray-600 dark:text-gray-300`}>
                         {item.transaction_type !== 'invoice' && '-'}
-                        {item.transaction_type !== 'invoice' && item.amount.toLocaleString()}
+                        {item.transaction_type !== 'invoice' ? item.amount.toLocaleString() : 0}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                         {item.attachments.length > 0
@@ -514,29 +511,33 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                           : t('No attachments')}
                       </td>
                       <td className='py-2 px-4 border-[1px] dark:border-gray-600 dark:text-gray-300'>
-                        <button
-                          className='text-gray-800 py-1 rounded mr-1 dark:text-white'
-                          onClick={() => {
-                            setType('Edit');
-                            console.log(item.transaction_date);
+                        {item.approve_status !== 1 ? (
+                          <></>
+                        ) : (
+                          <button
+                            className='text-gray-800 py-1 rounded mr-1 dark:text-white'
+                            onClick={() => {
+                              setType('Edit');
+                              console.log(item.transaction_date);
 
-                            setTransaction({
-                              date: item.transaction_date,
-                              customer: item.customer?._id || null,
-                              supplier: item.supplier?._id || null,
-                              transaction: item.transaction_type,
-                              amount: item.amount,
-                              balance: item.balance,
-                              note: item.notes,
-                            });
-                            setTransactionId(item._id);
-                            setShowTransactionForm(true);
-                          }}
-                        >
-                          <FaRegEdit />
-                        </button>
+                              setTransaction({
+                                date: item.transaction_date,
+                                customer: item.customer?._id || null,
+                                supplier: item.supplier?._id || null,
+                                transaction: item.transaction_type,
+                                amount: item.amount,
+                                balance: item.balance,
+                                note: item.notes,
+                              });
+                              setTransactionId(item._id);
+                              setShowTransactionForm(true);
+                            }}
+                          >
+                            <FaRegEdit />
+                          </button>
+                        )}
 
-                        {role !== 'customer' && (
+                        {role !== 'customer' && item.approve_status === 1 && (
                           <button
                             className='text-gray-800 py-1 rounded mr-1 dark:text-white ml-[20px]'
                             onClick={() => {

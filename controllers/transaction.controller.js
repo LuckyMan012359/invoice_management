@@ -114,7 +114,7 @@ exports.readTransaction = async (req, res) => {
     }
 
     if (approve_status && Number(approve_status) === 1) {
-      match['$or'] = [{ approve_status: 1 }, { approve_status: 3 }];
+      match['$or'] = [{ approve_status: 1 }, { approve_status: 2 }, { approve_status: 3 }];
     } else if (approve_status && Number(approve_status) === 2) {
       match['approve_status'] = 2;
     } else if (approve_status && Number(approve_status) === 3) {
