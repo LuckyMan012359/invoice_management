@@ -81,7 +81,7 @@ const Profile = () => {
   };
 
   return (
-    <div className='min-h-screen px-[100px] pb-[50px] pt-[200px] max-xl:px-[50px] max-sm:px-[15px] bg-gray-100 dark:bg-gray-900 overflow-hidden'>
+    <div className='min-h-screen px-[100px] pb-[50px] pt-[200px] max-xl:px-[50px] max-sm:px-[15px] bg-gray-300 dark:bg-gray-900 overflow-hidden'>
       <div className='max-w-6xl mx-auto bg-white shadow-md rounded-lg p-6 space-y-6 dark:bg-gray-800'>
         {isLoading ? (
           <div className='w-full h-[200px] flex justify-center items-center'>

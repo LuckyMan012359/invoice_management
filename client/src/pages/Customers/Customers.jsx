@@ -172,7 +172,7 @@ export const Customers = () => {
   };
 
   return (
-    <div className='min-h-screen px-[100px] pb-[50px] pt-[200px] max-xl:px-[50px] max-sm:px-[15px] bg-gray-100 dark:bg-gray-900 overflow-hidden'>
+    <div className='min-h-screen px-[100px] pb-[50px] pt-[200px] max-xl:px-[50px] max-sm:px-[15px] bg-gray-300 dark:bg-gray-900 overflow-hidden'>
       <div className='max-w-6xl mx-auto bg-white shadow-md rounded-lg p-6 space-y-6 dark:bg-gray-800'>
         <div className='flex justify-between max-md:flex-col gap-4 mb-4'>
           <div className='flex justify-start gap-4 max-md:w-full max-sm:flex-col'>
@@ -228,7 +228,7 @@ export const Customers = () => {
           ) : (
             <table className='w-full text-left bg-white rounded-lg max-2xl:min-w-[1200px] dark:bg-gray-800'>
               <thead>
-                <tr className='text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700'>
+                <tr className='text-gray-700 dark:text-gray-300 bg-gray-300 dark:bg-gray-700 border-[1px] border-gray-400 dark:border-gray-600'>
                   <th className='py-2 px-4 text-left'>{t('Name')}</th>
                   <th className='py-2 px-4 text-left'>{t('Total Purchases')}</th>
                   <th className='py-2 px-4 text-left'>{t('Total Payments')}</th>
@@ -239,7 +239,7 @@ export const Customers = () => {
               <tbody>
                 {filteredCustomers.map((customer, index) => (
                   <tr key={customer._id || `customer-${index}`} className='border-b'>
-                    <td className='py-2 px-4 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                    <td className='py-2 px-4 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                       {customer.role !== 'admin' ? (
                         <Link to={`/transactions?customer_id=${customer._id}&&supplier_id=`}>
                           {customer.firstName} {customer.lastName}
@@ -253,7 +253,7 @@ export const Customers = () => {
                     {customer.role === 'admin' ? (
                       <>
                         <td
-                          className='py-2 px-4 text-center border-[1px] dark:border-gray-600 dark:text-gray-300'
+                          className='py-2 px-4 text-center border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'
                           colSpan={3}
                         >
                           {t('Admin')}
@@ -261,23 +261,23 @@ export const Customers = () => {
                       </>
                     ) : (
                       <>
-                        <td className='py-2 px-4 text-[green] border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                        <td className='py-2 px-4 text-[green] border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                           {customer.totalPurchase.toLocaleString() || 0}
                         </td>
-                        <td className='py-2 px-4 text-[red] border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                        <td className='py-2 px-4 text-[red] border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                           {customer.totalPayment > 0 && '-'}
                           {customer.totalPayment.toLocaleString() || 0}
                         </td>
                         <td
                           className={`py-2 px-4 ${
                             customer.totalBalance >= 0 ? 'text-[green]' : 'text-[red]'
-                          } border-[1px] dark:border-gray-600 dark:text-gray-300`}
+                          } border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300`}
                         >
                           {customer.totalBalance.toLocaleString() || 0}
                         </td>
                       </>
                     )}
-                    <td className='py-2 px-4 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                    <td className='py-2 px-4 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                       <button
                         className='text-gray-800 py-1 rounded dark:text-white mr-[15px]'
                         onClick={() => {
@@ -300,26 +300,26 @@ export const Customers = () => {
 
                 <tr>
                   <td
-                    className='py-2 px-4 text-center text-[red]  border-[1px] dark:border-gray-600'
+                    className='py-2 px-4 text-center text-[red] border-[1px] border-gray-400 dark:border-gray-600'
                     colSpan={1}
                   >
                     {t('Total')}
                   </td>
                   <td
-                    className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600'
+                    className='py-2 px-4 text-center text-[green] border-[1px] border-gray-400 dark:border-gray-600'
                     colSpan={1}
                   >
                     {t('Invoice')}: {incomes.toLocaleString()}
                   </td>
                   <td
-                    className='py-2 px-4 text-center text-[red] border-[1px] dark:border-gray-600'
+                    className='py-2 px-4 text-center text-[red] border-[1px] border-gray-400 dark:border-gray-600'
                     colSpan={1}
                   >
                     {t('Payment')}: {expenses > 0 && '-'}
                     {expenses.toLocaleString()}
                   </td>
                   <td
-                    className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600'
+                    className='py-2 px-4 text-center text-[green] border-[1px] border-gray-400 dark:border-gray-600'
                     colSpan={2}
                   >
                     {t('Balance')}:{' '}

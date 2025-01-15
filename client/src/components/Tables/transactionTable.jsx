@@ -52,6 +52,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
   const customer_id = searchParams.get('customer_id');
   const supplier_id = searchParams.get('supplier_id');
 
+  const [transactionType, setTransactionType] = useState('');
+
   const [transaction, setTransaction] = useState({
     date: '',
     customer: '',
@@ -435,7 +437,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
             ) : (
               <table className='w-full text-left bg-white rounded-lg max-2xl:min-w-[1200px] dark:bg-gray-800'>
                 <thead>
-                  <tr className='text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700'>
+                  <tr className='text-gray-700 dark:text-gray-300 bg-gray-300 dark:bg-gray-700 border-[1px] border-gray-400 dark:border-gray-600'>
                     <th className='p-3'>#</th>
                     <th className='p-3'>{t('Date')}</th>
                     <th className='p-3'>{t('Customer')}</th>
@@ -458,43 +460,47 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                         item.approve_status === 3 && 'text-[blue]'
                       }`}
                     >
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {index + 1 + transactionsPerPage * (currentPage - 1)}
                       </td>
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {(() => {
                           const date = new Date(item.transaction_date);
                           const formattedDate = date.toISOString().split('T')[0];
                           return formattedDate;
                         })()}
                       </td>
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {item.customer?.firstName} {item.customer?.lastName}
                       </td>
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {item.supplier?.name}
                       </td>
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {item.transaction_type === 'invoice'
                           ? t('invoice')
                           : item.transaction_type === 'payment'
                           ? t('payment')
                           : t('return')}
                       </td>
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {item.document}
                       </td>
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {item.notes}
                       </td>
-                      <td className={`p-3 border-[1px] dark:border-gray-600 dark:text-gray-300`}>
+                      <td
+                        className={`p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300`}
+                      >
                         {item.transaction_type === 'invoice' ? item.amount.toLocaleString() : 0}
                       </td>
-                      <td className={`p-3 border-[1px] dark:border-gray-600 dark:text-gray-300`}>
+                      <td
+                        className={`p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300`}
+                      >
                         {item.transaction_type !== 'invoice' && '-'}
                         {item.transaction_type !== 'invoice' ? item.amount.toLocaleString() : 0}
                       </td>
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {item.attachments.length > 0
                           ? item.attachments.map((attachment, index) => {
                               const fileName = attachment.split('/').pop();
@@ -514,35 +520,32 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                             })
                           : t('No attachments')}
                       </td>
-                      <td className='py-2 px-4 border-[1px] dark:border-gray-600 dark:text-gray-300'>
-                        {item.approve_status !== 1 ? (
-                          <></>
-                        ) : (
-                          <button
-                            className='text-gray-800 py-1 rounded mr-1 dark:text-white'
-                            onClick={() => {
-                              setType('Edit');
-                              console.log(item.transaction_date);
+                      <td className='py-2 px-4 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
+                        <button
+                          className='text-gray-800 py-1 rounded mr-1 dark:text-white'
+                          onClick={() => {
+                            setType('Edit');
+                            console.log(item.transaction_date);
 
-                              setTransaction({
-                                date: item.transaction_date,
-                                customer: item.customer?._id || null,
-                                supplier: item.supplier?._id || null,
-                                transaction: item.transaction_type,
-                                document: item.document,
-                                amount: item.amount,
-                                balance: item.balance,
-                                note: item.notes,
-                              });
-                              setTransactionId(item._id);
-                              setShowTransactionForm(true);
-                            }}
-                          >
-                            <FaRegEdit />
-                          </button>
-                        )}
+                            setTransaction({
+                              date: item.transaction_date,
+                              customer: item.customer?._id || null,
+                              supplier: item.supplier?._id || null,
+                              transaction: item.transaction_type,
+                              document: item.document,
+                              amount: item.amount,
+                              balance: item.balance,
+                              note: item.notes,
+                            });
+                            setTransactionId(item._id);
+                            setShowTransactionForm(true);
+                            setTransactionType(item.approve_status === 2 ? 2 : 1);
+                          }}
+                        >
+                          <FaRegEdit />
+                        </button>
 
-                        {role !== 'customer' && item.approve_status === 1 && (
+                        {role !== 'customer' && (
                           <button
                             className='text-gray-800 py-1 rounded mr-1 dark:text-white ml-[20px]'
                             onClick={() => {
@@ -557,26 +560,26 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                   ))}
                   <tr>
                     <td
-                      className='py-2 px-4 text-center text-[red]  border-[1px] dark:border-gray-600'
+                      className='py-2 px-4 text-center text-[red] border-[1px]  border-gray-400 dark:border-gray-600'
                       colSpan={2}
                     >
                       {t('Total')}
                     </td>
                     <td
-                      className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600'
-                      colSpan={2}
+                      className='py-2 px-4 text-center text-[green] border-[1px] border-gray-400 dark:border-gray-600'
+                      colSpan={3}
                     >
                       {t('Invoice')}: {incomes.toLocaleString()}
                     </td>
                     <td
-                      className='py-2 px-4 text-center text-[red] border-[1px] dark:border-gray-600'
-                      colSpan={role === 'admin' ? 4 : 5}
+                      className='py-2 px-4 text-center text-[red] border-[1px] border-gray-400 dark:border-gray-600'
+                      colSpan={4}
                     >
                       {t('Payment')}: {expenses > 0 && '-'}
                       {expenses.toLocaleString()}
                     </td>
                     <td
-                      className='py-2 px-4 text-center text-[green] border-[1px] dark:border-gray-600'
+                      className='py-2 px-4 text-center text-[green] border-[1px] border-gray-400 dark:border-gray-600'
                       colSpan={2}
                     >
                       {t('Balance')}:{' '}
@@ -625,6 +628,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
         isChanged={isChanged}
         transactionId={transactionId}
         setLoading={setLoading}
+        transactionType={transactionType}
       />
 
       <Modal

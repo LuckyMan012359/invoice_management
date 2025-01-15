@@ -429,7 +429,7 @@ export const TransactionCreateApproveTable = ({ isChanged, setIsChanged }) => {
             ) : (
               <table className='w-full text-left bg-white rounded-lg max-2xl:min-w-[1200px] dark:bg-gray-800'>
                 <thead>
-                  <tr className='text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700'>
+                  <tr className='text-gray-700 dark:text-gray-300 bg-gray-300 dark:bg-gray-700 border-[1px] border-gray-400 dark:border-gray-600'>
                     <th className='p-3'>#</th>
                     <th className='p-3'>{t('Date')}</th>
                     <th className='p-3'>{t('Customer')}</th>
@@ -447,51 +447,51 @@ export const TransactionCreateApproveTable = ({ isChanged, setIsChanged }) => {
                 <tbody>
                   {transactionData.map((item, index) => (
                     <tr key={item._id || `transaction-${index}`}>
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {index + 1 + transactionsPerPage * (currentPage - 1)}
                       </td>
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {(() => {
                           const date = new Date(item.transaction_date);
                           const formattedDate = date.toISOString().split('T')[0];
                           return formattedDate;
                         })()}
                       </td>
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {item.customer?.firstName} {item.customer?.lastName}
                       </td>
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {item.supplier?.name}
                       </td>
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {item.transaction_type === 'invoice'
                           ? t('invoice')
                           : item.transaction_type === 'payment'
                           ? t('payment')
                           : t('return')}
                       </td>
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {item.document}
                       </td>
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {item.notes}
                       </td>
                       <td
                         className={`p-3 ${
                           item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
-                        } border-[1px] dark:border-gray-600 dark:text-gray-300`}
+                        } border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300`}
                       >
                         {item.transaction_type === 'invoice' ? item.amount.toLocaleString() : 0}
                       </td>
                       <td
                         className={`p-3 ${
                           item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
-                        } border-[1px] dark:border-gray-600 dark:text-gray-300`}
+                        } border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300`}
                       >
                         {item.transaction_type !== 'invoice' && '-'}
                         {item.transaction_type !== 'invoice' ? item.amount.toLocaleString() : 0}
                       </td>
-                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {item.attachments.length > 0
                           ? item.attachments.map((attachment, index) => {
                               const fileName = attachment.split('/').pop();
@@ -511,7 +511,7 @@ export const TransactionCreateApproveTable = ({ isChanged, setIsChanged }) => {
                             })
                           : t('No attachments')}
                       </td>
-                      <td className='py-2 px-4 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      <td className='py-2 px-4 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {role !== 'admin' ? (
                           <>
                             <Button

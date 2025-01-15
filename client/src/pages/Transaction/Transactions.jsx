@@ -118,7 +118,7 @@ export const Transactions = () => {
   ];
 
   return (
-    <div className='min-h-screen px-[100px] pb-[50px] pt-[200px] max-xl:px-[50px] max-sm:px-[15px] bg-gray-100 dark:bg-gray-900'>
+    <div className='min-h-screen px-[100px] pb-[50px] pt-[200px] max-xl:px-[50px] max-sm:px-[15px] bg-gray-300 dark:bg-gray-900'>
       <div className='tabs mx-auto bg-white shadow-md rounded-lg p-6 space-y-6 dark:bg-gray-800'>
         <Tabs activeKey={tabNum} onChange={(key) => setTabNum(key)} items={items} />
       </div>

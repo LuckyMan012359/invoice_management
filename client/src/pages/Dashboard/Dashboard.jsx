@@ -26,19 +26,19 @@ export const Dashboard = () => {
   return (
     <div className='w-full h-auto px-[100px] pb-[50px] pt-[200px] max-2xl:px-[50px]'>
       <div className='grid grid-cols-3 max-2xl:grid-cols-3 max-xl:grid-cols-2 max-lg:grid-cols-1 gap-[70px] m-5 dark:text-white'>
-        <div className='rounded-md h-24 border-2 flex flex-col shadow-md'>
+        <div className='rounded-md h-24 border-2 flex flex-col shadow-xl'>
           <p className='p-2'>{t('Total Sales')}</p>
           <p className='flex items-center justify-center text-2xl'>
             ${totalPurchase.toLocaleString()}
           </p>
         </div>
-        <div className='rounded-md h-24 border-2 shadow-md'>
+        <div className='rounded-md h-24 border-2 shadow-xl'>
           <p className='p-2'>{t('Total Payments')}</p>
           <p className='flex items-center justify-center text-2xl'>
             ${totalPayment.toLocaleString()}
           </p>
         </div>
-        <div className='rounded-md h-24 border-2 shadow-md'>
+        <div className='rounded-md h-24 border-2 shadow-xl'>
           <p className='p-2'>{t('Total Balance')}</p>
           <p className='flex items-center justify-center text-2xl'>
             ${(totalPurchase - totalPayment).toLocaleString()}

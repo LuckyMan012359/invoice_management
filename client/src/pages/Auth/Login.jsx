@@ -35,7 +35,7 @@ export const Login = () => {
   };
 
   return (
-    <div className='bg-gray-50 font-[sans-serif]'>
+    <div className='bg-gray-300 font-[sans-serif]'>
       <div className='min-h-screen flex flex-col items-center justify-center py-6 px-4'>
         <div className='max-w-md w-full'>
           <Link href='#'>
@@ -46,7 +46,7 @@ export const Login = () => {
             />
           </Link>
 
-          <div className='p-8 rounded-2xl bg-white shadow'>
+          <div className='p-8 rounded-2xl bg-white shadow-lg'>
             <h2 className='text-gray-800 text-center text-2xl font-bold'>Sign in</h2>
             <form className='mt-8 space-y-4' onSubmit={onSubmit}>
               <div>
