@@ -23,6 +23,7 @@ const TransactionForm = ({
   isChanged,
   transactionId,
   setLoading,
+  transactionApproveStatus,
 }) => {
   const { t, i18n } = useTranslation();
 
@@ -165,7 +166,11 @@ const TransactionForm = ({
           setLoading(true);
           setShowTransactionForm(false);
 
-          await axiosInstance('/transaction/update_transaction', 'put', formattedData);
+          if (transactionApproveStatus === 2) {
+            await axiosInstance('/transaction/update_create_transaction', 'put', formattedData);
+          } else {
+            await axiosInstance('/transaction/update_transaction', 'put', formattedData);
+          }
           toast.success(t('Transaction updated successfully'));
 
           setIsChanged(!isChanged);

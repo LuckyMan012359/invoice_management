@@ -598,6 +598,107 @@ exports.approveUpdateTransaction = async (req, res) => {
   }
 };
 
+exports.updateCreateTransaction = async (req, res) => {
+  try {
+    const {
+      transaction_id,
+      customer_id,
+      supplier_id,
+      transaction_type,
+      amount,
+      document,
+      notes,
+      transaction_date,
+      isRemove,
+    } = req.body;
+
+    if (
+      !transaction_id ||
+      !customer_id ||
+      !supplier_id ||
+      !transaction_type ||
+      !amount ||
+      !transaction_date
+    ) {
+      return res.status(400).send({ message: 'All fields are required.' });
+    }
+
+    const existingTransaction = await Transaction.findById(transaction_id);
+    if (!existingTransaction) {
+      return res.status(404).send({ message: 'Transaction not found.' });
+    }
+
+    let balance = transaction_type === 'invoice' ? Number(amount) : -Number(amount);
+
+    let attachments = existingTransaction.attachments;
+
+    if (isRemove === 'true') {
+      attachments.forEach((filePath) => {
+        const fullPath = path.join(__dirname, '..', filePath);
+        fs.unlink(fullPath, (err) => {
+          if (err) {
+            console.error(`Error deleting file: ${fullPath}`, err);
+          } else {
+            console.log(`File deleted successfully: ${fullPath}`);
+          }
+        });
+      });
+      attachments = [];
+    }
+
+    if (req.files && req.files.length > 0) {
+      existingTransaction.attachments.forEach((filePath) => {
+        const fullPath = path.join(__dirname, '..', filePath);
+        fs.unlink(fullPath, (err) => {
+          if (err) {
+            console.error(`Error deleting file: ${fullPath}`, err);
+          } else {
+            console.log(`File deleted successfully: ${fullPath}`);
+          }
+        });
+      });
+      attachments = req.files.map((file) => `uploads/attachments/${file.filename}`);
+    }
+
+    const translate_transaction_type =
+      transaction_type === 'invoice'
+        ? 'factura'
+        : transaction_type === 'payment'
+        ? 'pago'
+        : 'devolucion';
+
+    existingTransaction.customer_id = customer_id;
+    existingTransaction.supplier_id = supplier_id;
+    existingTransaction.transaction_type = transaction_type;
+    existingTransaction.translate_transaction_type = translate_transaction_type;
+    existingTransaction.amount = amount;
+    existingTransaction.document = document;
+    existingTransaction.balance = balance;
+    existingTransaction.notes = notes;
+    existingTransaction.transaction_date = transaction_date;
+    existingTransaction.attachments = attachments;
+    existingTransaction.approve_status = 2;
+
+    await existingTransaction.save();
+
+    deleteCache('customer');
+    deleteCache('transaction');
+    deleteCache('pending_transaction');
+    deleteCache('supplier');
+
+    res.status(200).send({
+      message: 'Transaction updated successfully!',
+      transaction: existingTransaction,
+    });
+  } catch (error) {
+    console.error('Error updating transaction:', error);
+    res.status(500).send({
+      message: 'An error occurred while updating the transaction.',
+      error: error.message,
+    });
+  }
+};
+
 exports.deleteTransaction = async (req, res) => {
   try {
     const { transaction_id } = req.query;

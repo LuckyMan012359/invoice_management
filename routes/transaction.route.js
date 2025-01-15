@@ -15,6 +15,7 @@ const {
   approveCreatingTransaction,
   deleteApproveUpdatingTransaction,
   getTransactionDataAmount,
+  updateCreateTransaction,
 } = require('../controllers/transaction.controller.js');
 const verifyToken = require('../middlewares/authJWT.js');
 
@@ -146,6 +147,24 @@ router.put(
 
     try {
       await approveUpdateTransaction(req, res);
+      sendUpdateToClients({ type: 'DELETE', transactionId: transaction_id });
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+      res.status(500).json({ message: 'Failed to delete transaction' });
+    }
+  },
+);
+
+router.put(
+  '/update_create_transaction',
+  upload.array('attachments'),
+  verifyToken,
+  validateAndOptimizeFiles,
+  async (req, res) => {
+    const { transaction_id } = req.body;
+
+    try {
+      await updateCreateTransaction(req, res);
       sendUpdateToClients({ type: 'DELETE', transactionId: transaction_id });
     } catch (error) {
       console.error('Error deleting transaction:', error);

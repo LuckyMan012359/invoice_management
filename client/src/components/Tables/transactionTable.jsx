@@ -52,7 +52,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
   const customer_id = searchParams.get('customer_id');
   const supplier_id = searchParams.get('supplier_id');
 
-  const [transactionType, setTransactionType] = useState('');
+  const [transactionApproveStatus, setTransactionApproveStatus] = useState('');
 
   const [transaction, setTransaction] = useState({
     date: '',
@@ -539,7 +539,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                             });
                             setTransactionId(item._id);
                             setShowTransactionForm(true);
-                            setTransactionType(item.approve_status === 2 ? 2 : 1);
+                            setTransactionApproveStatus(item.approve_status === 2 ? 2 : 1);
                           }}
                         >
                           <FaRegEdit />
@@ -628,7 +628,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
         isChanged={isChanged}
         transactionId={transactionId}
         setLoading={setLoading}
-        transactionType={transactionType}
+        transactionApproveStatus={transactionApproveStatus}
       />
 
       <Modal
