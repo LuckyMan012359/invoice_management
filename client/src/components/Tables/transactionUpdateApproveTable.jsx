@@ -456,7 +456,6 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
                     <th className='p-3'>{t('Note')}</th>
                     <th className='p-3'>{t('Amount')}</th>
                     <th className='p-3'>{t('Payment')}</th>
-                    {role === 'customer' && <th className='p-3'>{t('Balance')}</th>}
                     <th className='p-3'>{t('Attachments')}</th>
                     <th className='p-3'>{t('Action')}</th>
                   </tr>
@@ -512,15 +511,6 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
                         {item.updated_transaction_type !== 'invoice' &&
                           item.updated_amount.toLocaleString()}
                       </td>
-                      {role === 'customer' && (
-                        <td
-                          className={`p-3 border-[1px] dark:border-gray-600 dark:text-gray-300 ${
-                            item.updated_balance >= 0 ? 'text-[green]' : 'text-[red]'
-                          }`}
-                        >
-                          {item.updated_balance.toLocaleString()}
-                        </td>
-                      )}
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                         {item.updated_attachments.length > 0
                           ? item.updated_attachments.map((attachment, index) => {
