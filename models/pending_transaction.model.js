@@ -24,6 +24,9 @@ const pendingTransactionSchema = new Schema({
     type: Number,
     required: true,
   },
+  document: {
+    type: String,
+  },
   notes: {
     type: String,
   },

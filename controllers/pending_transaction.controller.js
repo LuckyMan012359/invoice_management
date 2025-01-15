@@ -7,8 +7,15 @@ const path = require('path');
 
 exports.createPendingTransaction = async (req, res) => {
   try {
-    const { transaction_type, amount, notes, transaction_date, original_transaction, isRemove } =
-      req.body;
+    const {
+      transaction_type,
+      amount,
+      notes,
+      document,
+      transaction_date,
+      original_transaction,
+      isRemove,
+    } = req.body;
 
     const existingPendingTransaction = await PendingTransaction.findOne({
       original_transaction: original_transaction,
@@ -43,6 +50,7 @@ exports.createPendingTransaction = async (req, res) => {
         customer_id: originalTransaction.customer_id,
         transaction_type,
         amount,
+        document,
         notes,
         transaction_date,
         attachments: attachments.map((file) => `uploads/attachments/${file.hashedName}`),
@@ -80,6 +88,7 @@ exports.createPendingTransaction = async (req, res) => {
       existingPendingTransaction.customer_id = originalTransaction.customer_id;
       existingPendingTransaction.transaction_type = transaction_type;
       existingPendingTransaction.amount = amount;
+      existingPendingTransaction.document = document;
       existingPendingTransaction.pending = true;
       existingPendingTransaction.original_transaction = original_transaction;
       existingPendingTransaction.attachmentsUpdateStatus = pendingStatus;
@@ -136,6 +145,7 @@ exports.readPendingTransaction = async (req, res) => {
     if (keyword) {
       match.$or = [
         { notes: { $regex: keyword, $options: 'i' } },
+        { document: { $regex: keyword, $options: 'i' } },
         { amount: parseFloat(keyword) },
         { transaction_type: { $regex: keyword, $options: 'i' } },
       ];
@@ -186,6 +196,7 @@ exports.readPendingTransaction = async (req, res) => {
           _id: 1,
           transaction_type: 1,
           amount: 1,
+          document: 1,
           notes: 1,
           transaction_date: 1,
           attachments: 1,
@@ -240,6 +251,7 @@ exports.readPendingTransaction = async (req, res) => {
           _id: 1,
           transaction_type: 1,
           amount: 1,
+          document: 1,
           balance: 1,
           notes: 1,
           transaction_date: 1,
@@ -351,6 +363,7 @@ exports.updatePendingTransaction = async (req, res) => {
       latestTransaction.transaction_type = existingPendingTransaction.transaction_type;
       latestTransaction.translate_transaction_type = translate_transaction_type;
       latestTransaction.amount = existingPendingTransaction.amount;
+      latestTransaction.document = existingPendingTransaction.document;
       latestTransaction.balance = balance;
       latestTransaction.notes = '';
       latestTransaction.transaction_date = existingPendingTransaction.transaction_date;

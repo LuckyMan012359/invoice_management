@@ -51,6 +51,7 @@ const TransactionForm = ({
     supplierId: '',
     transactionType: '',
     amount: '',
+    document: '',
     notes: '',
     date: '',
     attachments: [],
@@ -65,6 +66,7 @@ const TransactionForm = ({
       supplierId: null,
       transactionType: null,
       amount: '',
+      document: '',
       notes: '',
       date: null,
       attachments: [],
@@ -81,6 +83,7 @@ const TransactionForm = ({
         supplierId: transaction.supplier || '',
         transactionType: transaction.transaction || '',
         amount: transaction.amount || '',
+        document: transaction.document || '',
         notes: transaction.note || '',
         date: dayjs(transaction.date),
         attachments: [],
@@ -116,6 +119,7 @@ const TransactionForm = ({
     formattedData.append('supplier_id', formData.supplierId);
     formattedData.append('transaction_type', formData.transactionType);
     formattedData.append('amount', formData.amount);
+    formattedData.append('document', formData.document);
     formattedData.append('notes', formData.notes);
     formattedData.append('transaction_id', transactionId ? transactionId : '');
     formattedData.append('isRemove', removeAttachments);
@@ -324,6 +328,16 @@ const TransactionForm = ({
                 onChange={handleChange}
                 className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
                 required
+              />
+            </div>
+
+            <div className='mb-4'>
+              <label className='block text-gray-700 dark:text-gray-300'>{t('Document')}</label>
+              <textarea
+                name='document'
+                value={formData.document}
+                onChange={handleChange}
+                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
               />
             </div>
 

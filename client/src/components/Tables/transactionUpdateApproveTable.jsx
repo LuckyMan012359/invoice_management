@@ -184,15 +184,19 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
     amount,
     notes,
     transaction_date,
+    document,
     isRemove,
     updated_attachments,
   ) => {
+    console.log(document);
+
     const response = await axiosInstance('/transaction/approve_update_transaction', 'put', {
       transaction_id,
       customer_id,
       supplier_id,
       transaction_type,
       amount,
+      document,
       notes,
       transaction_date,
       isRemove,
@@ -453,6 +457,7 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
                     <th className='p-3'>{t('Customer')}</th>
                     <th className='p-3'>{t('Supplier')}</th>
                     <th className='p-3'>{t('Transaction')}</th>
+                    <th className='p-3'>{t('Document')}</th>
                     <th className='p-3'>{t('Note')}</th>
                     <th className='p-3'>{t('Amount')}</th>
                     <th className='p-3'>{t('Payment')}</th>
@@ -488,6 +493,9 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
                           : t('return')}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                        {item.updated_document}
+                      </td>
+                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                         {item.updated_notes}
                       </td>
                       <td
@@ -497,8 +505,9 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
                             : 'text-[red]'
                         } border-[1px] dark:border-gray-600 dark:text-gray-300`}
                       >
-                        {item.updated_transaction_type === 'invoice' &&
-                          item.updated_amount.toLocaleString()}
+                        {item.updated_transaction_type === 'invoice'
+                          ? item.updated_amount.toLocaleString()
+                          : 0}
                       </td>
                       <td
                         className={`p-3 ${
@@ -508,8 +517,9 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
                         } border-[1px] dark:border-gray-600 dark:text-gray-300`}
                       >
                         {item.updated_transaction_type !== 'invoice' && '-'}
-                        {item.updated_transaction_type !== 'invoice' &&
-                          item.updated_amount.toLocaleString()}
+                        {item.updated_transaction_type !== 'invoice'
+                          ? item.updated_amount.toLocaleString()
+                          : 0}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                         {item.updated_attachments.length > 0
@@ -546,6 +556,7 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
                                   item.updated_amount,
                                   item.updated_notes,
                                   item.updated_transaction_date,
+                                  item.updated_document,
                                   item.isRemoved[0],
                                   item.updated_attachments,
                                 );

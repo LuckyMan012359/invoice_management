@@ -393,6 +393,7 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
                   <th className='p-3'>{t('Customer')}</th>
                   <th className='p-3'>{t('Supplier')}</th>
                   <th className='p-3'>{t('Transaction')}</th>
+                  <th className='p-3'>{t('Document')}</th>
                   <th className='p-3'>{t('Amount')}</th>
                   <th className='p-3'>{t('Note')}</th>
                   <th className='p-3'>{t('Attachments')}</th>
@@ -423,6 +424,9 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
                         : item.transaction_type === 'payment'
                         ? t('payment')
                         : t('return')}
+                    </td>
+                    <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                      {item.document}
                     </td>
                     <td
                       className={`p-3 ${

@@ -7,8 +7,15 @@ const path = require('path');
 
 exports.createTransaction = async (req, res) => {
   try {
-    const { customer_id, supplier_id, transaction_type, amount, notes, transaction_date } =
-      req.body;
+    const {
+      customer_id,
+      supplier_id,
+      transaction_type,
+      amount,
+      document,
+      notes,
+      transaction_date,
+    } = req.body;
 
     const latestTransaction = await Transaction.findOne({ customer_id }).sort({
       created: -1,
@@ -46,6 +53,7 @@ exports.createTransaction = async (req, res) => {
       transaction_type,
       translate_transaction_type,
       amount,
+      document,
       balance,
       notes,
       transaction_date,
@@ -125,6 +133,7 @@ exports.readTransaction = async (req, res) => {
       if (keyword) {
         match.$or = [
           { notes: { $regex: keyword, $options: 'i' } },
+          { document: { $regex: keyword, $options: 'i' } },
           { amount: parseFloat(keyword.replace(/-/g, '').replace(/,/g, '')) },
           { transaction_type: { $regex: keyword, $options: 'i' } },
           { translate_transaction_type: { $regex: keyword, $options: 'i' } },
@@ -134,6 +143,7 @@ exports.readTransaction = async (req, res) => {
       if (keyword) {
         match.$or = [
           { notes: { $regex: keyword, $options: 'i' } },
+          { document: { $regex: keyword, $options: 'i' } },
           { amount: parseFloat(keyword.replace(/-/g, '').replace(/,/g, '')) },
           { balance: parseFloat(keyword.replace(/,/g, '')) },
           { transaction_type: { $regex: keyword, $options: 'i' } },
@@ -211,6 +221,8 @@ exports.readTransaction = async (req, res) => {
           translate_transaction_type: 1,
           amount: 1,
           balance: 1,
+          document: 1,
+          updated_document: 1,
           notes: 1,
           transaction_date: 1,
           approve_status: 1,
@@ -284,6 +296,7 @@ exports.readTransaction = async (req, res) => {
           transaction_type: 1,
           amount: 1,
           balance: 1,
+          document: 1,
           notes: 1,
           transaction_date: 1,
           approve_status: 1,
@@ -343,6 +356,7 @@ exports.updateTransaction = async (req, res) => {
       supplier_id,
       transaction_type,
       amount,
+      document,
       notes,
       transaction_date,
       isRemove,
@@ -394,6 +408,7 @@ exports.updateTransaction = async (req, res) => {
     existingTransaction.updated_transaction_type = transaction_type;
     existingTransaction.updated_translate_transaction_type = translate_transaction_type;
     existingTransaction.updated_amount = amount;
+    existingTransaction.updated_document = document;
     existingTransaction.updated_balance = balance;
     existingTransaction.updated_notes = notes;
     existingTransaction.updated_transaction_date = transaction_date;
@@ -429,6 +444,7 @@ exports.approveUpdateTransaction = async (req, res) => {
       supplier_id,
       transaction_type,
       amount,
+      document,
       notes,
       transaction_date,
       isRemove,
@@ -523,6 +539,7 @@ exports.approveUpdateTransaction = async (req, res) => {
     existingTransaction.transaction_type = transaction_type;
     existingTransaction.translate_transaction_type = translate_transaction_type;
     existingTransaction.amount = amount;
+    existingTransaction.document = document;
     existingTransaction.balance = balance;
     existingTransaction.notes = notes;
     existingTransaction.transaction_date = transaction_date;
@@ -531,9 +548,12 @@ exports.approveUpdateTransaction = async (req, res) => {
     existingTransaction.updated_customer_id = null;
     existingTransaction.updated_supplier_id = null;
     existingTransaction.updated_amount = 0;
+    existingTransaction.updated_document = '';
     existingTransaction.updated_balance = 0;
     existingTransaction.updated_notes = '';
-    (existingTransaction.updated_attachments = []), await existingTransaction.save();
+    existingTransaction.updated_attachments = [];
+
+    await existingTransaction.save();
 
     deleteCache('customer');
     deleteCache('transaction');
@@ -763,6 +783,7 @@ exports.deleteApproveUpdatingTransaction = async (req, res) => {
     transaction.updated_amount = 0;
     transaction.updated_balance = 0;
     transaction.updated_notes = '';
+    transaction.updated_document = '';
 
     console.log(transaction);
 
@@ -792,6 +813,8 @@ exports.getTransactionDataAmount = async (req, res) => {
     const cachedData = getCache('transaction', cacheKey);
 
     if (cachedData) {
+      console.log('cacheData', cachedData);
+
       return res.status(200).send(cachedData);
     }
 
@@ -803,9 +826,17 @@ exports.getTransactionDataAmount = async (req, res) => {
 
     const transactions = await Transaction.find(filter);
 
-    const pendingTransaction = await PendingTransaction.find({ customer_id: req.user._id });
+    let pendingFilter = {};
+
+    if (req.user.role !== 'admin') {
+      pendingFilter = { customer_id: req.user._id };
+    }
+
+    const pendingTransaction = await PendingTransaction.find(pendingFilter);
 
     const result = { transactions, pendingTransaction };
+
+    console.log('result', cacheKey, result);
 
     setCache('transaction', cacheKey, result);
 

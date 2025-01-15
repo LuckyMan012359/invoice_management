@@ -435,6 +435,7 @@ export const TransactionCreateApproveTable = ({ isChanged, setIsChanged }) => {
                     <th className='p-3'>{t('Customer')}</th>
                     <th className='p-3'>{t('Supplier')}</th>
                     <th className='p-3'>{t('Transaction')}</th>
+                    <th className='p-3'>{t('Document')}</th>
                     <th className='p-3'>{t('Note')}</th>
                     <th className='p-3'>{t('Amount')}</th>
                     <th className='p-3'>{t('Payment')}</th>
@@ -470,6 +471,9 @@ export const TransactionCreateApproveTable = ({ isChanged, setIsChanged }) => {
                           : t('return')}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                        {item.document}
+                      </td>
+                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                         {item.notes}
                       </td>
                       <td
@@ -477,7 +481,7 @@ export const TransactionCreateApproveTable = ({ isChanged, setIsChanged }) => {
                           item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
                         } border-[1px] dark:border-gray-600 dark:text-gray-300`}
                       >
-                        {item.transaction_type === 'invoice' && item.amount.toLocaleString()}
+                        {item.transaction_type === 'invoice' ? item.amount.toLocaleString() : 0}
                       </td>
                       <td
                         className={`p-3 ${
@@ -485,7 +489,7 @@ export const TransactionCreateApproveTable = ({ isChanged, setIsChanged }) => {
                         } border-[1px] dark:border-gray-600 dark:text-gray-300`}
                       >
                         {item.transaction_type !== 'invoice' && '-'}
-                        {item.transaction_type !== 'invoice' && item.amount.toLocaleString()}
+                        {item.transaction_type !== 'invoice' ? item.amount.toLocaleString() : 0}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                         {item.attachments.length > 0

@@ -441,6 +441,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                     <th className='p-3'>{t('Customer')}</th>
                     <th className='p-3'>{t('Supplier')}</th>
                     <th className='p-3'>{t('Transaction')}</th>
+                    <th className='p-3'>{t('Document')}</th>
                     <th className='p-3'>{t('Note')}</th>
                     <th className='p-3'>{t('Amount')}</th>
                     <th className='p-3'>{t('Payment')}</th>
@@ -479,6 +480,9 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                           : item.transaction_type === 'payment'
                           ? t('payment')
                           : t('return')}
+                      </td>
+                      <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                        {item.document}
                       </td>
                       <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
                         {item.notes}
@@ -525,6 +529,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                                 customer: item.customer?._id || null,
                                 supplier: item.supplier?._id || null,
                                 transaction: item.transaction_type,
+                                document: item.document,
                                 amount: item.amount,
                                 balance: item.balance,
                                 note: item.notes,

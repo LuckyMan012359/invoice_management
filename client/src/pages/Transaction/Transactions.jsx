@@ -22,6 +22,8 @@ export const Transactions = () => {
     const fetchData = async () => {
       const response = await axiosInstance('/transaction/get_transaction_data_amount', 'get', {});
 
+      console.log(response.data);
+
       const approveCreateTransactions = response.data.transactions.filter(
         (item) => item.approve_status === 2,
       );

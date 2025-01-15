@@ -54,6 +54,12 @@ const transactionSchema = new Schema({
   updated_balance: {
     type: Number,
   },
+  document: {
+    type: String,
+  },
+  updated_document: {
+    type: String,
+  },
   notes: {
     type: String,
   },
