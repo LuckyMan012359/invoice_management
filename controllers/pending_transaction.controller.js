@@ -59,7 +59,11 @@ exports.createPendingTransaction = async (req, res) => {
         attachmentsUpdateStatus: pendingStatus,
       });
 
-      await transaction.save();
+      const newTransaction = await transaction.save();
+
+      originalTransaction.pending_transaction_id = newTransaction._id;
+      console.log(originalTransaction);
+      await originalTransaction.save();
 
       deleteCache('transaction');
       deleteCache('pending_transaction');
@@ -97,6 +101,12 @@ exports.createPendingTransaction = async (req, res) => {
       existingPendingTransaction.attachments = attachments;
 
       await existingPendingTransaction.save();
+
+      originalTransaction.pending_transaction_id = existingPendingTransaction._id;
+      await originalTransaction.save();
+
+      deleteCache('transaction');
+      deleteCache('pending_transaction');
 
       res.status(200).send({
         message: 'Transaction pending successfully!',
@@ -367,6 +377,7 @@ exports.updatePendingTransaction = async (req, res) => {
       latestTransaction.balance = balance;
       latestTransaction.notes = '';
       latestTransaction.transaction_date = existingPendingTransaction.transaction_date;
+      latestTransaction.pending_transaction_id = null;
 
       await latestTransaction.save();
 
@@ -468,6 +479,11 @@ exports.deletePendingTransaction = async (req, res) => {
     }
 
     await PendingTransaction.findByIdAndDelete(transaction_id);
+
+    const originalTransaction = await Transaction.findById(transaction.original_transaction);
+
+    originalTransaction.pending_transaction_id = null;
+    await originalTransaction.save();
 
     deleteCache('transaction');
     deleteCache('pending_transaction');

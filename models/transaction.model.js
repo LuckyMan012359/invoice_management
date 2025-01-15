@@ -23,6 +23,11 @@ const transactionSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Supplier',
   },
+  pending_transaction_id: {
+    type: Schema.Types.ObjectId,
+    ref: 'PendingTransaction',
+    default: null,
+  },
   transaction_type: {
     type: String,
     enum: ['invoice', 'payment', 'return'],

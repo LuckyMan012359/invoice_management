@@ -429,11 +429,11 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
                         ? t('payment')
                         : t('return')}
                     </td>
-                    <td className='p-3 border-[1px] dark:border-gray-600 dark:text-gray-300'>
+                    <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                       {item.document}
                     </td>
                     <td
-                      className={`p-3 ${
+                      className={`p-3 border-[1px] border-gray-400 ${
                         item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
                       }`}
                     >
@@ -443,12 +443,11 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
                     <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                       {item.notes}
                     </td>
-                    <td className='p-3 flex flex-col'>
+                    <td className='p-3 border-[1px] border-gray-400'>
                       {item.attachments.length > 0
                         ? item.attachments.map((attachment, index) => {
-                            // Extract file name from the attachment path
-                            const fileName = attachment.split('/').pop(); // Gets the file name from the path
-                            const fileType = fileName.split('.').pop(); // Extracts the file extension
+                            const fileName = attachment.split('/').pop();
+                            const fileType = fileName.split('.').pop();
 
                             return (
                               <div

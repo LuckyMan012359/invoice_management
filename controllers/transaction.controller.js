@@ -197,6 +197,30 @@ exports.readTransaction = async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: 'pendingtransactions',
+          localField: 'pending_transaction_id',
+          foreignField: '_id',
+          as: 'pending_transaction',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'pending_transaction.customer_id',
+          foreignField: '_id',
+          as: 'pending_transaction_customer',
+        },
+      },
+      {
+        $lookup: {
+          from: 'suppliers',
+          localField: 'pending_transaction.supplier_id',
+          foreignField: '_id',
+          as: 'pending_transaction_supplier',
+        },
+      },
+      {
         $unwind: { path: '$customer', preserveNullAndEmptyArrays: true },
       },
       {
@@ -207,6 +231,15 @@ exports.readTransaction = async (req, res) => {
       },
       {
         $unwind: { path: '$updated_supplier', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $unwind: { path: '$pending_transaction', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $unwind: { path: '$pending_transaction_customer', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $unwind: { path: '$pending_transaction_supplier', preserveNullAndEmptyArrays: true },
       },
       {
         $match: match,
@@ -250,6 +283,26 @@ exports.readTransaction = async (req, res) => {
           'updated_supplier._id': 1,
           'updated_supplier.email': 1,
           'updated_supplier.name': 1,
+          pending_transaction_id: 1,
+          'pending_transaction._id': 1,
+          'pending_transaction.supplier_id': 1,
+          'pending_transaction.customer_id': 1,
+          'pending_transaction.transaction_type': 1,
+          'pending_transaction.amount': 1,
+          'pending_transaction.document': 1,
+          'pending_transaction.notes': 1,
+          'pending_transaction.transaction_date': 1,
+          'pending_transaction.attachments': 1,
+          'pending_transaction.attachmentsUpdateStatus': 1,
+          'pending_transaction.original_transaction': 1,
+          'pending_transaction.pending': 1,
+          'pending_transaction_customer._id': 1,
+          'pending_transaction_customer.email': 1,
+          'pending_transaction_customer.firstName': 1,
+          'pending_transaction_customer.lastName': 1,
+          'pending_transaction_supplier._id': 1,
+          'pending_transaction_supplier.email': 1,
+          'pending_transaction_supplier.name': 1,
         },
       },
     ];
@@ -279,10 +332,21 @@ exports.readTransaction = async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: 'pendingtransactions',
+          localField: 'pending_transaction_id',
+          foreignField: '_id',
+          as: 'pending_transaction',
+        },
+      },
+      {
         $unwind: { path: '$customer', preserveNullAndEmptyArrays: true },
       },
       {
         $unwind: { path: '$supplier', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $unwind: { path: '$pending_transaction', preserveNullAndEmptyArrays: true },
       },
       {
         $match: match,
@@ -300,6 +364,9 @@ exports.readTransaction = async (req, res) => {
           notes: 1,
           transaction_date: 1,
           approve_status: 1,
+          updated_transaction_type: 1,
+          updated_amount: 1,
+          updated_balance: 1,
           'customer._id': 1,
           'customer.email': 1,
           'customer.firstName': 1,
@@ -307,6 +374,11 @@ exports.readTransaction = async (req, res) => {
           'supplier._id': 1,
           'supplier.email': 1,
           'supplier.name': 1,
+          pending_transaction_id: 1,
+          'pending_transaction._id': 1,
+          'pending_transaction.transaction_type': 1,
+          'pending_transaction.amount': 1,
+          'pending_transaction.balance': 1,
         },
       },
     ];
@@ -319,10 +391,24 @@ exports.readTransaction = async (req, res) => {
     let expenses = 0;
 
     totalTransactions.forEach((item) => {
-      if (item.transaction_type === 'invoice') {
-        incomes += item.amount;
+      if (item.pending_transaction_id) {
+        if (item.pending_transaction?.transaction_type === 'invoice') {
+          incomes += item.pending_transaction?.amount || 0;
+        } else {
+          expenses += item.pending_transaction?.amount || 0;
+        }
+      } else if (item.approve_status === 3) {
+        if (item.updated_transaction_type === 'invoice') {
+          incomes += item.updated_amount || 0;
+        } else {
+          expenses += item.updated_amount || 0;
+        }
       } else {
-        expenses += item.amount;
+        if (item.transaction_type === 'invoice') {
+          incomes += item.amount || 0;
+        } else {
+          expenses += item.amount || 0;
+        }
       }
     });
 
@@ -799,7 +885,10 @@ exports.getTransactionData = async (req, res) => {
       return res.status(200).send(cachedData);
     }
 
-    let filter = { approve_status: 1 };
+    let filter = {
+      approve_status: 1,
+      pending_transaction_id: { $exists: false },
+    };
 
     if (req.user.role !== 'admin') {
       filter.customer_id = req.user._id;

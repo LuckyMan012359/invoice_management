@@ -8,7 +8,7 @@ import * as XLSX from 'xlsx';
 import { LoadingOutlined } from '@ant-design/icons';
 import Select from 'react-select';
 
-import { Modal } from 'antd';
+import { Button, Modal } from 'antd';
 
 import { FaRegEdit } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
@@ -180,10 +180,18 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     fetchSuppliersData();
   }, []);
 
-  const deleteTransaction = async (id) => {
-    const response = await axiosInstance('/transaction/delete_transaction', 'delete', {
-      transaction_id: id,
-    });
+  const deleteTransaction = async (id, approve_status) => {
+    let response;
+
+    if (approve_status === 3) {
+      response = await axiosInstance('/transaction/delete_approve_update_transaction', 'put', {
+        transaction_id: id,
+      });
+    } else {
+      response = await axiosInstance('/transaction/delete_transaction', 'delete', {
+        transaction_id: id,
+      });
+    }
 
     if (response.status === 200) {
       toast.success(t('Transaction and associated attachments deleted successfully'));
@@ -192,6 +200,42 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     }
 
     setIsChanged(!isChanged);
+  };
+
+  const allowPendingTransaction = async (id, type) => {
+    try {
+      const response = await axiosInstance('/pending/update_pending_transaction', 'put', {
+        pending_transaction_id: id,
+        allowStatus: type,
+      });
+
+      if (response.status === 200) {
+        if (type === 'allow') {
+          toast.success(t('Allow pending transaction successfully'));
+        } else {
+          toast.success(t('Disallow pending transaction successfully'));
+        }
+        setIsChanged(!isChanged);
+      } else {
+        toast.warning(response.data.message);
+      }
+    } catch (error) {
+      console.error('Error updating pending transaction:', error);
+      toast.error(t('An error occurred while processing the transaction'));
+    }
+  };
+
+  const deletePendingTransaction = async (id) => {
+    const response = await axiosInstance('/pending/delete_pending_transaction', 'delete', {
+      transaction_id: id,
+    });
+
+    if (response.status === 200) {
+      toast.success(t('Pending transaction deleted successfully'));
+      setIsChanged(!isChanged);
+    } else {
+      toast.warning(response.data.message);
+    }
   };
 
   const resetFilter = () => {
@@ -457,7 +501,9 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                     <tr
                       key={item._id || `transaction-${index}`}
                       className={`${item.approve_status === 2 && 'text-[red]'} ${
-                        item.approve_status === 3 && 'text-[blue]'
+                        (item.approve_status === 3 ||
+                          (item.pending_transaction_id && item.pending_transaction_id !== null)) &&
+                        'text-[blue]'
                       }`}
                     >
                       <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
@@ -465,44 +511,104 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                       </td>
                       <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
                         {(() => {
-                          const date = new Date(item.transaction_date);
+                          const date = new Date(
+                            item.pending_transaction_id
+                              ? item.pending_transaction?.transaction_date
+                              : item.approve_status === 3
+                              ? item.updated_transaction_date
+                              : item.transaction_date,
+                          );
                           const formattedDate = date.toISOString().split('T')[0];
                           return formattedDate;
                         })()}
                       </td>
                       <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
-                        {item.customer?.firstName} {item.customer?.lastName}
+                        {item.pending_transaction_id
+                          ? `${item.pending_transaction_customer?.firstName} ${item.pending_transaction_customer?.lastName}`
+                          : item.approve_status === 3
+                          ? `${item.updated_customer?.firstName} ${item.updated_customer?.lastName}`
+                          : `${item.customer?.firstName} ${item.customer?.lastName}`}
                       </td>
                       <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
-                        {item.supplier?.name}
+                        {item.pending_transaction_id
+                          ? item.pending_transaction_supplier?.name
+                          : item.approve_status === 3
+                          ? item.updated_supplier?.name
+                          : item.supplier?.name}
                       </td>
                       <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
-                        {item.transaction_type === 'invoice'
+                        {item.pending_transaction_id
+                          ? item.pending_transaction?.transaction_type === 'invoice'
+                            ? t('invoice')
+                            : item.pending_transaction?.transaction_type === 'payment'
+                            ? t('payment')
+                            : t('return')
+                          : item.approve_status === 3
+                          ? item.updated_transaction_type
+                          : item.transaction_type === 'invoice'
                           ? t('invoice')
                           : item.transaction_type === 'payment'
                           ? t('payment')
                           : t('return')}
                       </td>
                       <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
-                        {item.document}
+                        {item.pending_transaction_id
+                          ? item.pending_transaction?.document
+                          : item.approve_status === 3
+                          ? item.updated_document
+                          : item.document}
                       </td>
                       <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
-                        {item.notes}
+                        {item.pending_transaction_id
+                          ? item.pending_transaction?.notes
+                          : item.approve_status === 3
+                          ? item.updated_notes
+                          : item.notes}
                       </td>
                       <td
                         className={`p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300`}
                       >
-                        {item.transaction_type === 'invoice' ? item.amount.toLocaleString() : 0}
+                        {(item.pending_transaction_id
+                          ? item.pending_transaction?.transaction_type
+                          : item.approve_status === 3
+                          ? item.updated_transaction_type
+                          : item.transaction_type) === 'invoice'
+                          ? (item.pending_transaction_id
+                              ? item.pending_transaction?.amount
+                              : item.approve_status === 3
+                              ? item.updated_amount
+                              : item.amount
+                            ).toLocaleString()
+                          : 0}
                       </td>
                       <td
                         className={`p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300`}
                       >
-                        {item.transaction_type !== 'invoice' && '-'}
-                        {item.transaction_type !== 'invoice' ? item.amount.toLocaleString() : 0}
+                        {(item.pending_transaction_id
+                          ? item.pending_transaction?.transaction_type
+                          : item.approve_status === 3
+                          ? item.updated_transaction_type
+                          : item.transaction_type) !== 'invoice' && '-'}
+                        {(item.pending_transaction_id
+                          ? item.pending_transaction?.transaction_type
+                          : item.approve_status === 3
+                          ? item.updated_transaction_type
+                          : item.transaction_type) !== 'invoice'
+                          ? (item.pending_transaction_id
+                              ? item.pending_transaction?.amount
+                              : item.approve_status === 3
+                              ? item.updated_amount
+                              : item.amount
+                            ).toLocaleString()
+                          : 0}
                       </td>
                       <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
-                        {item.attachments.length > 0
-                          ? item.attachments.map((attachment, index) => {
+                        {(item.approve_status === 3 ? item.updated_attachments : item.attachments)
+                          .length > 0
+                          ? (item.approve_status === 3
+                              ? item.updated_attachments
+                              : item.attachments
+                            ).map((attachment, index) => {
                               const fileName = attachment.split('/').pop();
                               const fileType = fileName.split('.').pop();
 
@@ -521,39 +627,80 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                           : t('No attachments')}
                       </td>
                       <td className='py-2 px-4 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
-                        <button
-                          className='text-gray-800 py-1 rounded mr-1 dark:text-white'
-                          onClick={() => {
-                            setType('Edit');
-                            console.log(item.transaction_date);
+                        {role === 'admin' && item.pending_transaction_id ? (
+                          <>
+                            <Button
+                              color='primary'
+                              variant='solid'
+                              onClick={() =>
+                                allowPendingTransaction(item.pending_transaction?._id, 'allow')
+                              }
+                            >
+                              {t('Allow')}
+                            </Button>
+                            <Button
+                              color='danger'
+                              variant='solid'
+                              onClick={() =>
+                                allowPendingTransaction(item.pending_transaction?._id, 'disallow')
+                              }
+                              className='ml-[15px]'
+                            >
+                              {t('Disallow')}
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              className='text-gray-800 py-1 rounded mr-1 dark:text-white'
+                              onClick={() => {
+                                setType('Edit');
+                                if (item.pending_transaction_id) {
+                                  setTransaction({
+                                    date: item.pending_transaction?.transaction_date,
+                                    customer: item.pending_transaction_customer?._id || null,
+                                    supplier: item.pending_transaction_supplier?._id || null,
+                                    transaction: item.pending_transaction?.transaction_type,
+                                    document: item.pending_transaction?.document,
+                                    amount: item.pending_transaction?.amount,
+                                    balance: item.pending_transaction?.balance,
+                                    note: item.pending_transaction?.notes,
+                                  });
+                                } else {
+                                  setTransaction({
+                                    date: item.transaction_date,
+                                    customer: item.customer?._id || null,
+                                    supplier: item.supplier?._id || null,
+                                    transaction: item.transaction_type,
+                                    document: item.document,
+                                    amount: item.amount,
+                                    balance: item.balance,
+                                    note: item.notes,
+                                  });
+                                }
+                                setTransactionId(item._id);
+                                setShowTransactionForm(true);
+                                setTransactionApproveStatus(item.approve_status === 2 ? 2 : 1);
+                              }}
+                            >
+                              <FaRegEdit />
+                            </button>
 
-                            setTransaction({
-                              date: item.transaction_date,
-                              customer: item.customer?._id || null,
-                              supplier: item.supplier?._id || null,
-                              transaction: item.transaction_type,
-                              document: item.document,
-                              amount: item.amount,
-                              balance: item.balance,
-                              note: item.notes,
-                            });
-                            setTransactionId(item._id);
-                            setShowTransactionForm(true);
-                            setTransactionApproveStatus(item.approve_status === 2 ? 2 : 1);
-                          }}
-                        >
-                          <FaRegEdit />
-                        </button>
-
-                        {role !== 'customer' && (
-                          <button
-                            className='text-gray-800 py-1 rounded mr-1 dark:text-white ml-[20px]'
-                            onClick={() => {
-                              deleteTransaction(item._id);
-                            }}
-                          >
-                            <MdDelete />
-                          </button>
+                            {(role !== 'customer' || item.pending_transaction_id) && (
+                              <button
+                                className='text-gray-800 py-1 rounded mr-1 dark:text-white ml-[20px]'
+                                onClick={() => {
+                                  if (item.pending_transaction_id) {
+                                    deletePendingTransaction(item.pending_transaction_id);
+                                  } else {
+                                    deleteTransaction(item._id, item.approve_status);
+                                  }
+                                }}
+                              >
+                                <MdDelete />
+                              </button>
+                            )}
+                          </>
                         )}
                       </td>
                     </tr>
