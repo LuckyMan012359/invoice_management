@@ -432,7 +432,15 @@ exports.updatePendingTransaction = async (req, res) => {
         });
       }
 
-      await PendingTransaction.findByIdAndDelete(pending_transaction_id);
+      const deletedTransaction = await PendingTransaction.findByIdAndDelete(pending_transaction_id);
+
+      if (deletedTransaction) {
+        const originalTransaction = await Transaction.findById(
+          deletedTransaction.original_transaction,
+        );
+        originalTransaction.pending_transaction_id = null;
+        await originalTransaction.save();
+      }
 
       res.status(200).send({
         message: 'Disallow pending transaction successfully',

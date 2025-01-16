@@ -112,5 +112,6 @@
   "Invoice": "Invoice",
   "Invoice Approval": "Invoice Approval",
   "Update Invoices": "Update Invoices",
-  "Document": "Document"
+  "Document": "Document",
+  "This transaction needs to be approved": "This transaction needs to be approved"
 }

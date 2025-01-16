@@ -276,10 +276,10 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
     control: (styles, { isFocused }) => ({
       ...styles,
       backgroundColor: 'var(--bg-color)',
-      borderColor: isFocused ? 'var(--focus-border-color)' : isDarkMode ? '#fff' : '#e7e9ed',
+      borderColor: isFocused ? 'var(--focus-border-color)' : isDarkMode ? '#fff' : '#9ca3af',
       boxShadow: isFocused ? '0 0 0 1px var(--focus-border-color)' : 'none',
       '&:hover': {
-        borderColor: isDarkMode ? '#fff' : '#e7e9ed',
+        borderColor: isDarkMode ? '#fff' : '#9ca3af',
       },
       color: isDarkMode ? '#fff' : '#000',
     }),
@@ -342,7 +342,7 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
                 {t('Records per Page')}
               </label>
               <select
-                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                className='w-full px-3 py-2 border border-1px border-gray-400 rounded-md dark:bg-gray-700 dark:text-gray-300'
                 onChange={(e) =>
                   setTransactionsPerPage(e.target.value === 'All' ? '' : Number(e.target.value))
                 }
@@ -391,7 +391,7 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
               <label className='block text-gray-700 dark:text-gray-300'>{t('Keyword')}</label>
               <input
                 type='text'
-                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                className='w-full px-3 py-2 border border-1px border-gray-400 rounded-md dark:bg-gray-700 dark:text-gray-300'
                 placeholder={t('Filter by keyword')}
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
@@ -411,7 +411,7 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
                 showFooter={true}
                 containerClassName='relative'
                 popoverDirection='down'
-                inputClassName='transition-all duration-300 py-2.5 pl-4 pr-14 w-full border dark:bg-gray-700 dark:border dark:border-white dark:text-white/80 rounded-lg tracking-wide font-light text-sm placeholder-gray-400 bg-white focus:ring disabled:opacity-40 disabled:cursor-not-allowed focus:border-blue-500 focus:ring-blue-500/20'
+                inputClassName='transition-all duration-300 py-2.5 pl-4 pr-14 w-full border border-1px border-gray-400 dark:bg-gray-700 dark:border dark:border-white dark:text-white/80 rounded-lg tracking-wide font-light text-sm placeholder-gray-400 bg-white focus:ring disabled:opacity-40 disabled:cursor-not-allowed focus:border-blue-500 focus:ring-blue-500/20'
               />
             </div>
           </div>

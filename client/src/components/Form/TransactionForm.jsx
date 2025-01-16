@@ -177,6 +177,10 @@ const TransactionForm = ({
         }
         resetForm();
       } else {
+        if (transactionApproveStatus === 2 || transactionApproveStatus === 3) {
+          toast.warning(t('This transaction needs to be approved'));
+          return;
+        }
         setLoading(true);
         formattedData.append('original_transaction', transactionId);
         setShowTransactionForm(false);
@@ -292,7 +296,7 @@ const TransactionForm = ({
                 onChange={handleDateChange}
                 displayFormat={'DD/MM/YYYY'}
                 placeholder='DD/MM/YYYY'
-                className='w-full'
+                className='w-full border border-1px border-black dark:border-white'
                 size='large'
               />
             </div>
@@ -339,7 +343,7 @@ const TransactionForm = ({
             <div className='mb-4'>
               <label className='block text-gray-700 dark:text-gray-300'>{t('Amount')}</label>
               <InputNumber
-                className='w-full'
+                className='w-full border border-1px border-black dark:border-white'
                 value={formData.amount}
                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                 parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
@@ -354,7 +358,7 @@ const TransactionForm = ({
                 name='document'
                 value={formData.document}
                 onChange={handleChange}
-                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                className='w-full px-3 py-2 border border-1px border-black dark:border-white rounded-md dark:bg-gray-700 dark:text-gray-300'
               />
             </div>
 
@@ -363,7 +367,7 @@ const TransactionForm = ({
               <textarea
                 name='notes'
                 value={formData.notes}
-                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                className='w-full px-3 py-2 border border-1px border-black dark:border-white rounded-md dark:bg-gray-700 dark:text-gray-300'
                 onChange={handleChange}
                 required={userRole !== 'admin'}
               />
@@ -405,7 +409,7 @@ const TransactionForm = ({
               <div className='mb-4'>
                 <label className='block text-gray-700 dark:text-gray-300'>{t('Attachments')}</label>
                 <input
-                  className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                  className='w-full px-3 py-2 border rounded-md border-1px border-gray-400 dark:bg-gray-700 dark:text-gray-300'
                   type='file'
                   multiple
                   accept='.jpg, .jpeg, .png, .webp, .jfif, .pdf'

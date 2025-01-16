@@ -295,10 +295,10 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     control: (styles, { isFocused }) => ({
       ...styles,
       backgroundColor: 'var(--bg-color)',
-      borderColor: isFocused ? 'var(--focus-border-color)' : isDarkMode ? '#fff' : '#e7e9ed',
+      borderColor: isFocused ? 'var(--focus-border-color)' : isDarkMode ? '#fff' : '#9ca3af',
       boxShadow: isFocused ? '0 0 0 1px var(--focus-border-color)' : 'none',
       '&:hover': {
-        borderColor: isDarkMode ? '#fff' : '#e7e9ed',
+        borderColor: isDarkMode ? '#fff' : '#9ca3af',
       },
       color: isDarkMode ? '#fff' : '#000',
     }),
@@ -361,7 +361,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                 {t('Records per Page')}
               </label>
               <select
-                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                className='w-full px-3 py-2 border border-1px border-gray-400 rounded-md dark:bg-gray-700 dark:text-gray-300'
                 onChange={(e) =>
                   setTransactionsPerPage(e.target.value === 'All' ? '' : Number(e.target.value))
                 }
@@ -410,7 +410,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
               <label className='block text-gray-700 dark:text-gray-300'>{t('Keyword')}</label>
               <input
                 type='text'
-                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                className='w-full px-3 py-2 border border-1px border-gray-400 rounded-md dark:bg-gray-700 dark:text-gray-300'
                 placeholder={t('Filter by keyword')}
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
@@ -430,7 +430,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                 showFooter={true}
                 containerClassName='relative'
                 popoverDirection='down'
-                inputClassName='transition-all duration-300 py-2.5 pl-4 pr-14 w-full border dark:bg-gray-700 dark:border dark:border-white dark:text-white/80 rounded-lg tracking-wide font-light text-sm placeholder-gray-400 bg-white focus:ring disabled:opacity-40 disabled:cursor-not-allowed focus:border-blue-500 focus:ring-blue-500/20'
+                inputClassName='transition-all duration-300 py-2.5 pl-4 pr-14 w-full border border-1px border-gray-400 dark:bg-gray-700 dark:border dark:border-white dark:text-white/80 rounded-lg tracking-wide font-light text-sm placeholder-gray-400 bg-white focus:ring disabled:opacity-40 disabled:cursor-not-allowed focus:border-blue-500 focus:ring-blue-500/20'
               />
             </div>
           </div>
@@ -479,7 +479,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                 <LoadingOutlined className='text-[40px]' />
               </div>
             ) : (
-              <table className='w-full text-left bg-white rounded-lg max-2xl:min-w-[1200px] dark:bg-gray-800'>
+              <table className='w-full text-left bg-white rounded-lg max-2xl:min-w-[1400px] dark:bg-gray-800'>
                 <thead>
                   <tr className='text-gray-700 dark:text-gray-300 bg-gray-300 dark:bg-gray-700 border-[1px] border-gray-400 dark:border-gray-600'>
                     <th className='p-3'>#</th>
@@ -500,16 +500,21 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                   {transactionData.map((item, index) => (
                     <tr
                       key={item._id || `transaction-${index}`}
-                      className={`${item.approve_status === 2 && 'text-[red]'} ${
-                        (item.approve_status === 3 ||
-                          (item.pending_transaction_id && item.pending_transaction_id !== null)) &&
-                        'text-[blue]'
+                      className={`${
+                        item.approve_status === 2
+                          ? '!text-[red] dark:text-[red]'
+                          : 'dark:text-gray-300'
+                      } ${
+                        item.approve_status === 3 ||
+                        (item.pending_transaction_id && item.pending_transaction_id !== null)
+                          ? '!text-[blue] !dark:text-[blue]'
+                          : 'dark:text-gray-300'
                       }`}
                     >
-                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600'>
                         {index + 1 + transactionsPerPage * (currentPage - 1)}
                       </td>
-                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600'>
                         {(() => {
                           const date = new Date(
                             item.pending_transaction_id
@@ -522,21 +527,21 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                           return formattedDate;
                         })()}
                       </td>
-                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600'>
                         {item.pending_transaction_id
                           ? `${item.pending_transaction_customer?.firstName} ${item.pending_transaction_customer?.lastName}`
                           : item.approve_status === 3
                           ? `${item.updated_customer?.firstName} ${item.updated_customer?.lastName}`
                           : `${item.customer?.firstName} ${item.customer?.lastName}`}
                       </td>
-                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600'>
                         {item.pending_transaction_id
                           ? item.pending_transaction_supplier?.name
                           : item.approve_status === 3
                           ? item.updated_supplier?.name
                           : item.supplier?.name}
                       </td>
-                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600'>
                         {item.pending_transaction_id
                           ? item.pending_transaction?.transaction_type === 'invoice'
                             ? t('invoice')
@@ -551,23 +556,21 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                           ? t('payment')
                           : t('return')}
                       </td>
-                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600'>
                         {item.pending_transaction_id
                           ? item.pending_transaction?.document
                           : item.approve_status === 3
                           ? item.updated_document
                           : item.document}
                       </td>
-                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600'>
                         {item.pending_transaction_id
                           ? item.pending_transaction?.notes
                           : item.approve_status === 3
                           ? item.updated_notes
                           : item.notes}
                       </td>
-                      <td
-                        className={`p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300`}
-                      >
+                      <td className={`p-3 border-[1px] border-gray-400 dark:border-gray-600`}>
                         {(item.pending_transaction_id
                           ? item.pending_transaction?.transaction_type
                           : item.approve_status === 3
@@ -581,9 +584,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                             ).toLocaleString()
                           : 0}
                       </td>
-                      <td
-                        className={`p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300`}
-                      >
+                      <td className={`p-3 border-[1px] border-gray-400 dark:border-gray-600`}>
                         {(item.pending_transaction_id
                           ? item.pending_transaction?.transaction_type
                           : item.approve_status === 3
@@ -602,7 +603,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                             ).toLocaleString()
                           : 0}
                       </td>
-                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300'>
+                      <td className='p-3 border-[1px] border-gray-400 dark:border-gray-600'>
                         {(item.approve_status === 3 ? item.updated_attachments : item.attachments)
                           .length > 0
                           ? (item.approve_status === 3

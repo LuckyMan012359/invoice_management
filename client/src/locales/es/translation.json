@@ -113,5 +113,6 @@
   "Invoice": "Factura",
   "Invoice Approval": "Aprobación de facturas",
   "Update Invoices": "Actualización de facturas",
-  "Document": "Documento"
+  "Document": "Documento",
+  "This transaction needs to be approved": "Esta transacción necesita ser aprobada"
 }
