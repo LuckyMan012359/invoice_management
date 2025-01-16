@@ -93,7 +93,7 @@ const Profile = () => {
               <label className='block text-gray-700 dark:text-gray-300'>{t('First Name')}</label>
               <input
                 type='text'
-                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                className='w-full px-3 py-2 border border-black dark:border-gray-300 rounded-md dark:bg-gray-700 dark:text-gray-300'
                 placeholder={t('First Name')}
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
@@ -103,7 +103,7 @@ const Profile = () => {
               <label className='block text-gray-700 dark:text-gray-300'>{t('Last Name')}</label>
               <input
                 type='text'
-                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                className='w-full px-3 py-2 border border-black dark:border-gray-300 rounded-md dark:bg-gray-700 dark:text-gray-300'
                 placeholder={t('Last Name')}
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
@@ -113,7 +113,7 @@ const Profile = () => {
               <label className='block text-gray-700 dark:text-gray-300'>{t('Phone Number')}</label>
               <input
                 type='text'
-                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                className='w-full px-3 py-2 border border-black dark:border-gray-300 rounded-md dark:bg-gray-700 dark:text-gray-300'
                 placeholder={t('Phone Number')}
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
@@ -123,7 +123,7 @@ const Profile = () => {
               <label className='block text-gray-700 dark:text-gray-300'>{t('Home Address')}</label>
               <input
                 type='text'
-                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                className='w-full px-3 py-2 border border-black dark:border-gray-300 rounded-md dark:bg-gray-700 dark:text-gray-300'
                 placeholder={t('Home Address')}
                 value={homeAddress}
                 onChange={(e) => setHomeAddress(e.target.value)}
@@ -143,7 +143,7 @@ const Profile = () => {
                 <div className='flex items-center justify-end'>
                   <input
                     type={isPasswordVisible ? 'text' : 'password'}
-                    className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 pr-10'
+                    className='w-full px-3 py-2 border border-black dark:border-gray-300 rounded-md dark:bg-gray-700 dark:text-gray-300 pr-10'
                     name='password'
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
