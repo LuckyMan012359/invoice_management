@@ -2,28 +2,35 @@ import { Modal } from 'antd';
 import { ThemeProvider } from 'antd-style';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useState } from 'react';
 
 const SupplierForm = ({ showSupplierForm, onClose, onSubmit, supplier, setSupplier, type }) => {
   const { t } = useTranslation();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isDarkMode = useSelector((state) => state.darkMode.isDarkMode);
 
   if (!showSupplierForm) return null;
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      await onSubmit(e);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <ThemeProvider appearance={isDarkMode ? 'dark' : 'light'}>
-      <Modal
-        open={showSupplierForm}
-        onOk={onSubmit}
-        onCancel={() => {
-          onClose();
-        }}
-        footer={[]}
-      >
+      <Modal open={showSupplierForm} onOk={handleSubmit} onCancel={onClose} footer={[]}>
         <h2 className='text-2xl font-bold mb-4 dark:text-white'>
           {type === 'Add' ? t('Add New Supplier') : t('Edit supplier')}
         </h2>
-        <form onSubmit={onSubmit}>
+        <form onSubmit={handleSubmit}>
           <div className='mb-4'>
             <label className='block text-gray-700 dark:text-gray-300'>{t('Name')}</label>
             <input
@@ -73,11 +80,16 @@ const SupplierForm = ({ showSupplierForm, onClose, onSubmit, supplier, setSuppli
               type='button'
               className='bg-gray-500 text-white px-4 py-2 rounded mr-2'
               onClick={onClose}
+              disabled={isSubmitting}
             >
               {t('Cancel')}
             </button>
-            <button type='submit' className='bg-green-500 text-white px-4 py-2 rounded'>
-              {type === 'Add' ? t('Add') : t('Edit')}
+            <button
+              type='submit'
+              className='bg-green-500 text-white px-4 py-2 rounded disabled:opacity-50'
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? t('Processing...') : type === 'Add' ? t('Add') : t('Edit')}
             </button>
           </div>
         </form>

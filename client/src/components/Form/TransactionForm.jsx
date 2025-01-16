@@ -119,13 +119,19 @@ const TransactionForm = ({
     }));
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isSubmitting) return;
 
     if (!formData.customerId || !formData.supplierId || !formData.transactionType) {
       toast.error('Please fill all fields');
       return;
     }
+
+    setIsSubmitting(true);
 
     const formattedData = new FormData();
     formattedData.append('customer_id', formData.customerId);
@@ -139,7 +145,7 @@ const TransactionForm = ({
 
     const rawDate = formData.date;
     if (rawDate) {
-      const formattedDate = rawDate.format('YYYY-MM-DD'); // Use dayjs's format method
+      const formattedDate = rawDate.format('YYYY-MM-DD');
       formattedData.append('transaction_date', formattedDate);
     }
 
@@ -192,6 +198,8 @@ const TransactionForm = ({
       }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Something went wrong');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -274,7 +282,6 @@ const TransactionForm = ({
   return (
     <ConfigProvider locale={locale}>
       <ThemeProvider appearance={isDarkMode ? 'dark' : 'light'}>
-        {/* <div className='fixed top-0 left-0 w-screen h-screen flex justify-center py-[50px] z-[101] bg-black overflow-y-scroll bg-opacity-50'> */}
         <Modal
           open={showTransactionForm}
           onOk={handleSubmit}
@@ -426,16 +433,20 @@ const TransactionForm = ({
                   onClose();
                   resetForm();
                 }}
+                disabled={isSubmitting}
               >
                 {t('Cancel')}
               </button>
-              <button type='submit' className='bg-green-500 text-white px-4 py-2 rounded'>
-                {type === 'Add' ? t('Add') : t('Edit')}
+              <button
+                type='submit'
+                className='bg-green-500 text-white px-4 py-2 rounded disabled:opacity-50'
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? t('Processing...') : type === 'Add' ? t('Add') : t('Edit')}
               </button>
             </div>
           </form>
         </Modal>
-        {/* </div> */}
       </ThemeProvider>
     </ConfigProvider>
   );

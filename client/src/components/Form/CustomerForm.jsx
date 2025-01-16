@@ -17,6 +17,7 @@ const CustomerForm = ({
   setIsChangePassword,
 }) => {
   const { t } = useTranslation();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -75,20 +76,25 @@ const CustomerForm = ({
     }),
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      await onSubmit(e);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <ThemeProvider appearance={isDarkMode ? 'dark' : 'light'}>
-      <Modal
-        open={showCustomerForm}
-        onOk={onSubmit}
-        onCancel={() => {
-          onClose();
-        }}
-        footer={[]}
-      >
+      <Modal open={showCustomerForm} onOk={handleSubmit} onCancel={onClose} footer={[]}>
         <h2 className='text-2xl font-bold mb-4 dark:text-white'>
           {type === 'Add' ? t('Add New Customer') : t('Edit customer information')}
         </h2>
-        <form onSubmit={onSubmit}>
+        <form onSubmit={handleSubmit}>
           <div className='mb-4'>
             <label className='block text-gray-700 dark:text-gray-300'>{t('First Name')}</label>
             <input
@@ -259,11 +265,16 @@ const CustomerForm = ({
               type='button'
               className='bg-gray-500 text-white px-4 py-2 rounded mr-2'
               onClick={onClose}
+              disabled={isSubmitting}
             >
               {t('Cancel')}
             </button>
-            <button type='submit' className='bg-green-500 text-white px-4 py-2 rounded'>
-              {type === 'Add' ? t('Add') : t('Edit')}
+            <button
+              type='submit'
+              className='bg-green-500 text-white px-4 py-2 rounded disabled:opacity-50'
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? t('Processing...') : type === 'Add' ? t('Add') : t('Edit')}
             </button>
           </div>
         </form>

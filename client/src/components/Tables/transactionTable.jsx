@@ -183,6 +183,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
   const deleteTransaction = async (id, approve_status) => {
     let response;
 
+    setLoading(true);
+
     if (approve_status === 3) {
       response = await axiosInstance('/transaction/delete_approve_update_transaction', 'put', {
         transaction_id: id,
@@ -204,6 +206,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
   const allowPendingTransaction = async (id, type) => {
     try {
+      setLoading(true);
+
       const response = await axiosInstance('/pending/update_pending_transaction', 'put', {
         pending_transaction_id: id,
         allowStatus: type,
@@ -226,6 +230,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
   };
 
   const deletePendingTransaction = async (id) => {
+    setLoading(true);
+
     const response = await axiosInstance('/pending/delete_pending_transaction', 'delete', {
       transaction_id: id,
     });
