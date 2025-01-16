@@ -132,7 +132,7 @@ export const Suppliers = () => {
                 {t('Suppliers per Page')}
               </label>
               <select
-                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                className='w-full px-3 py-2 border border-gray-400 rounded-md dark:bg-gray-700 dark:text-gray-300'
                 onChange={(e) =>
                   setSuppliersPerPage(e.target.value === 'All' ? '' : Number(e.target.value))
                 }
@@ -147,7 +147,7 @@ export const Suppliers = () => {
               <label className='block text-gray-700 dark:text-gray-300'>{t('Keyword')}</label>
               <input
                 type='text'
-                className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+                className='w-full px-3 py-2 border border-gray-400 rounded-md dark:bg-gray-700 dark:text-gray-300'
                 placeholder={t('Filter by keyword')}
                 value={keyword}
                 onChange={(e) => {

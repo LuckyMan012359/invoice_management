@@ -93,7 +93,7 @@ const CustomerForm = ({
             <label className='block text-gray-700 dark:text-gray-300'>{t('First Name')}</label>
             <input
               type='text'
-              className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+              className='w-full px-3 py-2 border border-black rounded-md dark:bg-gray-700 dark:text-gray-300'
               value={customer.firstName}
               name='name'
               onChange={(e) =>
@@ -107,7 +107,7 @@ const CustomerForm = ({
             <label className='block text-gray-700 dark:text-gray-300'>{t('Last Name')}</label>
             <input
               type='text'
-              className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+              className='w-full px-3 py-2 border border-black rounded-md dark:bg-gray-700 dark:text-gray-300'
               value={customer.lastName}
               name='name'
               onChange={(e) => setCustomer((prev) => ({ ...prev, lastName: e.target.value }))}
@@ -119,7 +119,7 @@ const CustomerForm = ({
             <label className='block text-gray-700 dark:text-gray-300'>{t('Email')}</label>
             <input
               type='email'
-              className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+              className='w-full px-3 py-2 border border-black rounded-md dark:bg-gray-700 dark:text-gray-300'
               value={customer.email}
               name='email'
               onChange={(e) => setCustomer((prev) => ({ ...prev, email: e.target.value }))}
@@ -175,7 +175,7 @@ const CustomerForm = ({
             <label className='block text-gray-700 dark:text-gray-300'>{t('Phone Number')}</label>
             <input
               type='text'
-              className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+              className='w-full px-3 py-2 border border-black rounded-md dark:bg-gray-700 dark:text-gray-300'
               value={customer.phoneNumber}
               name='phone'
               onChange={(e) => setCustomer((prev) => ({ ...prev, phoneNumber: e.target.value }))}
@@ -187,7 +187,7 @@ const CustomerForm = ({
             <label className='block text-gray-700 dark:text-gray-300'>{t('Home Address')}</label>
             <input
               type='text'
-              className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+              className='w-full px-3 py-2 border border-black rounded-md dark:bg-gray-700 dark:text-gray-300'
               value={customer.homeAddress}
               name='home_address'
               onChange={(e) => setCustomer((prev) => ({ ...prev, homeAddress: e.target.value }))}
@@ -209,7 +209,7 @@ const CustomerForm = ({
               <div className='flex items-center justify-end'>
                 <input
                   type={isPasswordVisible ? 'text' : 'password'}
-                  className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 pr-10'
+                  className='w-full px-3 py-2 border border-black rounded-md dark:bg-gray-700 dark:text-gray-300 pr-10'
                   name='password'
                   onChange={(e) => setCustomer((prev) => ({ ...prev, password: e.target.value }))}
                   required={type !== 'Edit'}
@@ -233,7 +233,7 @@ const CustomerForm = ({
               <div className='flex items-center justify-end'>
                 <input
                   type={isPasswordVisible ? 'text' : 'password'}
-                  className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 pr-10'
+                  className='w-full px-3 py-2 border border-black rounded-md dark:bg-gray-700 dark:text-gray-300 pr-10'
                   name='password'
                   onChange={(e) => setCustomer((prev) => ({ ...prev, password: e.target.value }))}
                   required={type !== 'Edit'}

@@ -28,7 +28,7 @@ const SupplierForm = ({ showSupplierForm, onClose, onSubmit, supplier, setSuppli
             <label className='block text-gray-700 dark:text-gray-300'>{t('Name')}</label>
             <input
               type='text'
-              className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+              className='w-full px-3 py-2 border border-black rounded-md dark:bg-gray-700 dark:text-gray-300'
               value={supplier.name}
               name='name'
               onChange={(e) => setSupplier((prev) => ({ ...prev, name: e.target.value }))}
@@ -39,7 +39,7 @@ const SupplierForm = ({ showSupplierForm, onClose, onSubmit, supplier, setSuppli
             <label className='block text-gray-700 dark:text-gray-300'>{t('Email')}</label>
             <input
               type='email'
-              className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+              className='w-full px-3 py-2 border border-black rounded-md dark:bg-gray-700 dark:text-gray-300'
               value={supplier.email}
               name='email'
               onChange={(e) => setSupplier((prev) => ({ ...prev, email: e.target.value }))}
@@ -50,7 +50,7 @@ const SupplierForm = ({ showSupplierForm, onClose, onSubmit, supplier, setSuppli
             <label className='block text-gray-700 dark:text-gray-300'>{t('Phone Number')}</label>
             <input
               type='text'
-              className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+              className='w-full px-3 py-2 border border-black rounded-md dark:bg-gray-700 dark:text-gray-300'
               value={supplier.phoneNumber}
               name='phone'
               onChange={(e) => setSupplier((prev) => ({ ...prev, phoneNumber: e.target.value }))}
@@ -61,7 +61,7 @@ const SupplierForm = ({ showSupplierForm, onClose, onSubmit, supplier, setSuppli
             <label className='block text-gray-700 dark:text-gray-300'>{t('Home Address')}</label>
             <input
               type='text'
-              className='w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300'
+              className='w-full px-3 py-2 border border-black rounded-md dark:bg-gray-700 dark:text-gray-300'
               value={supplier.homeAddress}
               name='home_address'
               onChange={(e) => setSupplier((prev) => ({ ...prev, homeAddress: e.target.value }))}
