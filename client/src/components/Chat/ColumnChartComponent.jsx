@@ -94,6 +94,32 @@ const ColumnChartComponent = ({ type }) => {
         formatter: (val) => val?.toLocaleString() || '0', // Safely format tooltip values
       },
     },
+    grid: {
+      show: true,
+      borderColor: isDarkMode ? '#404040' : '#a4abb7',
+      strokeDashArray: 0,
+      position: 'back',
+      xaxis: {
+        lines: {
+          show: false,
+        },
+      },
+      yaxis: {
+        lines: {
+          show: true,
+        },
+      },
+      column: {
+        colors: undefined,
+        opacity: 1,
+      },
+      padding: {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+      },
+    },
   };
 
   const seriesData = [
@@ -115,7 +141,7 @@ const ColumnChartComponent = ({ type }) => {
   ];
 
   return (
-    <>
+    <div className='bg-white dark:bg-gray-800 rounded-md shadow-lg w-full m-5'>
       <div className='w-full text-center text-[#000] text-[20px] mt-[50px] mb-[20px] dark:text-[#fff]'>
         {type === 'invoice'
           ? t('Total Purchases')
@@ -123,12 +149,12 @@ const ColumnChartComponent = ({ type }) => {
           ? t('Total Payments')
           : t('Total Returns')}
       </div>
-      <div className='dark:text-white overflow-auto'>
-        <div className='w-full max-xl:w-[1180px]'>
+      <div className='dark:text-white overflow-auto flex justify-center items-center'>
+        <div className='w-11/12 max-xl:w-[1180px]'>
           <Chart options={chartOptions} series={seriesData} type='bar' height={350} />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
