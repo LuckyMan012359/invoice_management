@@ -576,7 +576,13 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                           ? item.updated_notes
                           : item.notes}
                       </td>
-                      <td className={`p-3 border-[1px] border-gray-400 dark:border-gray-600`}>
+                      <td
+                        className={`p-3 border-[1px] border-gray-400 dark:border-gray-600 ${
+                          item.approve_status === 1 && !item.pending_transaction_id
+                            ? 'text-green-500'
+                            : ''
+                        }`}
+                      >
                         {(item.pending_transaction_id
                           ? item.pending_transaction?.transaction_type
                           : item.approve_status === 3
@@ -590,7 +596,13 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                             ).toLocaleString()
                           : 0}
                       </td>
-                      <td className={`p-3 border-[1px] border-gray-400 dark:border-gray-600`}>
+                      <td
+                        className={`p-3 border-[1px] border-gray-400 dark:border-gray-600 ${
+                          item.approve_status === 1 && !item.pending_transaction_id
+                            ? 'text-red-500'
+                            : ''
+                        }`}
+                      >
                         {(item.pending_transaction_id
                           ? item.pending_transaction?.transaction_type
                           : item.approve_status === 3

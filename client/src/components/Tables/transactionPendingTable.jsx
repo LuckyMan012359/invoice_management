@@ -433,8 +433,8 @@ export const TransactionPendingTable = ({ isChanged, setIsChanged }) => {
                       {item.document}
                     </td>
                     <td
-                      className={`p-3 border-[1px] border-gray-400 ${
-                        item.transaction_type === 'invoice' ? 'text-[green]' : 'text-[red]'
+                      className={`p-3 border-[1px] border-gray-400 dark:border-gray-600 ${
+                        item.transaction_type === 'invoice' ? 'text-green-500' : 'text-red-500'
                       }`}
                     >
                       {item.transaction_type !== 'invoice' && '-'}
