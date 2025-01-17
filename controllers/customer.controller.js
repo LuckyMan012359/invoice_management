@@ -96,7 +96,6 @@ exports.readCustomer = async (req, res) => {
       customers.map(async (customer) => {
         const transactions = await Transaction.find({
           customer_id: customer._id,
-          approve_status: { $in: [1, 3] },
         });
 
         if (transactions && transactions.length > 0) {
@@ -132,11 +131,6 @@ exports.readCustomer = async (req, res) => {
     );
 
     const totalPipeline = [
-      {
-        $match: {
-          approve_status: { $in: [1, 3] },
-        },
-      },
       {
         $lookup: {
           from: 'users',
@@ -188,9 +182,9 @@ exports.readCustomer = async (req, res) => {
 
     totalTransactions.forEach((item) => {
       if (item.transaction_type === 'invoice') {
-        incomes += item.amount;
+        incomes += item.amount || 0;
       } else {
-        expenses += item.amount;
+        expenses += item.amount || 0;
       }
     });
 
