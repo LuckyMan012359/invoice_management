@@ -94,19 +94,20 @@ exports.readCustomer = async (req, res) => {
 
     const resultCustomer = await Promise.all(
       customers.map(async (customer) => {
-        const transactions = await Transaction.find({ customer_id: customer._id });
+        const transactions = await Transaction.find({
+          customer_id: customer._id,
+          approve_status: { $in: [1, 3] },
+        });
 
         if (transactions && transactions.length > 0) {
           const { invoiceTotal, paymentTotal, returnTotal } = transactions.reduce(
             (totals, item) => {
-              if (item.approve_status === 1) {
-                if (item.transaction_type === 'invoice') {
-                  totals.invoiceTotal += item.amount || 0;
-                } else if (item.transaction_type === 'payment') {
-                  totals.paymentTotal += item.amount || 0;
-                } else {
-                  totals.returnTotal += item.amount || 0;
-                }
+              if (item.transaction_type === 'invoice') {
+                totals.invoiceTotal += item.amount || 0;
+              } else if (item.transaction_type === 'payment') {
+                totals.paymentTotal += item.amount || 0;
+              } else {
+                totals.returnTotal += item.amount || 0;
               }
               return totals;
             },
@@ -131,6 +132,11 @@ exports.readCustomer = async (req, res) => {
     );
 
     const totalPipeline = [
+      {
+        $match: {
+          approve_status: { $in: [1, 3] },
+        },
+      },
       {
         $lookup: {
           from: 'users',
