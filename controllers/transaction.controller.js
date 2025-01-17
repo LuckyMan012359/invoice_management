@@ -391,23 +391,13 @@ exports.readTransaction = async (req, res) => {
     let expenses = 0;
 
     totalTransactions.forEach((item) => {
-      if (item.pending_transaction_id) {
-        if (item.pending_transaction?.transaction_type === 'invoice') {
-          incomes += item.pending_transaction?.amount || 0;
-        } else {
-          expenses += item.pending_transaction?.amount || 0;
-        }
-      } else if (item.approve_status === 3) {
-        if (item.updated_transaction_type === 'invoice') {
-          incomes += item.updated_amount || 0;
-        } else {
-          expenses += item.updated_amount || 0;
-        }
-      } else {
-        if (item.transaction_type === 'invoice') {
-          incomes += item.amount || 0;
-        } else {
-          expenses += item.amount || 0;
+      if (item.approve_status === 1) {
+        if (!item.pending_transaction_id) {
+          if (item.transaction_type === 'invoice') {
+            incomes += item.amount || 0;
+          } else {
+            expenses += item.amount || 0;
+          }
         }
       }
     });
