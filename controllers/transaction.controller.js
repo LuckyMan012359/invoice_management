@@ -885,28 +885,112 @@ exports.getTransactionData = async (req, res) => {
       return res.status(200).send(cachedData);
     }
 
-    let filter = {
-      approve_status: 1,
-      pending_transaction_id: { $exists: false },
-    };
+    let filter = {};
 
     if (req.user.role !== 'admin') {
       filter.customer_id = req.user._id;
     }
 
-    const transactions = await Transaction.find(filter);
+    const totalPipeline = [
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'customer_id',
+          foreignField: '_id',
+          as: 'customer',
+        },
+      },
+      {
+        $lookup: {
+          from: 'suppliers',
+          localField: 'supplier_id',
+          foreignField: '_id',
+          as: 'supplier',
+        },
+      },
+      {
+        $lookup: {
+          from: 'pendingtransactions',
+          localField: 'pending_transaction_id',
+          foreignField: '_id',
+          as: 'pending_transaction',
+        },
+      },
+      {
+        $unwind: { path: '$customer', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $unwind: { path: '$supplier', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $unwind: { path: '$pending_transaction', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $match: filter,
+      },
+      {
+        $sort: { created: -1 },
+      },
+      {
+        $project: {
+          _id: 1,
+          transaction_type: 1,
+          amount: 1,
+          balance: 1,
+          document: 1,
+          notes: 1,
+          transaction_date: 1,
+          approve_status: 1,
+          updated_transaction_type: 1,
+          updated_amount: 1,
+          updated_balance: 1,
+          'customer._id': 1,
+          'customer.email': 1,
+          'customer.firstName': 1,
+          'customer.lastName': 1,
+          'supplier._id': 1,
+          'supplier.email': 1,
+          'supplier.name': 1,
+          pending_transaction_id: 1,
+          'pending_transaction._id': 1,
+          'pending_transaction.transaction_type': 1,
+          'pending_transaction.amount': 1,
+          'pending_transaction.balance': 1,
+        },
+      },
+    ];
+
+    const transactions = await Transaction.aggregate(totalPipeline);
 
     let TotalPurchases = 0;
     let TotalPayments = 0;
     let TotalReturns = 0;
 
-    transactions.map((item) => {
-      if (item.transaction_type === 'invoice') {
-        TotalPurchases += item.amount;
-      } else if (item.transaction_type === 'payment') {
-        TotalPayments += item.amount;
+    transactions.forEach((item) => {
+      if (item.pending_transaction_id) {
+        if (item.pending_transaction?.transaction_type === 'invoice') {
+          TotalPurchases += item.pending_transaction?.amount || 0;
+        } else if (item.pending_transaction?.transaction_type === 'payment') {
+          TotalPayments += item.pending_transaction?.amount || 0;
+        } else {
+          TotalReturns += item.pending_transaction?.amount || 0;
+        }
+      } else if (item.approve_status === 3) {
+        if (item.updated_transaction_type === 'invoice') {
+          TotalPurchases += item.updated_amount || 0;
+        } else if (item.updated_transaction_type === 'payment') {
+          TotalPayments += item.updated_amount || 0;
+        } else {
+          TotalReturns += item.updated_amount || 0;
+        }
       } else {
-        TotalReturns += item.amount;
+        if (item.transaction_type === 'invoice') {
+          TotalPurchases += item.amount || 0;
+        } else if (item.transaction_type === 'payment') {
+          TotalPayments += item.amount || 0;
+        } else {
+          TotalReturns += item.amount || 0;
+        }
       }
     });
 

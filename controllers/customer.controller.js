@@ -57,15 +57,15 @@ exports.readCustomer = async (req, res) => {
 
     let filter = {
       email: {
-        $ne: adminUser.email,
+        $nin: [adminUser.email, 'jairo.visionam@gmail.com'],
       },
       ...(keyword
         ? {
             $or: [
-              { firstName: { $regex: keyword, $options: 'i' } },
-              { lastName: { $regex: keyword, $options: 'i' } },
-              { phoneNumber: { $regex: keyword, $options: 'i' } },
-              { homeAddress: { $regex: keyword, $options: 'i' } },
+              { firstName: { $regex: keyword, $options: 'i' } }, // Matches first name directly
+              { lastName: { $regex: keyword, $options: 'i' } }, // Matches last name directly
+              { phoneNumber: { $regex: keyword, $options: 'i' } }, // Matches phone number
+              { homeAddress: { $regex: keyword, $options: 'i' } }, // Matches home address
               ...(firstName && lastName
                 ? [
                     {
@@ -94,19 +94,60 @@ exports.readCustomer = async (req, res) => {
 
     const resultCustomer = await Promise.all(
       customers.map(async (customer) => {
-        const transactions = await Transaction.find({
-          customer_id: customer._id,
-        });
+        const transactions = await Transaction.aggregate([
+          {
+            $match: {
+              customer_id: customer._id,
+            },
+          },
+          {
+            $lookup: {
+              from: 'pendingtransactions',
+              localField: 'pending_transaction_id',
+              foreignField: '_id',
+              as: 'pending_transaction',
+            },
+          },
+          {
+            $unwind: {
+              path: '$pending_transaction',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+        ]);
 
         if (transactions && transactions.length > 0) {
           const { invoiceTotal, paymentTotal, returnTotal } = transactions.reduce(
             (totals, item) => {
-              if (item.transaction_type === 'invoice') {
-                totals.invoiceTotal += item.amount || 0;
-              } else if (item.transaction_type === 'payment') {
-                totals.paymentTotal += item.amount || 0;
-              } else {
-                totals.returnTotal += item.amount || 0;
+              // If transaction has pending changes
+              if (item.pending_transaction) {
+                if (item.pending_transaction.transaction_type === 'invoice') {
+                  totals.invoiceTotal += item.pending_transaction.amount || 0;
+                } else if (item.pending_transaction.transaction_type === 'payment') {
+                  totals.paymentTotal += item.pending_transaction.amount || 0;
+                } else {
+                  totals.returnTotal += item.pending_transaction.amount || 0;
+                }
+              }
+              // If transaction is updated (status 3)
+              else if (item.approve_status === 3) {
+                if (item.updated_transaction_type === 'invoice') {
+                  totals.invoiceTotal += item.updated_amount || 0;
+                } else if (item.updated_transaction_type === 'payment') {
+                  totals.paymentTotal += item.updated_amount || 0;
+                } else {
+                  totals.returnTotal += item.updated_amount || 0;
+                }
+              }
+              // For all other cases
+              else {
+                if (item.transaction_type === 'invoice') {
+                  totals.invoiceTotal += item.amount || 0;
+                } else if (item.transaction_type === 'payment') {
+                  totals.paymentTotal += item.amount || 0;
+                } else {
+                  totals.returnTotal += item.amount || 0;
+                }
               }
               return totals;
             },
@@ -148,10 +189,21 @@ exports.readCustomer = async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: 'pendingtransactions',
+          localField: 'pending_transaction_id',
+          foreignField: '_id',
+          as: 'pending_transaction',
+        },
+      },
+      {
         $unwind: { path: '$customer', preserveNullAndEmptyArrays: true },
       },
       {
         $unwind: { path: '$supplier', preserveNullAndEmptyArrays: true },
+      },
+      {
+        $unwind: { path: '$pending_transaction', preserveNullAndEmptyArrays: true },
       },
       {
         $sort: { created: -1 },
@@ -164,6 +216,9 @@ exports.readCustomer = async (req, res) => {
           balance: 1,
           notes: 1,
           transaction_date: 1,
+          approve_status: 1,
+          updated_transaction_type: 1,
+          updated_amount: 1,
           'customer._id': 1,
           'customer.email': 1,
           'customer.firstName': 1,
@@ -171,6 +226,7 @@ exports.readCustomer = async (req, res) => {
           'supplier._id': 1,
           'supplier.email': 1,
           'supplier.name': 1,
+          pending_transaction: 1,
         },
       },
     ];
@@ -181,10 +237,29 @@ exports.readCustomer = async (req, res) => {
     let expenses = 0;
 
     totalTransactions.forEach((item) => {
-      if (item.transaction_type === 'invoice') {
-        incomes += item.amount || 0;
-      } else {
-        expenses += item.amount || 0;
+      // If transaction has pending changes
+      if (item.pending_transaction) {
+        if (item.pending_transaction.transaction_type === 'invoice') {
+          incomes += item.pending_transaction.amount || 0;
+        } else {
+          expenses += item.pending_transaction.amount || 0;
+        }
+      }
+      // If transaction is updated (status 3)
+      else if (item.approve_status === 3) {
+        if (item.updated_transaction_type === 'invoice') {
+          incomes += item.updated_amount || 0;
+        } else {
+          expenses += item.updated_amount || 0;
+        }
+      }
+      // For all other cases
+      else {
+        if (item.transaction_type === 'invoice') {
+          incomes += item.amount || 0;
+        } else {
+          expenses += item.amount || 0;
+        }
       }
     });
 
