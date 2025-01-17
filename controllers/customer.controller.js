@@ -57,15 +57,15 @@ exports.readCustomer = async (req, res) => {
 
     let filter = {
       email: {
-        $nin: [adminUser.email, 'jairo.visionam@gmail.com'],
+        $ne: adminUser.email,
       },
       ...(keyword
         ? {
             $or: [
-              { firstName: { $regex: keyword, $options: 'i' } }, // Matches first name directly
-              { lastName: { $regex: keyword, $options: 'i' } }, // Matches last name directly
-              { phoneNumber: { $regex: keyword, $options: 'i' } }, // Matches phone number
-              { homeAddress: { $regex: keyword, $options: 'i' } }, // Matches home address
+              { firstName: { $regex: keyword, $options: 'i' } },
+              { lastName: { $regex: keyword, $options: 'i' } },
+              { phoneNumber: { $regex: keyword, $options: 'i' } },
+              { homeAddress: { $regex: keyword, $options: 'i' } },
               ...(firstName && lastName
                 ? [
                     {
