@@ -579,7 +579,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                       <td
                         className={`p-3 border-[1px] border-gray-400 dark:border-gray-600 ${
                           item.approve_status === 1 && !item.pending_transaction_id
-                            ? 'text-green-500'
+                            ? 'text-[green]'
                             : ''
                         }`}
                       >
@@ -599,7 +599,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                       <td
                         className={`p-3 border-[1px] border-gray-400 dark:border-gray-600 ${
                           item.approve_status === 1 && !item.pending_transaction_id
-                            ? 'text-red-500'
+                            ? 'text-[red]'
                             : ''
                         }`}
                       >

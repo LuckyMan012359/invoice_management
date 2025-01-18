@@ -501,8 +501,8 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
                       <td
                         className={`p-3 border-[1px] border-gray-400 dark:border-gray-600 ${
                           item.updated_transaction_type === 'invoice'
-                            ? 'text-green-500'
-                            : 'text-green-500'
+                            ? 'text-[green]'
+                            : 'text-[green]'
                         }`}
                       >
                         {item.updated_transaction_type === 'invoice'
@@ -511,9 +511,7 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
                       </td>
                       <td
                         className={`p-3 border-[1px] border-gray-400 dark:border-gray-600 ${
-                          item.updated_transaction_type !== 'invoice'
-                            ? 'text-red-500'
-                            : 'text-red-500'
+                          item.updated_transaction_type !== 'invoice' ? 'text-[red]' : 'text-[red]'
                         }`}
                       >
                         {item.updated_transaction_type !== 'invoice' && '-'}
