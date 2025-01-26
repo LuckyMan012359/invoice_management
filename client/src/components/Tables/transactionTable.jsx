@@ -129,8 +129,37 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
         pageSize: transactionsPerPage,
       });
 
-      setIncomes(response.data.incomes);
-      setExpenses(response.data.expenses);
+      const data = response.data.transactions || [];
+
+      let totalIncome = 0;
+      let totalExpense = 0;
+
+      data.map((item) => {
+        if (item.transaction_type === 'invoice') {
+          if (item.approve_status === 1 || item.approve_status === 2) {
+            if (item.pending_transaction_id) {
+              totalIncome += item.pending_transaction.amount;
+            } else {
+              totalIncome += item.amount;
+            }
+          } else {
+            totalIncome += item.updated_amount;
+          }
+        } else {
+          if (item.approve_status === 1 || item.approve_status === 2) {
+            if (item.pending_transaction_id) {
+              totalExpense += item.pending_transaction.amount;
+            } else {
+              totalExpense += item.amount;
+            }
+          } else {
+            totalExpense += item.updated_amount;
+          }
+        }
+      });
+
+      setIncomes(totalIncome);
+      setExpenses(totalExpense);
 
       setTotalPages(response.data.totalPage);
       setTransactionData(response.data.transactions || []);
@@ -157,11 +186,43 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
       pageSize: transactionsPerPage,
     });
 
-    setIncomes(response.data.incomes);
-    setExpenses(response.data.expenses);
+    const data = response.data.transactions || [];
+
+    let totalIncome = 0;
+    let totalExpense = 0;
+
+    data.map((item) => {
+      if (item.transaction_type === 'invoice') {
+        if (item.approve_status === 1 || item.approve_status === 2) {
+          if (item.pending_transaction_id) {
+            totalIncome += item.pending_transaction.amount;
+          } else {
+            totalIncome += item.amount;
+          }
+        } else {
+          totalIncome += item.updated_amount;
+        }
+      } else {
+        totalExpense += item.amount;
+        if (item.approve_status === 1 || item.approve_status === 2) {
+          if (item.pending_transaction_id) {
+            totalExpense += item.pending_transaction.amount;
+          } else {
+            totalExpense += item.amount;
+          }
+        } else {
+          totalExpense += item.updated_amount;
+        }
+      }
+    });
+
+    setIncomes(totalIncome);
+    setExpenses(totalExpense);
 
     setTotalPages(response.data.totalPage);
+
     setTransactionData(response.data.transactions || []);
+
     setTotalTransactionsData(response.data.totalTransactions);
     setLoading(false);
   };
@@ -555,7 +616,11 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
                             ? t('payment')
                             : t('return')
                           : item.approve_status === 3
-                          ? item.updated_transaction_type
+                          ? item.updated_transaction_type === 'invoice'
+                            ? t('invoice')
+                            : item.updated_transaction_type === 'payment'
+                            ? t('payment')
+                            : t('return')
                           : item.transaction_type === 'invoice'
                           ? t('invoice')
                           : item.transaction_type === 'payment'
