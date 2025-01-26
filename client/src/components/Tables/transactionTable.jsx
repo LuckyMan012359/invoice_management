@@ -177,8 +177,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     console.log(customer, supplier);
 
     const response = await axiosInstance('/transaction/get_transactions', 'get', {
-      customer: customer,
-      supplier: supplier,
+      customer: customer === t('Select a customer') ? '' : customer,
+      supplier: supplier === t('Select a supplier') ? '' : supplier,
       keyword: keyword,
       date: filterDate,
       approve_status: 1,
