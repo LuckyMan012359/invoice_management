@@ -278,19 +278,25 @@ export const Customers = () => {
                     ) : (
                       <>
                         <td
-                          className={`${
-                            showValue ? 'blur-0' : 'blur-lg'
-                          } py-2 px-4 text-[green] border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300`}
+                          className={`py-2 px-4 text-[green] border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300`}
                         >
-                          {customer.totalPurchase.toLocaleString() || 0}
+                          {showValue ? (
+                            <>{customer.totalPurchase.toLocaleString() || 0}</>
+                          ) : (
+                            <div className='text-black'>-</div>
+                          )}
                         </td>
                         <td
-                          className={`${
-                            showValue ? 'blur-0' : 'blur-lg'
-                          } py-2 px-4 text-[red] border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300`}
+                          className={`py-2 px-4 text-[red] border-[1px] border-gray-400 dark:border-gray-600 dark:text-gray-300`}
                         >
-                          {customer.totalPayment > 0 && '-'}
-                          {customer.totalPayment.toLocaleString() || 0}
+                          {showValue ? (
+                            <>
+                              {customer.totalPayment > 0 && '-'}
+                              {customer.totalPayment.toLocaleString() || 0}
+                            </>
+                          ) : (
+                            <div className='text-black'>-</div>
+                          )}
                         </td>
                         <td
                           className={`py-2 px-4 ${
@@ -330,21 +336,28 @@ export const Customers = () => {
                     {t('Total')}
                   </td>
                   <td
-                    className={`${
-                      showValue ? 'blur-0' : 'blur-lg'
-                    } py-2 px-4 text-center text-[green] border-[1px] border-gray-400 dark:border-gray-600`}
+                    className={`py-2 px-4 text-center text-[green] border-[1px] border-gray-400 dark:border-gray-600`}
                     colSpan={1}
                   >
-                    {t('Invoice')}: {incomes.toLocaleString()}
+                    <span>{t('Invoice')}: </span>
+                    {showValue ? (
+                      <span>{incomes.toLocaleString()}</span>
+                    ) : (
+                      <span className='text-black'>-</span>
+                    )}
                   </td>
                   <td
-                    className={`${
-                      showValue ? 'blur-0' : 'blur-lg'
-                    } py-2 px-4 text-center text-[red] border-[1px] border-gray-400 dark:border-gray-600`}
+                    className={`py-2 px-4 text-center text-[red] border-[1px] border-gray-400 dark:border-gray-600`}
                     colSpan={1}
                   >
-                    {t('Payment')}: {expenses > 0 && '-'}
-                    {expenses.toLocaleString()}
+                    <span>{t('Payment')}: </span>
+                    {showValue ? (
+                      <span>
+                        {expenses > 0 && '-'} {expenses.toLocaleString()}
+                      </span>
+                    ) : (
+                      <span className='text-black'>-</span>
+                    )}
                   </td>
                   <td
                     className='py-2 px-4 text-center text-[green] border-[1px] border-gray-400 dark:border-gray-600'
