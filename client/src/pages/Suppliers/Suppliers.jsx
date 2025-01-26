@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 import SupplierForm from '../../components/Form/SupplierForm';
 import { LoadingOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
+import { IoIosEyeOff, IoIosEye } from 'react-icons/io';
+import { Button } from 'antd';
 
 export const Suppliers = () => {
   const { t } = useTranslation();
@@ -29,6 +31,12 @@ export const Suppliers = () => {
 
   const [incomes, setIncomes] = useState(0);
   const [expenses, setExpenses] = useState(0);
+
+  const [showValue, setShowValue] = useState(false);
+
+  const handleShowValue = () => {
+    setShowValue(!showValue);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -156,7 +164,15 @@ export const Suppliers = () => {
               />
             </div>
           </div>
-          <div className='flex items-end justify-end'>
+          <div className='flex items-end justify-end gap-4'>
+            <Button
+              variant='filled'
+              type='primary'
+              className='h-10 w-20 text-xl'
+              onClick={handleShowValue}
+            >
+              {showValue ? <IoIosEyeOff /> : <IoIosEye />}
+            </Button>
             <button
               className='px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none max-md:w-full'
               onClick={() => {
@@ -193,10 +209,18 @@ export const Suppliers = () => {
                         {supplier.name}
                       </Link>
                     </td>
-                    <td className='py-2 px-4 text-[green] border-[1px] border-gray-400 dark:border-gray-600'>
+                    <td
+                      className={`${
+                        showValue ? 'blur-0' : 'blur-lg'
+                      } py-2 px-4 text-[green] border-[1px] border-gray-400 dark:border-gray-600`}
+                    >
                       {supplier.totalPurchase.toLocaleString()}
                     </td>
-                    <td className='py-2 px-4 text-[red] border-[1px] border-gray-400 dark:border-gray-600'>
+                    <td
+                      className={`${
+                        showValue ? 'blur-0' : 'blur-lg'
+                      } py-2 px-4 text-[red] border-[1px] border-gray-400 dark:border-gray-600`}
+                    >
                       -{supplier.totalPayment.toLocaleString()}
                     </td>
                     <td
@@ -235,13 +259,17 @@ export const Suppliers = () => {
                     {t('Total')}
                   </td>
                   <td
-                    className='py-2 px-4 text-center text-[green] border-[1px] border-gray-400 dark:border-gray-600'
+                    className={`${
+                      showValue ? 'blur-0' : 'blur-lg'
+                    } py-2 px-4 text-center text-[green] border-[1px] border-gray-400 dark:border-gray-600`}
                     colSpan={1}
                   >
                     {t('Invoice')}: {incomes.toLocaleString()}
                   </td>
                   <td
-                    className='py-2 px-4 text-center text-[red] border-[1px] border-gray-400 dark:border-gray-600'
+                    className={`${
+                      showValue ? 'blur-0' : 'blur-lg'
+                    } py-2 px-4 text-center text-[red] border-[1px] border-gray-400 dark:border-gray-600`}
                     colSpan={1}
                   >
                     {t('Payment')}: {expenses > 0 && '-'}
