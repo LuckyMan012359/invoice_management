@@ -35,11 +35,14 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
   const [transactionData, setTransactionData] = useState([]);
   const [totalTransactionsData, setTotalTransactionsData] = useState([]);
 
+  const [searchFirstName, setSearchFirstName] = useState('');
+  const [searchLastName, setSearchLastName] = useState('');
+
   const [loading, setLoading] = useState(false);
 
   const [isClient, setIsClient] = useState(true);
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const customer_id = searchParams.get('customer_id');
   const supplier_id = searchParams.get('supplier_id');
@@ -82,6 +85,8 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
       let supplier_name = '';
       let customer_name = '';
 
+      let customer_search_name = '';
+
       if (supplier_data !== undefined) {
         const data = supplier_data.data.data.find((item) => item._id === supplier_id);
 
@@ -94,12 +99,16 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
         const data = customer_data.data.data.find((item) => item._id === customer_id);
 
         if (data) {
+          customer_search_name = `${data.firstName}:${data.lastName}`;
           customer_name = `${data.firstName} ${data.lastName}`;
         }
       }
 
+      setCustomer(customer_name !== '' ? customer_name : t('Select a customer'));
+      setSupplier(supplier_name !== '' ? supplier_name : t('Select a supplier'));
+
       const response = await axiosInstance('/transaction/get_transactions', 'get', {
-        customer: customer_name,
+        customer: customer_search_name,
         supplier: supplier_name,
         keyword: '',
         date: '',
@@ -114,7 +123,7 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
       setLoading(false);
     };
     if (isClient) fetchData();
-  }, [isChanged, currentPage, transactionsPerPage, role, isClient, customer_id, supplier_id]);
+  }, [t, isChanged, currentPage, transactionsPerPage, role, isClient, customer_id, supplier_id]);
 
   const filterData = async () => {
     setLoading(true);
@@ -122,8 +131,8 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
     const filterDate = date.endDate ? formatDate(date.endDate) : '';
 
     const response = await axiosInstance('/transaction/get_transactions', 'get', {
-      customer: customer,
-      supplier: supplier,
+      customer: customer === t('Select a customer') ? '' : `${searchFirstName}:${searchLastName}`,
+      supplier: supplier === t('Select a supplier') ? '' : supplier,
       keyword: keyword,
       date: filterDate,
       pageNum: currentPage,
@@ -237,6 +246,11 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
     });
 
     setIsChanged(!isChanged);
+
+    searchParams.set('customer_id', '');
+    searchParams.set('supplier_id', '');
+
+    setSearchParams(searchParams);
   };
 
   const showModal = (attachment) => {
@@ -364,8 +378,12 @@ export const TransactionUpdateApproveTable = ({ isChanged, setIsChanged }) => {
               /> */}
               <Select
                 options={customerOptions}
-                value={customerOptions.find((option) => option.value === customer)}
-                onChange={(option) => setCustomer(option.label)}
+                value={customerOptions.find((option) => option.label === customer)}
+                onChange={(option) => {
+                  setCustomer(option.label);
+                  setSearchFirstName(option.firstName);
+                  setSearchLastName(option.lastName);
+                }}
                 styles={selectStyles}
                 placeholder={t('Select a customer')}
               />

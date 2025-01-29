@@ -99,7 +99,7 @@ exports.readTransaction = async (req, res) => {
       match['customer_id'] = user._id;
     }
 
-    if (customer && Number(approve_status) === 1) {
+    if (customer) {
       // const nameParts = customer.trim().split(/\s+/);
       if (customer.length > 1) {
         // const firstName = nameParts.slice(0, -1).join(' ');
@@ -113,9 +113,9 @@ exports.readTransaction = async (req, res) => {
           { 'customer.lastName': { $regex: lastName, $options: 'i' } },
         ];
       } else {
-        match['$or'] = [
-          { 'customer.firstName': { $regex: customer, $options: 'i' } },
-          { 'customer.lastName': { $regex: customer, $options: 'i' } },
+        match['$and'] = [
+          { 'customer.firstName': { $regex: firstName, $options: 'i' } },
+          { 'customer.lastName': { $regex: lastName, $options: 'i' } },
         ];
       }
     }
@@ -1123,3 +1123,63 @@ exports.getTransactionDataAmount = async (req, res) => {
     throw new Error('Failed to fetch transaction data.');
   }
 };
+
+// exports.getTransactionDataAmount = async (req, res) => {
+//   try {
+//     const { customer_id, supplier_id } = req.query;
+
+//     console.log('customer_id', customer_id);
+//     console.log('supplier_id', supplier_id);
+
+//     const cacheKey = `transactionAmounts:${req.user.role}:${req.user._id}:${customer_id}:${supplier_id}`;
+
+//     const cachedData = getCache('transaction', cacheKey);
+
+//     // if (cachedData) {
+//     //   console.log('cacheData', cachedData);
+
+//     //   return res.status(200).send(cachedData);
+//     // }
+
+//     let filter = { approve_status: { $in: [2, 3] } };
+
+//     if (req.user.role !== 'admin') {
+//       if (customer_id) {
+//         if (userData) {
+//           filter['$and'] = [{ customer_id: customer_id }, { customer_id: req.user._id }];
+//         }
+//       } else {
+//         filter.customer_id = req.user._id;
+//       }
+//     } else {
+//       if (customer_id) {
+//         filter.customer_id = customer_id;
+//       }
+//     }
+
+//     if (supplier_id) {
+//       filter.supplier_id = supplier_id;
+//     }
+
+//     const transactions = await Transaction.find(filter);
+
+//     let pendingFilter = {};
+
+//     if (req.user.role !== 'admin') {
+//       pendingFilter = { customer_id: req.user._id };
+//     }
+
+//     const pendingTransaction = await PendingTransaction.find(pendingFilter);
+
+//     const result = { transactions, pendingTransaction };
+
+//     console.log('result', cacheKey, result);
+
+//     setCache('transaction', cacheKey, result);
+
+//     res.status(200).send(result);
+//   } catch (error) {
+//     console.error('Error fetching transaction data:', error);
+//     throw new Error('Failed to fetch transaction data.');
+//   }
+// };

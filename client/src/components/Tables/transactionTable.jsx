@@ -206,7 +206,6 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
           totalIncome += item.updated_amount;
         }
       } else {
-        totalExpense += item.amount;
         if (item.approve_status === 1 || item.approve_status === 2) {
           if (item.pending_transaction_id) {
             totalExpense += item.pending_transaction.amount;
