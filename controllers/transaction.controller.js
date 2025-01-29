@@ -99,11 +99,14 @@ exports.readTransaction = async (req, res) => {
       match['customer_id'] = user._id;
     }
 
-    if (customer) {
-      const nameParts = customer.trim().split(/\s+/);
-      if (nameParts.length > 1) {
-        const firstName = nameParts.slice(0, -1).join(' '); // Everything except the last part
-        const lastName = nameParts[nameParts.length - 1]; // Last part
+    if (customer && Number(approve_status) === 1) {
+      // const nameParts = customer.trim().split(/\s+/);
+      if (customer.length > 1) {
+        // const firstName = nameParts.slice(0, -1).join(' ');
+        // const lastName = nameParts[nameParts.length - 1];
+
+        const firstName = customer.split(':')[0];
+        const lastName = customer.split(':')[1];
 
         match['$and'] = [
           { 'customer.firstName': { $regex: firstName, $options: 'i' } },

@@ -40,6 +40,9 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
   const [totalTransactionsData, setTotalTransactionsData] = useState([]);
   const [transactionId, setTransactionId] = useState('');
 
+  const [searchFirstName, setSearchFirstName] = useState('');
+  const [searchLastName, setSearchLastName] = useState('');
+
   const [incomes, setIncomes] = useState(0);
   const [expenses, setExpenses] = useState(0);
 
@@ -99,6 +102,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
       let supplier_name = '';
       let customer_name = '';
+      let customer_search_name = '';
 
       if (supplier_data !== undefined) {
         const data = supplier_data.data.data.find((item) => item._id === supplier_id);
@@ -112,6 +116,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
         const data = customer_data.data.data.find((item) => item._id === customer_id);
 
         if (data) {
+          customer_search_name = `${data.firstName}:${data.lastName}`;
           customer_name = `${data.firstName} ${data.lastName}`;
         }
       }
@@ -120,7 +125,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
       setSupplier(supplier_name !== '' ? supplier_name : t('Select a supplier'));
 
       const response = await axiosInstance('/transaction/get_transactions', 'get', {
-        customer: customer_name,
+        customer: customer_search_name,
         supplier: supplier_name,
         approve_status: 1,
         keyword: '',
@@ -134,7 +139,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
       let totalIncome = 0;
       let totalExpense = 0;
 
-      data.map((item) => {
+      data.forEach((item) => {
         if (item.transaction_type === 'invoice') {
           if (item.approve_status === 1 || item.approve_status === 2) {
             if (item.pending_transaction_id) {
@@ -175,7 +180,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     const filterDate = date.endDate ? formatDate(date.endDate) : '';
 
     const response = await axiosInstance('/transaction/get_transactions', 'get', {
-      customer: customer === t('Select a customer') ? '' : customer,
+      customer: customer === t('Select a customer') ? '' : `${searchFirstName}:${searchLastName}`,
       supplier: supplier === t('Select a supplier') ? '' : supplier,
       keyword: keyword,
       date: filterDate,
@@ -189,7 +194,7 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     let totalIncome = 0;
     let totalExpense = 0;
 
-    data.map((item) => {
+    data.forEach((item) => {
       if (item.transaction_type === 'invoice') {
         if (item.approve_status === 1 || item.approve_status === 2) {
           if (item.pending_transaction_id) {
@@ -403,6 +408,8 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
     ...customers.map((customer) => ({
       value: customer._id,
       label: `${customer.firstName} ${customer.lastName}`,
+      firstName: customer.firstName,
+      lastName: customer.lastName,
       isDisabled: false,
     })),
   ];
@@ -449,7 +456,11 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
               <Select
                 options={customerOptions}
                 value={customerOptions.find((option) => option.label === customer)}
-                onChange={(option) => setCustomer(option.label)}
+                onChange={(option) => {
+                  setCustomer(option.label);
+                  setSearchFirstName(option.firstName);
+                  setSearchLastName(option.lastName);
+                }}
                 styles={selectStyles}
                 placeholder={t('Select a customer')}
               />
