@@ -174,8 +174,6 @@ export const TransactionTable = ({ isChanged, setIsChanged }) => {
 
     const filterDate = date.endDate ? formatDate(date.endDate) : '';
 
-    console.log(customer, supplier);
-
     const response = await axiosInstance('/transaction/get_transactions', 'get', {
       customer: customer === t('Select a customer') ? '' : customer,
       supplier: supplier === t('Select a supplier') ? '' : supplier,
